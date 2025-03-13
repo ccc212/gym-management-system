@@ -1,4 +1,4 @@
-package com.gymsys.gymmanagemnetsystem;
+package com.gymsys;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,6 +8,7 @@ public class GymManagemnetSystemApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(GymManagemnetSystemApplication.class, args);
+        System.out.println("启动成功");
     }
 
 }

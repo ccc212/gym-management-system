@@ -13,7 +13,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/announcements")
-public class AnnouncementController {
+public class AnnouncementController {// 代码行数：30
     
     private final AnnouncementService announcementService;
     

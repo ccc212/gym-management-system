@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5f1e8b11-9fc9-4e83-95fc-35cef020537c" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/GymManagementSystemApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/ServletInitializer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/config/MyBatisPlusConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/config/WebMvcConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/controller/AnnouncementController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/controller/ReservationController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/controller/UsageController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/controller/VenueController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/domain/entity/Result.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/entity/AnnouncementEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/entity/ReservationEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/entity/UsageEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/entity/VenueEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/enums/StatusCodeEnum.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/exception/BizException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/handler/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/json/JacksonObjectMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/repository/AnnouncementRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/repository/ReservationRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/repository/UsageRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/repository/VenueRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/service/AnnouncementService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/service/ReservationManagement.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/service/ReservationService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/service/UsageService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/service/VenueManagement.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/java/com/gymsys/service/VenueService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/GymApplicationIntegrationTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/GymManagemnetSystemApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/controller/AnnouncementControllerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/controller/ReservationControllerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/controller/UsageControllerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/controller/VenueControllerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/repository/AnnouncementRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/repository/ReservationRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/repository/UsageRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/repository/VenueRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/service/AnnouncementServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/service/ReservationServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/service/UsageServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/java/com/gymsys/service/VenueServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagemnetSystem/src/test/resources/application.properties" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;TomOVOTom&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ccc212/gym-management-system.git&quot;,
+    &quot;accountId&quot;: &quot;9c75f68b-e6d6-4e51-9ad8-343594b616be&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2uf1zH6Riu5WRLdCrJocf6crqaW" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Maven.gym-management-system [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.GymManagementSystemApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Zheng-Boyi&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Geek/Downloads/Compressed/Spring打包资料/gym-management-system/rear/gymManagementSystem&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="GymManagementSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="gym-management-system" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.gymsys.GymManagementSystemApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="5f1e8b11-9fc9-4e83-95fc-35cef020537c" name="更改" comment="" />
+      <created>1742625076435</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1742625076435</updated>
+      <workItem from="1742625077543" duration="640000" />
+      <workItem from="1742625733391" duration="38000" />
+      <workItem from="1742626894531" duration="16000" />
+      <workItem from="1742626928008" duration="25000" />
+      <workItem from="1742626960739" duration="116000" />
+      <workItem from="1742627634578" duration="34000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

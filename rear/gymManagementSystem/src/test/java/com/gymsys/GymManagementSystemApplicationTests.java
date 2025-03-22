@@ -1,10 +1,10 @@
-package com.gymsys.gymmanagemnetsystem;
+package com.gymsys;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GymManagemnetSystemApplicationTests {
+class GymManagementSystemApplicationTests {
 
     @Test
     void contextLoads() {

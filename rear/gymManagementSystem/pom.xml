@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.gymsys</groupId>
-    <artifactId>gymManagemnetSystem</artifactId>
+    <artifactId>gymManagementSystem</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>gymManagemnetSystem</name>
-    <description>gymManagemnetSystem</description>
+    <name>gymManagementSystem</name>
+    <description>gymManagementSystem</description>
 
     <properties>
         <java.version>17</java.version>

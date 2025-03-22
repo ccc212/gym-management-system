@@ -159,7 +159,7 @@ class AnnouncementControllerTest {
         // 模拟服务层方法，当调用getLatestAnnouncementContent时返回测试公告内容
         when(announcementService.getLatestAnnouncementContent()).thenReturn("这是一条测试公告内容");
 
-        // 执行GET请求获取最新公告
+            // 执行GET请求获取最新公告
         mockMvc.perform(get("/api/announcements/latest"))                      // 执行GET请求
                 .andExpect(status().isOk())                                    // 期望响应状态码为200 OK
                 .andExpect(jsonPath("$.content", is("这是一条测试公告内容")));    // 验证返回的JSON中content字段

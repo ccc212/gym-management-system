@@ -1,7 +1,7 @@
 package com.gymsys.service;
 
-import gym.entity.AnnouncementEntity;
-import gym.repository.AnnouncementRepository;
+import com.gymsys.entity.AnnouncementEntity;
+import com.gymsys.repository.AnnouncementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

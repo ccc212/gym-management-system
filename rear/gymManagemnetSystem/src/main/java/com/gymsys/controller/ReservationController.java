@@ -1,7 +1,7 @@
 package com.gymsys.controller;
 
-import gym.entity.ReservationEntity;
-import gym.service.ReservationService;
+import com.gymsys.entity.ReservationEntity;
+import com.gymsys.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;

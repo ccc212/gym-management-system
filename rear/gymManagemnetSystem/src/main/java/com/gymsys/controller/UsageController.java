@@ -1,7 +1,7 @@
 package com.gymsys.controller;
 
-import gym.entity.UsageEntity;
-import gym.service.UsageService;
+import com.gymsys.entity.UsageEntity;
+import com.gymsys.service.UsageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

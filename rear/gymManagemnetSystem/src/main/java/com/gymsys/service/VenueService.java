@@ -1,7 +1,7 @@
 package com.gymsys.service;
 
-import gym.entity.VenueEntity;
-import gym.repository.VenueRepository;
+import com.gymsys.entity.VenueEntity;
+import com.gymsys.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

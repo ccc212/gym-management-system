@@ -1,6 +1,6 @@
 package com.gymsys.repository;
 
-import gym.entity.AnnouncementEntity;
+import com.gymsys.entity.AnnouncementEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

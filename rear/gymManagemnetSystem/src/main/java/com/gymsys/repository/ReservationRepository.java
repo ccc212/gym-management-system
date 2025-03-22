@@ -1,7 +1,7 @@
 package com.gymsys.repository;
 
-import gym.entity.ReservationEntity;
-import gym.entity.VenueEntity;
+import com.gymsys.entity.ReservationEntity;
+import com.gymsys.entity.VenueEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -1,7 +1,7 @@
 package com.gymsys.controller;
 
-import gym.entity.AnnouncementEntity;
-import gym.service.AnnouncementService;
+import com.gymsys.entity.AnnouncementEntity;
+import com.gymsys.service.AnnouncementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

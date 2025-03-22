@@ -1,7 +1,7 @@
 package com.gymsys.controller;
 
-import gym.entity.VenueEntity;
-import gym.service.VenueService;
+import com.gymsys.entity.VenueEntity;
+import com.gymsys.service.VenueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

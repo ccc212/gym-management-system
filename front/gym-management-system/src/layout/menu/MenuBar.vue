@@ -82,6 +82,36 @@ let menuList = reactive([
         
     ],
     },
+    {
+        path: '/venues',
+        component: 'layout',
+        name:"venues",
+        meta:{
+            title:"场地管理",
+            icon:"Setting",
+            roles:["sys:venues"]
+        },
+    },
+    {
+        path: '/euqipment',
+        component: 'layout',
+        name:"euqipment",
+        meta:{
+            title:"器材管理",
+            icon:"Setting",
+            roles:["sys:euqipment"]
+        },
+    },
+    {
+        path: '/competition',
+        component: 'layout',
+        name:"competition",
+        meta:{
+            title:"赛事管理",
+            icon:"Setting",
+            roles:["sys:competition"]
+        },
+    },
 ])
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)

@@ -76,7 +76,37 @@ const routes: Array<RouteRecordRaw> = [
             },
         },
     ]
-   }
+   },
+   {
+    path: '/venues',
+    component: Layout,
+    name:"venues",
+    meta:{
+        title:"场地管理",
+        icon:"Setting",
+        roles:["sys:venues"]
+    },
+},
+{
+    path: '/euqipment',
+    component: Layout,
+    name:"euqipment",
+    meta:{
+        title:"器材管理",
+        icon:"Setting",
+        roles:["sys:euqipment"]
+    },
+},
+{
+    path: '/competition',
+    component: Layout,
+    name:"competition",
+    meta:{
+        title:"赛事管理",
+        icon:"Setting",
+        roles:["sys:competition"]
+    },
+},
 ]
 
 const router = createRouter({

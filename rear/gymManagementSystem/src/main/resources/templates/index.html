@@ -9,21 +9,129 @@
     <!-- 引入自定义样式 -->
     <link rel="stylesheet" href="/css/main.css">
     <style>
-        /* 添加登录页样式 */
-        .login-container {
+        /* 添加v-cloak指令样式 */
+        [v-cloak] {
+            display: none;
+        }
+
+        /* 添加场地预约页面样式 */
+        .venue-booking-container {
+            padding: 10px;
+        }
+        .time-slots-container {
+            margin: 15px 0;
+        }
+        .time-slot {
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #dcdfe6;
+        }
+        .time-slot.available {
+            background-color: #f0f9eb;
+            color: #67c23a;
+        }
+        .time-slot.booked {
+            background-color: #f56c6c;
+            color: white;
+            cursor: not-allowed;
+        }
+        .time-slot.special {
+            background-color: #e6a23c;
+            color: white;
+            cursor: not-allowed;
+        }
+        .time-slot.selected {
+            border: 2px solid #409eff;
+            box-shadow: 0 0 5px rgba(64, 158, 255, 0.5);
+        }
+        .venue-detail {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            background-color: #f5f7fa;
+            flex-wrap: wrap;
         }
-        .login-card {
-            width: 400px;
-        }
-        .card-header {
+        .venue-image {
+            flex: 0 0 100%;
+            margin-bottom: 15px;
             text-align: center;
         }
+        .venue-image img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+        }
+        .venue-info {
+            flex: 1;
+        }
+        .booking-summary {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f5f7fa;
+            border-radius: 4px;
+        }
+        .pagination-container {
+            margin-top: 20px;
+            text-align: right;
+        }
+        /* 添加场地使用页面样式 */
+        .venue-usage-container {
+            padding: 10px;
+        }
+        .usage-timer-card {
+            height: 100%;
+        }
+        .timer-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .timer-label {
+            font-size: 16px;
+            color: #606266;
+            margin-bottom: 10px;
+        }
+        .timer-display {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #409EFF;
+        }
+        .cost-container {
+            margin: 20px 0;
+        }
+        .cost-label {
+            font-size: 16px;
+            color: #606266;
+        }
+        .cost-display {
+            font-size: 24px;
+            color: #F56C6C;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .timer-actions {
+            margin-top: 30px;
+        }
+        .empty-usage {
+            padding: 40px 0;
+        }
+        .no-usage-card {
+            height: 100%;
+        }
+        .highlight-cost {
+            color: #F56C6C;
+            font-weight: bold;
+        }
+        .overtime-tag {
+            font-size: 12px;
+            color: #E6A23C;
+            margin-left: 5px;
+        }
+        .payment-options {
+            margin-top: 20px;
+        }
     </style>
+
 </head>
 <body>
 <div id="app">
@@ -113,6 +221,13 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.js"></script>
 <!-- 引入Axios -->
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+<!-- 引入场地预约组件 -->
+<script src="/js/user-venues.js"></script>
+<!-- 引入我的预约组件 -->
+<script src="/js/user-reservations.js"></script>
+<!-- 引入场地使用组件 -->
+<script src="/js/user-usage.js"></script>
 
 <script>
     // API基础URL
@@ -213,9 +328,9 @@
     const AdminNoshowsComponent = { template: "<div>失约处理</div>" };
     const AdminAnnouncementsComponent = { template: "<div>场馆公告</div>" };
 
-    const UserVenuesComponent = { template: "<div>场地预约</div>" };
-    const UserReservationsComponent = { template: "<div>我的预约</div>" };
-    const UserUsageComponent = { template: "<div>场地使用</div>" };
+    //const UserVenuesComponent = { template: "<div>场地预约</div>" };
+    //const UserReservationsComponent = { template: "<div>我的预约</div>" };
+    //const UserUsageComponent = { template: "<div>场地使用</div>" };
     const UserScheduleComponent = { template: "<div>场地安排</div>" };
     const UserPricesComponent = { template: "<div>收费标准</div>" };
 
@@ -339,4 +454,5 @@
     });
 </script>
 </body>
+
 </html>

@@ -188,25 +188,34 @@
                 }
             };
         },
-        methods: {
-            handleLogin() {
-                this.$refs.loginForm.validate(valid => {
-                    if (valid) {
-                        // 模拟登录成功
-                        localStorage.setItem('token', 'demo-token');
-                        const user = {
-                            id: 1,
-                            name: '测试用户',
-                            role: 'USER'
-                        };
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                        this.$router.push('/user/venues');
-                        // 通知父组件更新用户信息
-                        this.$root.currentUser = user;
-                    }
-                });
+      methods: {
+    handleLogin() {
+        this.$refs.loginForm.validate(valid => {
+            if (valid) {
+                // 模拟登录成功
+                localStorage.setItem('token', 'demo-token');
+                let user;
+                if (this.loginForm.username === 'admin' && this.loginForm.password === 'admin123') {
+                    user = {
+                        id: 1,
+                        name: '管理员',
+                        role: 'ADMIN'
+                    };
+                } else {
+                    user = {
+                        id: 2,
+                        name: '测试用户',
+                        role: 'USER'
+                    };
+                }
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                this.$router.push(user.role === 'ADMIN' ? '/admin/venues' : '/user/venues');
+                // 通知父组件更新用户信息
+                this.$root.currentUser = user;
             }
-        }
+        });
+    }
+}
     };
 
     // 简化的组件定义

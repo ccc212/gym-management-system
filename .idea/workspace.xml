@@ -4,8 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5f1e8b11-9fc9-4e83-95fc-35cef020537c" name="更改" comment="5.0.0 场地安排，收费标准等的前端也已经写好">
+    <list default="true" id="5f1e8b11-9fc9-4e83-95fc-35cef020537c" name="更改" comment="5.0.3 添加了管理员账户">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/admin-components.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/admin-noshows.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/admin-noshows.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/components.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/components.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/router.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-components.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-schedule.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-schedule.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/templates/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -37,32 +45,82 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "JavaScript 调试.index.html.executor": "Run",
-    "Maven.gym-management-system [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.GymManagementSystemApplication.executor": "Run",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Code/作业/软综作业/gym-management-system",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JUnit.AnnouncementControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements.executor&quot;: &quot;Debug&quot;,
+    &quot;JavaScript 调试.index.html.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.gym-management-system [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.GymManagementSystemApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Code/github项目&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Spring Boot.GymManagementSystemApplication">
+    <configuration name="AnnouncementControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="gym-management-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.gymsys.controller.venue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.gymsys.controller.venue" />
+      <option name="MAIN_CLASS_NAME" value="com.gymsys.controller.venue.AnnouncementControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="gym-management-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.gymsys.service.venue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.gymsys.service.venue" />
+      <option name="MAIN_CLASS_NAME" value="com.gymsys.service.venue.AnnouncementServiceTest" />
+      <option name="METHOD_NAME" value="testGetLatestAnnouncementContent_NoAnnouncements" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="gym-management-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.gymsys.service.venue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.gymsys.service.venue" />
+      <option name="MAIN_CLASS_NAME" value="com.gymsys.service.venue.AnnouncementServiceTest" />
+      <option name="METHOD_NAME" value="testGetLatestAnnouncementContent_WithAnnouncements" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="GymManagementSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="gym-management-system" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.gymsys.GymManagementSystemApplication" />
@@ -81,9 +139,19 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="JUnit.AnnouncementControllerTest" />
+      <item itemvalue="JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements" />
+      <item itemvalue="JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements" />
       <item itemvalue="npm.dev" />
       <item itemvalue="Spring Boot.GymManagementSystemApplication" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements" />
+        <item itemvalue="JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements" />
+        <item itemvalue="JUnit.AnnouncementControllerTest" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -111,7 +179,12 @@
       <workItem from="1743422078377" duration="50000" />
       <workItem from="1743422160624" duration="53000" />
       <workItem from="1743422227118" duration="8000" />
-      <workItem from="1743422286247" duration="7103000" />
+      <workItem from="1743422286247" duration="12689000" />
+      <workItem from="1743493736244" duration="333000" />
+      <workItem from="1743494105481" duration="10492000" />
+      <workItem from="1743684998401" duration="616000" />
+      <workItem from="1744104247759" duration="5801000" />
+      <workItem from="1744354205774" duration="2413000" />
     </task>
     <task id="LOCAL-00001" summary="成功运行了前端代码，修改了路由错误">
       <option name="closed" value="true" />
@@ -137,7 +210,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743429057471</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="5.0.3 添加了管理员账户">
+      <option name="closed" value="true" />
+      <created>1743474786836</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1743474786836</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -147,6 +228,7 @@
     <MESSAGE value="成功运行了前端代码，修改了路由错误" />
     <MESSAGE value="4.0.0 成功实现了预约的前端页面和场地的使用" />
     <MESSAGE value="5.0.0 场地安排，收费标准等的前端也已经写好" />
-    <option name="LAST_COMMIT_MESSAGE" value="5.0.0 场地安排，收费标准等的前端也已经写好" />
+    <MESSAGE value="5.0.3 添加了管理员账户" />
+    <option name="LAST_COMMIT_MESSAGE" value="5.0.3 添加了管理员账户" />
   </component>
 </project>

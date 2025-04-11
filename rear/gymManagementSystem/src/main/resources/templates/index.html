@@ -7,13 +7,20 @@
     <!-- 引入Element UI样式 - 使用国内CDN -->
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.css">
     <!-- 引入自定义样式 -->
-    <link rel="stylesheet" href="/css/main.css">
+    <!--    <link rel="stylesheet" href="/css/main.css">-->
 
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/venues.css">
     <link rel="stylesheet" href="/css/usage.css">
     <link rel="stylesheet" href="/css/schedule.css">
     <link rel="stylesheet" href="/css/prices.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- 在CSS链接后添加v-cloak样式 -->
+    <style>
+        [v-cloak] { display: none; }
+    </style>
+
+
 
 
 
@@ -97,7 +104,6 @@
         </el-container>
     </div>
 </div>
-
 <!-- 引入Vue.js -->
 <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.min.js"></script>
 <!-- 引入Vue Router -->
@@ -107,249 +113,25 @@
 <!-- 引入Axios -->
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 
-<!-- 引入场地预约组件 -->
+<!-- 引入各种组件 -->
 <script src="/js/user-venues.js"></script>
-<!-- 引入我的预约组件 -->
 <script src="/js/user-reservations.js"></script>
-<!-- 引入场地使用组件 -->
 <script src="/js/user-usage.js"></script>
-
 <script src="/js/user-schedule.js"></script>
 <script src="/js/user-prices.js"></script>
+<script src="/js/admin-venues.js"></script>
+<script src="/js/admin-reservations.js"></script>
+<script src="/js/admin-special.js"></script>
+<script src="/js/admin-noshows.js"></script>
+<script src="/js/admin-announcements.js"></script>
+<!-- 引入自定义JS（顺序很重要） -->
+<script src="/js/components.js"></script>
+<script src="/js/router.js"></script>
+<script src="/js/main.js"></script>
 
-<script>
-    // API基础URL
-    const API_BASE_URL = '/api';
 
-    // Axios全局配置
-    axios.defaults.baseURL = API_BASE_URL;
-    axios.defaults.headers.common['Content-Type'] = 'application/json';
 
-    // 添加请求拦截器，设置token等
-    axios.interceptors.request.use(config => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        return config;
-    }, error => {
-        return Promise.reject(error);
-    });
 
-    // 添加响应拦截器，处理错误等
-    axios.interceptors.response.use(response => {
-        return response;
-    }, error => {
-        if (error.response && error.response.status === 401) {
-            // 未授权，跳转到登录页面
-            localStorage.removeItem('token');
-            localStorage.removeItem('currentUser');
-            router.push('/login');
-        }
-        return Promise.reject(error);
-    });
-
-    // 组件定义
-    // 登录组件
-    const LoginComponent = {
-        template: `
-        <div class="login-container">
-            <el-card class="login-card">
-                <div slot="header" class="card-header">
-                    <h2>登录体育场馆管理系统</h2>
-                </div>
-                <el-form :model="loginForm" :rules="rules" ref="loginForm">
-                    <el-form-item prop="username">
-                        <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="用户名"></el-input>
-                    </el-form-item>
-                    <el-form-item prop="password">
-                        <el-input v-model="loginForm.password" prefix-icon="el-icon-lock" type="password" placeholder="密码"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="handleLogin" style="width: 100%">登录</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-card>
-        </div>
-    `,
-        data() {
-            return {
-                loginForm: {
-                    username: '',
-                    password: ''
-                },
-                rules: {
-                    username: [
-                        { required: true, message: '请输入用户名', trigger: 'blur' }
-                    ],
-                    password: [
-                        { required: true, message: '请输入密码', trigger: 'blur' }
-                    ]
-                }
-            };
-        },
-      methods: {
-    handleLogin() {
-        this.$refs.loginForm.validate(valid => {
-            if (valid) {
-                // 模拟登录成功
-                localStorage.setItem('token', 'demo-token');
-                let user;
-                if (this.loginForm.username === 'admin' && this.loginForm.password === 'admin123') {
-                    user = {
-                        id: 1,
-                        name: '管理员',
-                        role: 'ADMIN'
-                    };
-                } else {
-                    user = {
-                        id: 2,
-                        name: '测试用户',
-                        role: 'USER'
-                    };
-                }
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                this.$router.push(user.role === 'ADMIN' ? '/admin/venues' : '/user/venues');
-                // 通知父组件更新用户信息
-                this.$root.currentUser = user;
-            }
-        });
-    }
-}
-    };
-
-    // 简化的组件定义
-    const AdminVenuesComponent = { template: "<div>场地管理</div>" };
-    const AdminReservationsComponent = { template: "<div>预约管理</div>" };
-    const AdminSpecialComponent = { template: "<div>特殊场地管理</div>" };
-    const AdminNoshowsComponent = { template: "<div>失约处理</div>" };
-    const AdminAnnouncementsComponent = { template: "<div>场馆公告</div>" };
-
-    //const UserVenuesComponent = { template: "<div>场地预约</div>" };
-    //const UserReservationsComponent = { template: "<div>我的预约</div>" };
-    //const UserUsageComponent = { template: "<div>场地使用</div>" };
-    //const UserScheduleComponent = { template: "<div>场地安排</div>" };
-    //const UserPricesComponent = { template: "<div>收费标准</div>" };
-
-    // 路由配置
-    const routes = [
-        {
-            path: '/',
-            redirect: '/login'
-        },
-        {
-            path: '/login',
-            component: LoginComponent
-        },
-        // 场地管理员路由
-        {
-            path: '/admin/venues',
-            component: AdminVenuesComponent,
-            meta: { requiresAuth: true, role: 'ADMIN' }
-        },
-        {
-            path: '/admin/reservations',
-            component: AdminReservationsComponent,
-            meta: { requiresAuth: true, role: 'ADMIN' }
-        },
-        {
-            path: '/admin/special',
-            component: AdminSpecialComponent,
-            meta: { requiresAuth: true, role: 'ADMIN' }
-        },
-        {
-            path: '/admin/noshows',
-            component: AdminNoshowsComponent,
-            meta: { requiresAuth: true, role: 'ADMIN' }
-        },
-        {
-            path: '/admin/announcements',
-            component: AdminAnnouncementsComponent,
-            meta: { requiresAuth: true, role: 'ADMIN' }
-        },
-        // 普通用户路由
-        {
-            path: '/user/venues',
-            component: UserVenuesComponent,
-            meta: { requiresAuth: true, role: 'USER' }
-        },
-        {
-            path: '/user/myreservations',
-            component: UserReservationsComponent,
-            meta: { requiresAuth: true, role: 'USER' }
-        },
-        {
-            path: '/user/usage',
-            component: UserUsageComponent,
-            meta: { requiresAuth: true, role: 'USER' }
-        },
-        {
-            path: '/user/schedule',
-            component: UserScheduleComponent,
-            meta: { requiresAuth: true, role: 'USER' }
-        },
-        {
-            path: '/user/prices',
-            component: UserPricesComponent,
-            meta: { requiresAuth: true, role: 'USER' }
-        }
-    ];
-
-    // 创建路由实例
-    const router = new VueRouter({
-        routes
-    });
-
-    // 路由守卫
-    router.beforeEach((to, from, next) => {
-        const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-
-        if (requiresAuth && !currentUser) {
-            next('/login');
-        } else if (requiresAuth && to.meta.role && to.meta.role !== currentUser.role) {
-            next('/'); // 权限不足，重定向到主页
-        } else {
-            next();
-        }
-    });
-
-    // 全局Vue实例
-    const app = new Vue({
-        el: '#app',
-        router,
-        data() {
-            return {
-                currentUser: null,
-            };
-        },
-        created() {
-            // 从本地存储中恢复用户信息
-            const userStr = localStorage.getItem('currentUser');
-            if (userStr) {
-                try {
-                    this.currentUser = JSON.parse(userStr);
-                } catch (e) {
-                    localStorage.removeItem('currentUser');
-                }
-            }
-        },
-        methods: {
-            handleCommand(command) {
-                if (command === 'logout') {
-                    this.logout();
-                }
-            },
-            logout() {
-                localStorage.removeItem('token');
-                localStorage.removeItem('currentUser');
-                this.currentUser = null;
-                this.$message.success('已成功退出登录');
-                this.$router.push('/login');
-            }
-        }
-    });
-</script>
 </body>
 
 </html>

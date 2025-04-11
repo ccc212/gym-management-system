@@ -32,7 +32,7 @@ axios.interceptors.response.use(response => {
 // 全局Vue实例
 const app = new Vue({
     el: '#app',
-    router,
+    router,  // 使用router.js中定义的router实例
     data() {
         return {
             currentUser: null,

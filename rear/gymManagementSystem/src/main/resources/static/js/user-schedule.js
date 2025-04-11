@@ -315,8 +315,7 @@ const UserScheduleComponent = {
 
                 this.loading = false;
             }, 500);
-        },
-        // 搜索场地安排
+        },        // 搜索场地安排
         searchSchedule() {
             this.loadScheduleData();
         },

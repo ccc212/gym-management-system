@@ -14,13 +14,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref,reactive } from 'vue';
+import { reactive } from 'vue';
 import {computed} from 'vue'
 import MenuItem from './MenuItem.vue';
 import {useRoute} from 'vue-router'
 import MenuLogo from './MenuLogo.vue';
+import { menuStore }  from '../../store/menu/index';
+
+
+//获取store
+const store = menuStore()
+//获取状态
+const isCollapse = computed(() => {
+    return store.getCollapse
+})
+
+
+
 const route = useRoute()
-const isCollapse = ref(false)
 //当前激活的菜单
 const defaultActive = computed(() => {
     const {path} = route
@@ -29,6 +40,16 @@ const defaultActive = computed(() => {
 
 //菜单数据
 let menuList = reactive([
+    {
+        path: '/dashboard',
+        component: '/dashboard/Index',
+        name:"dashboard",
+        meta:{
+            title:"首页",
+            icon:"House",
+            roles:["sys:dashboard"]
+        },
+    },
     {
         path: '/system',
         component: 'layout',

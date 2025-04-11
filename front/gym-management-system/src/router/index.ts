@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import Layout from '../layout/index.vue'
-import component from "element-plus/es/components/tree-select/src/tree-select-option.mjs"
 
 const routes: Array<RouteRecordRaw> = [
     /* {

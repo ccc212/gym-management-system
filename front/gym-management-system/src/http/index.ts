@@ -21,8 +21,8 @@ class Http{
     private instance:AxiosInstance
     //初始化
     constructor(configs:AxiosRequestConfig){
-        //创建axios实力
-        this.instance = axios.create(config)
+        //创建axios实例
+        this.instance = axios.create(configs)
         //配置请求拦截器
         this.interceptors()
     }

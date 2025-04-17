@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 17/04/2025 21:05:59
+ Date: 17/04/2025 21:14:56
 */
 
 SET NAMES utf8mb4;
@@ -146,10 +146,29 @@ INSERT INTO `sys_role` VALUES (10, '赛事管理员', '无', '2025-04-17 19:17:2
 INSERT INTO `sys_role` VALUES (11, '用户管理员', '无', '2025-04-17 19:32:50', '2025-04-17 19:32:50', NULL);
 
 -- ----------------------------
--- Table structure for sys_student
+-- Table structure for sys_use_role
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_student`;
-CREATE TABLE `sys_student`  (
+DROP TABLE IF EXISTS `sys_use_role`;
+CREATE TABLE `sys_use_role`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` int(0) NOT NULL COMMENT '用户id',
+  `role_id` int(0) NOT NULL COMMENT '角色id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_use_role_user_id`(`user_id`) USING BTREE,
+  INDEX `FK_use_role_role_id`(`role_id`) USING BTREE,
+  CONSTRAINT `FK_use_role_role_id` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_use_role_user_id` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户角色关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of sys_use_role
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sys_user
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_user`;
+CREATE TABLE `sys_user`  (
   `id` int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '学号或职工号',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户密码',
@@ -166,29 +185,10 @@ CREATE TABLE `sys_student`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_student_depart_id`(`depart_id`) USING BTREE,
   CONSTRAINT `FK_student_depart_id` FOREIGN KEY (`depart_id`) REFERENCES `sys_depart` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生用户表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of sys_student
--- ----------------------------
-
--- ----------------------------
--- Table structure for sys_use_role
--- ----------------------------
-DROP TABLE IF EXISTS `sys_use_role`;
-CREATE TABLE `sys_use_role`  (
-  `id` int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `user_id` int(0) NOT NULL COMMENT '用户id',
-  `role_id` int(0) NOT NULL COMMENT '角色id',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_use_role_user_id`(`user_id`) USING BTREE,
-  INDEX `FK_use_role_role_id`(`role_id`) USING BTREE,
-  CONSTRAINT `FK_use_role_role_id` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_use_role_user_id` FOREIGN KEY (`user_id`) REFERENCES `sys_student` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户角色关联表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of sys_use_role
+-- Records of sys_user
 -- ----------------------------
 
 -- ----------------------------

@@ -61,6 +61,16 @@ let menuList = reactive([
         },
         children: [
         {
+            path: "/departmentList",
+            component: '/system/Department/DepartmentList',
+            name:"departmentList",
+            meta:{
+                title:"部门管理",
+                icon:"UserFilled",
+                roles:["sys:department"]
+            },
+        },
+        {
             path: '/studentList',
             component: '/system/Student/StudentList',
             name:"studentList",

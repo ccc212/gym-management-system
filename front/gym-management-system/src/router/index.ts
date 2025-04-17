@@ -35,6 +35,16 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
         {
+            path: "/departmentList",
+            component: () => import('../views/system/Department/DepartmentList.vue'),
+            name:"departmentList",
+            meta:{
+                title:"部门管理",
+                icon:"UserFilled",
+                roles:["sys:department"]
+            },
+        },
+        {
             path: "/studentList",
             component: () => import('../views/system/Student/StudentList.vue'),
             name:"studentList",

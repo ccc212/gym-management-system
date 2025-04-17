@@ -5,7 +5,8 @@ import {ElMessage} from 'element-plus'
 
 //配置axios
 const config = {
-    baseURL: 'http://localhost:5678',
+    /* baseURL: 'http://localhost:5678', */
+    baseURL: '/api',
     timeout: 10000
 }
 

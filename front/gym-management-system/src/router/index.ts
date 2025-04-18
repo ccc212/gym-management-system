@@ -45,23 +45,23 @@ const routes: Array<RouteRecordRaw> = [
             },
         },
         {
-            path: "/studentList",
-            component: () => import('../views/system/Student/StudentList.vue'),
-            name:"studentList",
+            path: "/sectionList",
+            component: () => import('../views/system/Section/SectionList.vue'),
+            name:"sectionList",
             meta:{
-                title:"学生管理",
+                title:"班级管理",
                 icon:"UserFilled",
-                roles:["sys:student"]
+                roles:["sys:section"]
             },
         },
         {
-            path: '/staffList',
-            component: () => import('../views/system/Staff/StaffList.vue'),
-            name:"staffList",
+            path: "/userList",
+            component: () => import('../views/system/User/UserList.vue'),
+            name:"userList",
             meta:{
-                title:"教职管理",
+                title:"用户管理",
                 icon:"UserFilled",
-                roles:["sys:staff"]
+                roles:["sys:user"]
             },
         },
         {

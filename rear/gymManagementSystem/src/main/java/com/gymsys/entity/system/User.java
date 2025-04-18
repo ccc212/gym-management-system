@@ -9,18 +9,33 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("sys_depart")
-public class Department {
+@TableName("sys_user")
+public class User {
+
     @TableId(type = IdType.AUTO)
     private Integer id;
 
-    private String departName;
+    private String userNumber;
 
-    private String remark;
+    private String password;
+
+    private String name;
+
+    private String sex;
+
+    private String age;
+
+    private String phone;
+
+    private String email;
+
+    private String userType;
+
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTime;
+
 }

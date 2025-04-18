@@ -20,3 +20,8 @@ export function deleteRole(id:string){
 export function editRole(parm:Role){
     return http.put("/api/system/role",parm)
 }
+
+//下拉角色
+export function getRoleSelect(){
+    return http.get("/api/system/role/selectList")
+}

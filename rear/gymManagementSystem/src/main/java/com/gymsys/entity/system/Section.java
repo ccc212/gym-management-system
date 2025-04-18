@@ -9,12 +9,12 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("sys_depart")
-public class Department {
+@TableName("sys_section")
+public class Section {
     @TableId(type = IdType.AUTO)
     private Integer id;
 
-    private String departName;
+    private String sectionName;
 
     private String remark;
 

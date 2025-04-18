@@ -6,12 +6,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.domain.entity.Result;
 import com.gymsys.entity.system.Role;
 import com.gymsys.entity.system.RoleParm;
+import com.gymsys.entity.system.SelectItme;
 import com.gymsys.service.system.RoleService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api/system/role")
 @RestController
@@ -74,6 +78,24 @@ public class RoleController {
         }
         IPage<Role> list = roleService.page(page, query);
         return Result.success(list);
+    }
+
+    /**
+     * 获取角色下拉列表
+     * @return
+     */
+    @GetMapping("/selectList")
+    public Result selectList(){
+        List<Role> list = roleService.list();
+        List<SelectItme> selectList = new ArrayList<>();
+        Optional.ofNullable(list).orElse(new ArrayList<>())
+                .forEach(item -> {
+                    SelectItme vo = new SelectItme();
+                    vo.setLabel(item.getRoleName());
+                    vo.setValue(item.getId());
+                    selectList.add(vo);
+                });
+        return Result.success(selectList);
     }
 }
 

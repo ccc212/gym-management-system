@@ -8,6 +8,7 @@ CREATE TABLE sys_user (
                              age VARCHAR(255) NOT NULL COMMENT '年龄',
                              phone VARCHAR(255) NOT NULL COMMENT '电话',
                              email VARCHAR(255) NOT NULL COMMENT '邮箱',
+                             user_type VARCHAR(255) not null comment '用户类型';
                              create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                              update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) COMMENT = '用户表';
@@ -21,10 +22,25 @@ CREATE TABLE sys_use_depart (
 CREATE TABLE sys_depart (
                             id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
                             depart_name VARCHAR(255) NOT NULL COMMENT '部门名称',
-                            depart_stuorfac VARCHAR(255) NOT NULL COMMENT '区分学生或教职工部门 0 学生 1教师',
+                            remark VARCHAR(255) NOT NULL COMMENT '备注',
                             create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                             update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) COMMENT = '部门表';
+
+CREATE TABLE sys_section (
+                            id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+                            section_name VARCHAR(255) NOT NULL COMMENT '班级名称',
+                            remark VARCHAR(255) NOT NULL COMMENT '备注',
+                            create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                            update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) COMMENT = '班级表';
+
+CREATE TABLE sys_use_section (
+                              id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+                              user_id INT NOT NULL COMMENT '用户id',
+                              section_id INT NOT NULL COMMENT '角色id'
+) COMMENT = '用户班级关联表';
+
 
 CREATE TABLE sys_use_role (
                               id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
@@ -76,6 +92,16 @@ ALTER TABLE sys_use_depart
             ON DELETE CASCADE
             ON UPDATE CASCADE;
 
+-- 添加 sys_use_section 表的外键约束
+ALTER TABLE sys_use_section
+    ADD CONSTRAINT FK_use_section_user_id
+        FOREIGN KEY (user_id) REFERENCES sys_user(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
+    ADD CONSTRAINT FK_use_section_role_id
+        FOREIGN KEY (section_id) REFERENCES sys_class(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE;
 
 -- 添加 sys_use_role 表的外键约束
 ALTER TABLE sys_use_role

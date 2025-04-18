@@ -71,23 +71,23 @@ let menuList = reactive([
             },
         },
         {
-            path: '/studentList',
-            component: '/system/Student/StudentList',
-            name:"studentList",
+            path: "/sectionList",
+            component: '/system/Section/SectionList',
+            name:"sectionList",
             meta:{
-                title:"学生管理",
+                title:"班级管理",
                 icon:"UserFilled",
-                roles:["sys:student"]
+                roles:["sys:section"]
             },
         },
         {
-            path: '/staffList',
-            component: '/system/Staff/StaffList',
-            name:"staffList",
+            path: '/userList',
+            component: '/system/User/UserList',
+            name:"userList",
             meta:{
-                title:"教职管理",
+                title:"用户管理",
                 icon:"UserFilled",
-                roles:["sys:staff"]
+                roles:["sys:user"]
             },
         },
         {

@@ -3,8 +3,8 @@ package com.gymsys.entity.system;
 import lombok.Data;
 
 @Data
-public class DepartmentParm {
+public class SectionParm {
     private Long currentPage;
     private Long pageSize;
-    private String departName;
+    private String sectionName;
 }

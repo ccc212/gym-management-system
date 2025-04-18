@@ -8,7 +8,6 @@ CREATE TABLE sys_user (
                              age VARCHAR(255) NOT NULL COMMENT '年龄',
                              phone VARCHAR(255) NOT NULL COMMENT '电话',
                              email VARCHAR(255) NOT NULL COMMENT '邮箱',
-                             is_delete VARCHAR(255) DEFAULT '1' COMMENT '删除标志 0 删除 1未删除',
                              create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                              update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) COMMENT = '用户表';

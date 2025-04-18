@@ -14,6 +14,12 @@ CREATE TABLE sys_user (
                              update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) COMMENT = '用户表';
 
+CREATE TABLE sys_use_depart (
+                              id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+                              user_id INT NOT NULL COMMENT '用户id',
+                              depart_id INT NOT NULL COMMENT '角色id'
+) COMMENT = '用户部门关联表';
+
 CREATE TABLE sys_depart (
                             id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
                             depart_name VARCHAR(255) NOT NULL COMMENT '部门名称',
@@ -59,16 +65,24 @@ CREATE TABLE sys_menu (
                           update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) COMMENT = '菜单表';
 
-ALTER TABLE sys_student
-    ADD CONSTRAINT FK_student_depart_id
+
+
+-- 添加 sys_use_depart 表的外键约束
+ALTER TABLE sys_use_depart
+    ADD CONSTRAINT FK_use_depart_user_id
+        FOREIGN KEY (user_id) REFERENCES sys_user(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
+    ADD CONSTRAINT FK_use_depart_role_id
         FOREIGN KEY (depart_id) REFERENCES sys_depart(id)
             ON DELETE CASCADE
             ON UPDATE CASCADE;
 
+
 -- 添加 sys_use_role 表的外键约束
 ALTER TABLE sys_use_role
     ADD CONSTRAINT FK_use_role_user_id
-        FOREIGN KEY (user_id) REFERENCES sys_student(id)
+        FOREIGN KEY (user_id) REFERENCES sys_user(id)
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     ADD CONSTRAINT FK_use_role_role_id

@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 18/04/2025 09:29:33
+ Date: 18/04/2025 16:39:28
 */
 
 SET NAMES utf8mb4;
@@ -154,6 +154,25 @@ INSERT INTO `sys_role` VALUES (11, '用户管理员', '无', '2025-04-17 19:32:5
 INSERT INTO `sys_role` VALUES (18, '普通职工', '无', '2025-04-18 09:13:24', '2025-04-18 09:13:23', NULL);
 
 -- ----------------------------
+-- Table structure for sys_use_depart
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_use_depart`;
+CREATE TABLE `sys_use_depart`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` int(0) NOT NULL COMMENT '用户id',
+  `depart_id` int(0) NOT NULL COMMENT '角色id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK_use_depart_user_id`(`user_id`) USING BTREE,
+  INDEX `FK_use_depart_role_id`(`depart_id`) USING BTREE,
+  CONSTRAINT `FK_use_depart_role_id` FOREIGN KEY (`depart_id`) REFERENCES `sys_depart` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_use_depart_user_id` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户部门关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of sys_use_depart
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for sys_use_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_use_role`;
@@ -180,7 +199,6 @@ CREATE TABLE `sys_user`  (
   `id` int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `user_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '学号或职工号',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户密码',
-  `depart_id` int(0) NOT NULL COMMENT '部门id',
   `user_stuorfac` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '区分学生或教职工 0 学生 1教师',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '姓名',
   `sex` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '性别',
@@ -190,9 +208,7 @@ CREATE TABLE `sys_user`  (
   `is_delete` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '1' COMMENT '删除标志 0 删除 1未删除',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_student_depart_id`(`depart_id`) USING BTREE,
-  CONSTRAINT `FK_student_depart_id` FOREIGN KEY (`depart_id`) REFERENCES `sys_depart` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------

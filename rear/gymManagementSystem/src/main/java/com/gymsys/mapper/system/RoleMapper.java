@@ -8,5 +8,4 @@ import com.gymsys.entity.system.Role;
 
 public interface RoleMapper extends BaseMapper<Role> {
 
-
 }

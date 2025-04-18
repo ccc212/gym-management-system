@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 17/04/2025 21:14:56
+ Date: 18/04/2025 09:29:33
 */
 
 SET NAMES utf8mb4;
@@ -64,15 +64,22 @@ DROP TABLE IF EXISTS `sys_depart`;
 CREATE TABLE `sys_depart`  (
   `id` int(0) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `depart_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '部门名称',
-  `depart_stuorfac` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '区分学生或教职工部门 0 学生 1教师',
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
+  `depart_stuorfac` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '区分学生或教职工部门 0 学生 1教师',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '部门表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_depart
 -- ----------------------------
+INSERT INTO `sys_depart` VALUES (1, '软件系', '2025-04-18 09:03:24', '2025-04-18 09:03:23', '教师');
+INSERT INTO `sys_depart` VALUES (2, '软件1221', '2025-04-18 09:20:06', '2025-04-18 09:20:05', '学生');
+INSERT INTO `sys_depart` VALUES (3, '软件1222', '2025-04-18 09:20:15', '2025-04-18 09:20:15', '学生');
+INSERT INTO `sys_depart` VALUES (4, '软件1223', '2025-04-18 09:20:24', '2025-04-18 09:20:24', '学生');
+INSERT INTO `sys_depart` VALUES (5, '软件1224', '2025-04-18 09:20:36', '2025-04-18 09:20:35', '学生');
+INSERT INTO `sys_depart` VALUES (6, '软卓1221', '2025-04-18 09:20:45', '2025-04-18 09:20:44', '学生');
+INSERT INTO `sys_depart` VALUES (7, '后勤部', '2025-04-18 09:23:41', '2025-04-18 08:00:00', '职工');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -144,6 +151,7 @@ INSERT INTO `sys_role` VALUES (8, '器材管理员', '无', '2025-04-17 19:17:14
 INSERT INTO `sys_role` VALUES (9, '场地管理员', '无', '2025-04-17 19:17:21', '2025-04-17 19:17:21', NULL);
 INSERT INTO `sys_role` VALUES (10, '赛事管理员', '无', '2025-04-17 19:17:28', '2025-04-17 19:17:28', NULL);
 INSERT INTO `sys_role` VALUES (11, '用户管理员', '无', '2025-04-17 19:32:50', '2025-04-17 19:32:50', NULL);
+INSERT INTO `sys_role` VALUES (18, '普通职工', '无', '2025-04-18 09:13:24', '2025-04-18 09:13:23', NULL);
 
 -- ----------------------------
 -- Table structure for sys_use_role

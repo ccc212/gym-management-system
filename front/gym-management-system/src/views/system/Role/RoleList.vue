@@ -181,7 +181,7 @@ function editBtn(row:Role){
 
 //删除角色
 async function deleteBtn(id:string){
-   const confirm = await global.$myconfirm('是否确认删除角色信息编号为"' + id + '"的数据项？')
+   const confirm = await global.$myconfirm("是否确认删除该角色")
    if(confirm){
        const res = await deleteRole(id)
        if(res && res.code === 0){
@@ -214,10 +214,11 @@ function submitFormAdd() {
             if(res && res.code == 0){
                 ElMessage.success(res.msg)
                 getList()
+                openAdd.value = false;
             }
         }
     });
-    openAdd.value = false;
+    
 }
 
 //编辑提交按钮
@@ -229,10 +230,10 @@ function submitFormEdit() {
             if(res && res.code == 0){
                 ElMessage.success(res.msg)
                 getList()
+                openEdit.value = false;
             }
         }
     });
-    openEdit.value = false;
 }
 
 nextTick(() => {

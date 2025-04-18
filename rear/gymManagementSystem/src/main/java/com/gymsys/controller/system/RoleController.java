@@ -26,6 +26,7 @@ public class RoleController {
      */
     @PostMapping
     public Result add(@RequestBody Role role){
+        role.setCreateTime(new Date());
         if(roleService.save(role)){
             return Result.success("添加成功");
         }

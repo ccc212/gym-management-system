@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
-@RequestMapping("/api/department")
+@RequestMapping("/api/system/department")
 @RestController
 public class DepartmentController {
     @Autowired
@@ -27,6 +27,7 @@ public class DepartmentController {
      */
     @PostMapping
     public Result add(@RequestBody Department department){
+        department.setCreateTime(new Date());
         if(departmentService.save(department)){
             return Result.success("添加成功");
         }

@@ -3,7 +3,6 @@ CREATE TABLE sys_user (
                              user_number VARCHAR(255) NOT NULL COMMENT '学号或职工号',
                              password VARCHAR(255) NOT NULL COMMENT '用户密码',
                              depart_id INT NOT NULL COMMENT '部门id',
-                             user_stuorfac VARCHAR(255) NOT NULL COMMENT '区分学生或教职工 0 学生 1教师',
                              name VARCHAR(255) NOT NULL COMMENT '姓名',
                              sex VARCHAR(255) NOT NULL COMMENT '性别',
                              age VARCHAR(255) NOT NULL COMMENT '年龄',

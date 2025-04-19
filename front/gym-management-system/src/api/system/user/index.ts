@@ -20,3 +20,20 @@ export function deleteUser(id:string){
 export function editUser(parm:User){
     return http.put("/api/system/user",parm)
 }
+
+//查询角色id回显用
+export function getRoleById(id:string){
+    return http.get(`/api/system/user/getRoleId/`,{id:id})
+}
+//查询部门id回显用
+export function getDepartById(id:string){
+    return http.get(`/api/system/user/getDepartId/`,{id:id})
+}
+//查询班级id回显用
+export function getSectionById(id:string){
+    return http.get(`/api/system/user/getSectionId/`,{id:id})
+}
+//重置密码
+export function resetPassword(id:string){
+    return http.put(`/api/system/user/resetPassword/${id}`)
+}

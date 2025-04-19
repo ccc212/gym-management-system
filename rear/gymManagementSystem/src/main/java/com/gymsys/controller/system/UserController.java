@@ -1,19 +1,21 @@
 package com.gymsys.controller.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.domain.entity.Result;
-import com.gymsys.entity.system.Department;
-import com.gymsys.entity.system.DepartmentParm;
-import com.gymsys.entity.system.User;
-import com.gymsys.entity.system.UserParm;
-import com.gymsys.service.system.UserService;
+import com.gymsys.entity.system.*;
+import com.gymsys.service.system.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api/system/user")
 @RestController
@@ -21,6 +23,17 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private SysUserRoleService sysUserRoleService;
+
+    @Autowired
+    private SysUserDepartService sysUserDepartService;
+
+    @Autowired
+    private SysUserSectionService sysUserSectionService;
+
+
 
     /**
      * 添加用户
@@ -31,10 +44,8 @@ public class UserController {
     public Result add(@RequestBody User user){
         user.setCreateTime(new Date());
         user.setPassword("123456");
-        if(userService.save(user)){
-            return Result.success("添加成功");
-        }
-        return Result.error("添加失败");
+        userService.saveUser(user);
+        return Result.success("添加成功");
     }
 
     /**
@@ -45,10 +56,8 @@ public class UserController {
     @PutMapping
     public Result update(@RequestBody User user){
         user.setUpdateTime(new Date());
-        if(userService.updateById(user)){
-            return Result.success("修改成功");
-        }
-        return Result.error("修改失败");
+        userService.updateUser(user);
+        return Result.success("修改成功");
     }
 
     /**
@@ -58,10 +67,8 @@ public class UserController {
      */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable("id") Integer id){
-        if(userService.removeById(id)){
-            return Result.success("删除成功");
-        }
-        return Result.error("删除失败");
+        userService.deleteUser(id);
+        return Result.success("删除成功");
     }
 
     /**
@@ -90,4 +97,52 @@ public class UserController {
         return Result.success(list);
     }
 
+    /**
+     * 编辑按钮回显用
+     * @param id
+     * @return
+     */
+    @GetMapping("/getRoleId")
+    public Result getRoleId(Integer id){
+        QueryWrapper<SysUserRole> query = new QueryWrapper<>();
+        query.lambda().eq(SysUserRole::getUserId,id);
+        SysUserRole sysUserRole = sysUserRoleService.getOne(query);
+        Integer roleId = sysUserRole.getRoleId();
+        return Result.success(roleId);
+    }
+    @GetMapping("/getDepartId")
+    public Result getDepartmentId(Integer id){
+        QueryWrapper<SysUserDepart> query = new QueryWrapper<>();
+        query.lambda().eq(SysUserDepart::getUserId,id);
+        SysUserDepart sysUserDepart = sysUserDepartService.getOne(query);
+        Integer departId = sysUserDepart.getDepartId();
+        return Result.success(departId);
+    }
+    @GetMapping("/getSectionId")
+    public Result getSectionId(Integer id){
+        QueryWrapper<SysUserSection> query = new QueryWrapper<>();
+        query.lambda().eq(SysUserSection::getUserId,id);
+        SysUserSection sysUserSection = sysUserSectionService.getOne(query);
+        Integer sectionId = sysUserSection.getSectionId();
+        return Result.success(sectionId);
+    }
+
+    /**
+     * 重置密码
+     * @param
+     * @return
+     */
+    @PutMapping("/resetPassword/{id}")
+    public Result resetPassword(@PathVariable("id") Integer id){
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda()
+                .eq(User::getId, id)
+                .set(User::getPassword, "123456")
+                .set(User::getUpdateTime, new Date());
+        if (userService.update(updateWrapper)) {
+            return Result.success("重置密码成功");
+        } else {
+            return Result.error("重置密码失败");
+        }
+    }
 }

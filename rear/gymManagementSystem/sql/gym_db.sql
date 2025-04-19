@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 18/04/2025 21:51:54
+ Date: 19/04/2025 12:35:40
 */
 
 SET NAMES utf8mb4;
@@ -77,6 +77,8 @@ INSERT INTO `sys_depart` VALUES (9, '软件工程系', '2025-04-18 21:37:16', '2
 INSERT INTO `sys_depart` VALUES (10, '软件系学生会', '2025-04-18 21:39:26', '2025-04-18 21:39:25', '所属于软件系相关同学以及部门教职工的部门');
 INSERT INTO `sys_depart` VALUES (11, '软件系团委', '2025-04-18 21:40:00', '2025-04-18 21:40:00', '所属于软件系相关同学以及部分教职工的部门');
 INSERT INTO `sys_depart` VALUES (12, '广东海洋大学体育馆管理组', '2025-04-18 21:41:47', '2025-04-18 21:41:47', '所属于部分教职工的部门');
+INSERT INTO `sys_depart` VALUES (13, '广东海洋大学数学与计算机学院', '2025-04-19 08:00:00', '2025-04-19 09:10:35', '所属于该学院的学生与教职工');
+INSERT INTO `sys_depart` VALUES (14, '广东海洋大学机械工程学院', '2025-04-19 09:10:30', '2025-04-19 09:10:30', '所属于该学院的学生与教职工');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -188,6 +190,8 @@ CREATE TABLE `sys_use_depart`  (
 -- ----------------------------
 -- Records of sys_use_depart
 -- ----------------------------
+INSERT INTO `sys_use_depart` VALUES (1, 1, 13);
+INSERT INTO `sys_use_depart` VALUES (4, 3, 10);
 
 -- ----------------------------
 -- Table structure for sys_use_role
@@ -207,6 +211,8 @@ CREATE TABLE `sys_use_role`  (
 -- ----------------------------
 -- Records of sys_use_role
 -- ----------------------------
+INSERT INTO `sys_use_role` VALUES (1, 1, 5);
+INSERT INTO `sys_use_role` VALUES (4, 3, 6);
 
 -- ----------------------------
 -- Table structure for sys_use_section
@@ -226,6 +232,8 @@ CREATE TABLE `sys_use_section`  (
 -- ----------------------------
 -- Records of sys_use_section
 -- ----------------------------
+INSERT INTO `sys_use_section` VALUES (1, 1, 1);
+INSERT INTO `sys_use_section` VALUES (2, 3, 2);
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -249,6 +257,8 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
+INSERT INTO `sys_user` VALUES (1, '202211701001', '123456', '张三', '男', '22', '12345678912', '12345678912@qq.com', '2025-04-19 09:15:20', '2025-04-19 09:15:20', '学生');
+INSERT INTO `sys_user` VALUES (3, '2552552', '123456', '李四', '男', '44', '25252525', '252542424@qq.com', '2025-04-19 08:00:00', '2025-04-19 12:08:32', '学生');
 
 -- ----------------------------
 -- Table structure for usages

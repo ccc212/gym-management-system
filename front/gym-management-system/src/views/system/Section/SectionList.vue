@@ -164,17 +164,20 @@ const openEdit = ref(false)
 function cancel() {
   openEdit.value = false;
   openAdd.value = false;
+  addRef.value?.resetFields()
 }
 //新增班级
 function addBtn(){
-    openAdd.value = true
     addRef.value?.resetFields()
+    openAdd.value = true
+    
 }
 
 //编辑班级
 function editBtn(row:Section){
-    openEdit.value = true;
     addRef.value?.resetFields()
+    openEdit.value = true;
+    
     nextTick(()=>{
         Object.assign(addModel,row)
     })

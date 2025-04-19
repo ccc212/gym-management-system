@@ -164,17 +164,19 @@ const openEdit = ref(false)
 function cancel() {
   openEdit.value = false;
   openAdd.value = false;
+  addRef.value?.resetFields()
 }
 //新增部门
 function addBtn(){
-    openAdd.value = true
     addRef.value?.resetFields()
+    openAdd.value = true
 }
 
 //编辑部门
 function editBtn(row:Department){
-    openEdit.value = true;
     addRef.value?.resetFields()
+    openEdit.value = true;
+    
     nextTick(()=>{
         Object.assign(addModel,row)
     })

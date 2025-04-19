@@ -7,8 +7,15 @@
         <el-form-item>
             <el-input v-model="searchParm.name" placeholder="请输入姓名"></el-input>
         </el-form-item>
-        <el-form-item>
-
+        <el-form-item style="width: 200px;">
+            <el-select v-model="searchParm.userType" placeholder="请选择用户类型" clearable>
+                <el-option
+                v-for="item in userTypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+                ></el-option>
+            </el-select>
         </el-form-item>
         <el-form-item>
             <el-button icon="Search" @click="searchBtn">搜索</el-button>
@@ -19,16 +26,17 @@
 
        <!-- 表格 -->
        <el-table :height="tableHeight":data="tableList" border stripe>
-        <el-table-column prop="id" label="序号"></el-table-column>
-        <el-table-column prop="userType" label="用户类型"></el-table-column>
-        <el-table-column prop="userNumber" label="学号或工号"></el-table-column>
-        <el-table-column prop="name" label="姓名"></el-table-column>
-        <el-table-column prop="sex" label="性别"></el-table-column>
-        <el-table-column prop="phone" label="手机"></el-table-column>
-        <el-table-column prop="age" label="年龄"></el-table-column>
-        <el-table-column prop="email" label="邮箱"></el-table-column>
-        <el-table-column label="操作" width="200px">
+        <el-table-column prop="id" label="序号"width="100px"></el-table-column>
+        <el-table-column prop="userType" label="用户类型"width="150px"></el-table-column>
+        <el-table-column prop="userNumber" label="学号或工号"width="150px"></el-table-column>
+        <el-table-column prop="name" label="姓名"width="100px"></el-table-column>
+        <el-table-column prop="sex" label="性别"width="100px"></el-table-column>
+        <el-table-column prop="phone" label="手机"width="150px"></el-table-column>
+        <el-table-column prop="age" label="年龄"width="100px"></el-table-column>
+        <el-table-column prop="email" label="邮箱" width="200px"></el-table-column>
+        <el-table-column label="操作" width="350px">
             <template #default="scope">
+                <el-button type="warning" icon="Edit" size="small" @click="resetPasswordBtn(scope.row)">重置密码</el-button>
                 <el-button type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
                 <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
             </template>
@@ -126,6 +134,46 @@
     <!-- 编辑用户对话框 -->
     <el-dialog title="编辑部门" v-model="openEdit" width="500px" append-to-body>
       <el-form ref="addRef" :model="addModel" :rules="rules" label-width="80px">
+        <el-form-item label="类型" prop="userType">
+           <el-select v-model="addModel.userType" placeholder="请选择用户类型" clearable>
+            <el-option
+              v-for="item in userTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="角色" prop="roleId">
+           <el-select v-model="addModel.roleId" placeholder="请选择角色" clearable>
+            <el-option
+              v-for="item in Roleoptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="部门" prop="departId">
+            <el-select v-model="addModel.departId" placeholder="请选择部门" clearable>
+            <el-option
+              v-for="item in Departmentoptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="班级" prop="sectionId" v-if="showsectionOption">
+           <el-select v-model="addModel.sectionId" placeholder="请选择班级"  clearable>
+            <el-option
+              v-for="item in Sectionoptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="号码" prop="userNumber">
             <el-input v-model="addModel.userNumber" placeholder="请输入用户号码(学号或工号)" />
         </el-form-item>
@@ -166,13 +214,14 @@
 import {reactive,ref,watch} from 'vue'
 import type {FormInstance} from 'element-plus'
 import {ElMessage} from 'element-plus'
-import {addUser,getUserList,deleteUser,editUser} from '../../../api/system/user/index'
+import {addUser,getUserList,deleteUser,editUser,getRoleById,getDepartById,getSectionById,resetPassword} from '../../../api/system/user/index'
 import type {User} from '../../../api/system/user/UserModel'
 import { nextTick } from 'vue'
 import useInstance from '../../../hooks/useInstance'
 import {getRoleSelect} from '../../../api/system/role/index'
 import {getDepartmentSelect} from '../../../api/system/department/index'
 import {getSectionSelect} from '../../../api/system/section/index'
+
 
 //获取全局
 const {global} = useInstance()
@@ -250,6 +299,34 @@ const rules = reactive({
             message: '请输入邮箱',
             trigger: 'blur'
         }
+    ],
+    userType:[
+        {
+            required: true,
+            message: '请选择用户类型',
+            trigger: 'blur'
+        }
+    ],
+    roleId:[
+        {
+            required: true,
+            message: '请选择用户角色',
+            trigger: 'blur'
+        }
+    ],
+    departId:[
+        {
+            required: true,
+            message: '请选择部门',
+            trigger: 'blur'
+        }
+    ],
+    sectionId:[
+        {
+            required: true,
+            message: '请选择班级',
+            trigger: 'blur'
+        }
     ]
 })
 
@@ -291,17 +368,44 @@ const openEdit = ref(false)
 function cancel() {
   openEdit.value = false;
   openAdd.value = false;
+  addRef.value?.resetFields()
 }
 //新增用户
 function addBtn(){
-    openAdd.value = true
     addRef.value?.resetFields()
+    openAdd.value = true
+}
+
+
+//根据用户id查询角色
+async function getRoleList(id:string){
+    let res = await getRoleById(id)
+    if(res && res.code == 0){
+        addModel.roleId = res.data;
+    }
+}
+
+async function getDepartList(id:string){
+    let res = await getDepartById(id)
+    if(res && res.code == 0){
+        addModel.departId = res.data;
+    }
+}
+
+async function getSectionList(id:string){
+    let res = await getSectionById(id)
+    if(res && res.code == 0){
+        addModel.sectionId = res.data;
+    }
 }
 
 //编辑用户
 function editBtn(row:User){
-    openEdit.value = true;
+    getRoleList(row.id)
+    getDepartList(row.id)
+    getSectionList(row.id)
     addRef.value?.resetFields()
+    openEdit.value = true;
     nextTick(()=>{
         Object.assign(addModel,row)
     })
@@ -364,6 +468,17 @@ function submitFormEdit() {
     });
 }
 
+async function resetPasswordBtn(id:string){
+   const confirm = await global.$myconfirm("是否确认重置密码，重置后的密码为123456")
+   if(confirm){
+       const res = await resetPassword(id)
+       if(res && res.code === 0){
+           ElMessage.success(res.msg)
+           getList()
+       }
+   }
+}
+
 const sexOptions = reactive([
     {value:'男',label:'男'},
     {value:'女',label:'女'}
@@ -383,7 +498,6 @@ type Option = {
 let Roleoptions = ref<Option[]>([])
 let Departmentoptions = ref<Option[]>([])
 let Sectionoptions = ref<Option[]>([])
-
 const showsectionOption = ref(true);
 
 
@@ -406,6 +520,7 @@ async function getSelectRole(){
     }
 }
 
+
 async function getSelectDepartment(){
     let res = await getDepartmentSelect()
     if(res && res.code == 0){
@@ -416,7 +531,7 @@ async function getSelectDepartment(){
 async function getSelectSection(){
     let res = await getSectionSelect()
     if(res && res.code == 0){
-        Departmentoptions.value = res.data;
+        Sectionoptions.value = res.data;
     }
 }
 

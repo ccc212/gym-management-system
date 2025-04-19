@@ -163,17 +163,20 @@ const openEdit = ref(false)
 function cancel() {
   openEdit.value = false;
   openAdd.value = false;
+  addRef.value?.resetFields()
 }
 //新增角色
 function addBtn(){
-    openAdd.value = true
     addRef.value?.resetFields()
+    openAdd.value = true
+    
 }
 
 //编辑角色
 function editBtn(row:Role){
-    openEdit.value = true;
     addRef.value?.resetFields()
+    openEdit.value = true;
+    
     nextTick(()=>{
         Object.assign(addModel,row)
     })

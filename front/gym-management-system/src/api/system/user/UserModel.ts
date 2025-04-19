@@ -9,6 +9,9 @@ export type User = {
     phone:string;
     email:string;
     userType:string;
+    roleId:string;
+    departId:string;
+    sectionId:string;
 }
 
 //列表数据类型

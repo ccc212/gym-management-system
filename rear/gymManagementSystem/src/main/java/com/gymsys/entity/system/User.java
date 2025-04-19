@@ -1,6 +1,7 @@
 package com.gymsys.entity.system;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -31,6 +32,14 @@ public class User {
 
     private String userType;
 
+    @TableField(exist = false)
+    private Integer roleId;
+
+    @TableField(exist = false)
+    private Integer departId;
+
+    @TableField(exist = false)
+    private Integer sectionId;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;

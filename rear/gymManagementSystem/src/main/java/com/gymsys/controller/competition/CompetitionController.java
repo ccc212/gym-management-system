@@ -49,4 +49,9 @@ public class CompetitionController {
     public Result<?> listCompetition(@Valid ListCompetitionDTO listCompetitionDTO) {
         return Result.success(competitionService.listCompetition(listCompetitionDTO));
     }
+
+    @GetMapping("/getDetail/{id}")
+    public Result<?> getDetail(@PathVariable Long id) {
+        return Result.success(competitionService.getDetail(id));
+    }
 }

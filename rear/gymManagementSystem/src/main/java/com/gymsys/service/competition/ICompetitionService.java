@@ -6,6 +6,7 @@ import com.gymsys.entity.competition.Competition;
 import com.gymsys.entity.competition.dto.competition.AddCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
+import com.gymsys.entity.competition.vo.CompetitionDetailVO;
 
 /**
  * <p>
@@ -24,4 +25,6 @@ public interface ICompetitionService extends IService<Competition> {
     void updateCompetition(UpdateCompetitionDTO updateCompetitionDTO);
 
     IPage<Competition> listCompetition(ListCompetitionDTO listCompetitionDTO);
+
+    CompetitionDetailVO getDetail(Long id);
 }

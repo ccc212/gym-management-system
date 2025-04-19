@@ -6,14 +6,19 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gymsys.entity.competition.Competition;
+import com.gymsys.entity.competition.CompetitionEquipmentRelation;
 import com.gymsys.entity.competition.CompetitionItemRelation;
+import com.gymsys.entity.competition.CompetitionVenueRelation;
 import com.gymsys.entity.competition.dto.competition.AddCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
+import com.gymsys.entity.competition.vo.CompetitionDetailVO;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
+import com.gymsys.mapper.competition.CompetitionEquipmentRelationMapper;
 import com.gymsys.mapper.competition.CompetitionItemRelationMapper;
 import com.gymsys.mapper.competition.CompetitionMapper;
+import com.gymsys.mapper.competition.CompetitionVenueRelationMapper;
 import com.gymsys.service.competition.ICompetitionService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +40,10 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
 
     private final CompetitionItemRelationMapper competitionItemRelationMapper;
 
+    private final CompetitionVenueRelationMapper competitionVenueRelationMapper;
+
+    private final CompetitionEquipmentRelationMapper competitionEquipmentRelationMapper;
+
     @Override
     public void addCompetition(AddCompetitionDTO addCompetitionDTO) {
         // 添加赛事
@@ -54,8 +63,7 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
 
     @Override
     public void deleteCompetition(Long id) {
-        Competition isExist = lambdaQuery().eq(Competition::getId, id).one();
-        if (isExist == null) {
+        if (lambdaQuery().eq(Competition::getId, id).one() == null) {
             throw new BizException(StatusCodeEnum.COMPETITION_NOT_EXIST);
         }
 
@@ -105,5 +113,32 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
                         .like(StringUtils.isNotBlank(listCompetitionDTO.getName()), Competition::getName, listCompetitionDTO.getName())
                         .eq(listCompetitionDTO.getType() != null, Competition::getType, listCompetitionDTO.getType())
                         .eq(listCompetitionDTO.getStatus() != null, Competition::getStatus, listCompetitionDTO.getStatus()));
+    }
+
+    @Override
+    public CompetitionDetailVO getDetail(Long id) {
+        Competition competition = lambdaQuery().eq(Competition::getId, id).one();
+
+        List<CompetitionVenueRelation> competitionVenueRelations = competitionVenueRelationMapper.selectList(new LambdaQueryWrapper<CompetitionVenueRelation>()
+                .eq(CompetitionVenueRelation::getCompetitionId, id));
+
+        List<CompetitionEquipmentRelation> competitionEquipmentRelations = competitionEquipmentRelationMapper.selectList(new LambdaQueryWrapper<CompetitionEquipmentRelation>()
+                .eq(CompetitionEquipmentRelation::getCompetitionId, id));
+
+        return CompetitionDetailVO.builder()
+                .id(competition.getId())
+                .name(competition.getName())
+                .type(competition.getType())
+                .category(competition.getCategory())
+                .hoster(competition.getHoster())
+                .startTime(competition.getStartTime())
+                .endTime(competition.getEndTime())
+                .signUpDeadline(competition.getSignUpDeadline())
+                .isTeamCompetition(competition.getIsTeamCompetition())
+                .venueRelations(competitionVenueRelations)
+                .equipmentRelations(competitionEquipmentRelations)
+                .requirement(competition.getRequirement())
+                .description(competition.getDescription())
+                .build();
     }
 }

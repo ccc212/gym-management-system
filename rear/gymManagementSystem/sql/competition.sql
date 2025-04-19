@@ -1,7 +1,8 @@
 create
-    database if not exists gym_db;
+database if not exists gym_db;
 
-use gym_db;
+use
+gym_db;
 
 drop table if exists competition;
 create table `competition`
@@ -79,12 +80,14 @@ create table `competition_item_relation`
 drop table if exists competition_venue_relation;
 create table `competition_venue_relation`
 (
-    id             bigint             not null auto_increment primary key,
-    competition_id bigint             not null comment '赛事id',
-    venue_id       bigint             not null comment '场地id',
-    start_time     datetime default current_timestamp comment '开始时间',
-    end_time       datetime default current_timestamp comment '结束时间',
-    status         tinyint  default 0 not null comment '状态(0为预约中，1为预约成功，2为预约失败)'
+    id               bigint                  not null auto_increment primary key,
+    competition_id   bigint                  not null comment '赛事id',
+    venue_id         bigint                  not null comment '场地id',
+    responsible_name varchar(255) default '' not null comment '负责人姓名',
+    phone            varchar(255) default '' not null comment '联系电话',
+    start_time       datetime     default current_timestamp comment '开始时间',
+    end_time         datetime     default current_timestamp comment '结束时间',
+    status           tinyint      default 0  not null comment '状态(0为预约中，1为预约成功，2为预约失败)'
 ) engine = innodb
   default charset = utf8mb4 comment ='赛事与场地关联表';
 
@@ -94,6 +97,7 @@ create table `competition_equipment_relation`
     id             bigint             not null auto_increment primary key,
     competition_id bigint             not null comment '赛事id',
     equipment_id   bigint             not null comment '器材id',
+    num            int                not null comment '数量',
     start_time     datetime default current_timestamp comment '开始时间',
     end_time       datetime default current_timestamp comment '结束时间',
     status         tinyint  default 0 not null comment '状态(0为预约中，1为预约成功，2为预约失败)'

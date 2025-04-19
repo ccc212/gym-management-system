@@ -3,17 +3,19 @@ package com.gymsys.controller.system;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gymsys.domain.entity.Result;
+import com.gymsys.entity.Result;
 import com.gymsys.entity.system.Department;
 import com.gymsys.entity.system.DepartmentParm;
-import com.gymsys.entity.system.Role;
-import com.gymsys.entity.system.RoleParm;
+import com.gymsys.entity.system.SelectItme;
 import com.gymsys.service.system.DepartmentService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/api/system/department")
 @RestController
@@ -73,11 +75,25 @@ public class DepartmentController {
         if((StringUtils.isNotEmpty(parm.getDepartName()))){
             query.lambda().like(Department::getDepartName, parm.getDepartName());
         }
-        if((StringUtils.isNotEmpty(parm.getDepartStuorfac())))
-        {
-            query.lambda().like(Department::getDepartStuorfac, parm.getDepartStuorfac());
-        }
         IPage<Department> list = departmentService.page(page, query);
         return Result.success(list);
+    }
+
+    /**
+     * 获取部门下拉列表
+     * @return
+     */
+    @GetMapping("/selectList")
+    public Result selectList(){
+        List<Department> list = departmentService.list();
+        List<SelectItme> selectList = new ArrayList<>();
+        Optional.ofNullable(list).orElse(new ArrayList<>())
+                .forEach(item -> {
+                    SelectItme vo = new SelectItme();
+                    vo.setLabel(item.getDepartName());
+                    vo.setValue(item.getId());
+                    selectList.add(vo);
+                });
+        return Result.success(selectList);
     }
 }

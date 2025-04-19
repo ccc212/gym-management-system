@@ -20,3 +20,8 @@ export function deleteDepartment(id:string){
 export function editDepartment(parm:Department){
     return http.put("/api/system/department",parm)
 }
+
+//下拉部门
+export function getDepartmentSelect(){
+    return http.get("/api/system/department/selectList")
+}

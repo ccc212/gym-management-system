@@ -1,6 +1,6 @@
 package com.gymsys.handler;
 
-import com.gymsys.domain.entity.Result;
+import com.gymsys.entity.Result;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
 import lombok.extern.slf4j.Slf4j;

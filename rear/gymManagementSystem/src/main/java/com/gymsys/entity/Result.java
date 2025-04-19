@@ -1,4 +1,4 @@
-package com.gymsys.domain.entity;
+package com.gymsys.entity;
 
 import com.gymsys.enums.StatusCodeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;

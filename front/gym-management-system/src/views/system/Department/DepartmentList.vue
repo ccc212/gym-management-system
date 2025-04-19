@@ -4,19 +4,6 @@
         <el-form-item>
             <el-input v-model="searchParm.departName" placeholder="请输入部门名称"></el-input>
         </el-form-item>
-
-        <el-form-item>
-        <el-select v-model="searchParm.departStuorfac" placeholder="请选择部门类型" clearable style="width: 200px;">
-            <el-option
-            v-for="item in departStuorfacOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-        </el-form-item>
-
-
         <el-form-item>
             <el-button icon="Search" @click="searchBtn">搜索</el-button>
             <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
@@ -28,7 +15,7 @@
        <el-table :height="tableHeight":data="tableList" border stripe>
         <el-table-column prop="id" label="序号"></el-table-column>
         <el-table-column prop="departName" label="部门名称"></el-table-column>
-        <el-table-column prop="departStuorfac" label="部门类型"></el-table-column>
+        <el-table-column prop="remark" label="备注"></el-table-column>
         <el-table-column label="操作" width="200px">
             <template #default="scope">
                 <el-button type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
@@ -56,15 +43,8 @@
         <el-form-item label="部门名称" prop="departName">
             <el-input v-model="addModel.departName" placeholder="请输入部门名称" />
         </el-form-item>
-        <el-form-item label="部门类型" prop="departStuorfac">
-        <el-select v-model="addModel.departStuorfac" placeholder="请选择部门类型" clearable>
-          <el-option
-            v-for="item in departStuorfacOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
+        <el-form-item label="备注" prop="remark">
+            <el-input v-model="addModel.remark" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -81,15 +61,8 @@
         <el-form-item label="部门名称" prop="departName">
             <el-input v-model="addModel.departName" placeholder="请输入角色名称" />
         </el-form-item>
-        <el-form-item label="部门类型" prop="departStuorfac">
-            <el-select v-model="addModel.departStuorfac" placeholder="请选择部门类型" clearable>
-          <el-option
-            v-for="item in departStuorfacOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
+        <el-form-item label="备注" prop="remark">
+            <el-input v-model="addModel.remark" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -125,7 +98,7 @@ const searchParm = reactive({
     currentPage:1,
     pageSize:10,
     departName:'',
-    departStuorfac:'',
+    remark:'',
     total:0
 })
 
@@ -133,7 +106,7 @@ const searchParm = reactive({
 const addModel = reactive({
     id:'',
     departName:'',
-    departStuorfac:''
+    remark:'',
 })
 
 //表单验证规则
@@ -145,10 +118,10 @@ const rules = reactive({
             trigger: 'blur'
         }
     ],
-    departStuorfac:[
+    remark:[
         {
             required: true,
-            message: '请选择部门类型',
+            message: '请输入部门备注',
             trigger: 'blur'
         }
     ],
@@ -178,7 +151,6 @@ function searchBtn(){
 //重置搜索框
 function resetBtn(){
     searchParm.departName = ''
-    searchParm.departStuorfac = ''
     searchParm.currentPage = 1;
     getList()
 }
@@ -192,17 +164,19 @@ const openEdit = ref(false)
 function cancel() {
   openEdit.value = false;
   openAdd.value = false;
+  addRef.value?.resetFields()
 }
 //新增部门
 function addBtn(){
-    openAdd.value = true
     addRef.value?.resetFields()
+    openAdd.value = true
 }
 
 //编辑部门
 function editBtn(row:Department){
-    openEdit.value = true;
     addRef.value?.resetFields()
+    openEdit.value = true;
+    
     nextTick(()=>{
         Object.assign(addModel,row)
     })
@@ -263,21 +237,6 @@ function submitFormEdit() {
         }
     });
 }
-
-const departStuorfacOptions = [
-  {
-    value: '学生',
-    label: '学生'
-  },
-  {
-    value: '教师',
-    label: '教师'
-  },
-  {
-    value: '职工',
-    label: '职工'
-  }
-];
 
 nextTick(() => {
     tableHeight.value = window.innerHeight - 400

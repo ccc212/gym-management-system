@@ -2,7 +2,7 @@
 export type Department = {
     id:string;
     departName:string;
-    departStuorfac:string;
+    remark:string;
 }
 
 //列表数据类型
@@ -10,6 +10,5 @@ export type DepartmentListParm = {
     currentPage:number;
     pageSize:number;
     departName:string;
-    departStuorfac:string;
     total:number;
 }

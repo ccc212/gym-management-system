@@ -16,11 +16,11 @@ public class Department {
 
     private String departName;
 
+    private String remark;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updateTime;
-
-    private String departStuorfac;
 }

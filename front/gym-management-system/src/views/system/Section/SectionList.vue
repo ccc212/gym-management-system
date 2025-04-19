@@ -110,7 +110,7 @@ const addModel = reactive({
 })
 
 //表单验证规则
-const rules = reactive({
+const rules = ref({
     sectionName:[
         {
             required: true,

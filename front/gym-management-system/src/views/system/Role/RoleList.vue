@@ -175,6 +175,7 @@ function addBtn(){
 //编辑角色
 function editBtn(row:Role){
     addRef.value?.resetFields()
+
     openEdit.value = true;
     
     nextTick(()=>{

@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 19/04/2025 12:35:40
+ Date: 19/04/2025 20:39:40
 */
 
 SET NAMES utf8mb4;
@@ -33,6 +33,216 @@ CREATE TABLE `announcements`  (
 
 -- ----------------------------
 -- Records of announcements
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for competition
+-- ----------------------------
+DROP TABLE IF EXISTS `competition`;
+CREATE TABLE `competition`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '赛事名称',
+  `type` tinyint(0) NOT NULL DEFAULT 0 COMMENT '赛事类型(0为乒乓球赛，1为篮球赛)',
+  `category` tinyint(0) NOT NULL DEFAULT 0 COMMENT '赛事类别(0为淘汰赛，1为循环赛)',
+  `hoster` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '举办方',
+  `start_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '赛事开始时间',
+  `end_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '赛事结束时间',
+  `sign_up_deadline` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '报名截止时间',
+  `sign_up_num` int(0) NOT NULL DEFAULT 0 COMMENT '已报人数',
+  `max_sign_up_num` int(0) NOT NULL DEFAULT 0 COMMENT '最大报名人数',
+  `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '赛事状态(0为未开始，1为正在进行，2为已结束，3为报名已截止)',
+  `is_team_competition` tinyint(0) NOT NULL DEFAULT 0 COMMENT '是否为团体赛事',
+  `team_max_num` int(0) NOT NULL DEFAULT 0 COMMENT '每队人数上限',
+  `team_min_num` int(0) NOT NULL DEFAULT 0 COMMENT '每队人数下限',
+  `requirement` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '参赛要求',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '赛事描述',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `name`(`name`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for competition_equipment_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `competition_equipment_relation`;
+CREATE TABLE `competition_equipment_relation`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `competition_id` bigint(0) NOT NULL COMMENT '赛事id',
+  `equipment_id` bigint(0) NOT NULL COMMENT '器材id',
+  `num` int(0) NOT NULL COMMENT '数量',
+  `start_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '开始时间',
+  `end_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '结束时间',
+  `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '状态(0为预约中，1为预约成功，2为预约失败)',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与器材关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition_equipment_relation
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for competition_item
+-- ----------------------------
+DROP TABLE IF EXISTS `competition_item`;
+CREATE TABLE `competition_item`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '项目名',
+  `type` tinyint(0) NOT NULL DEFAULT 0 COMMENT '赛事类型(0为乒乓球赛，1为篮球赛)',
+  `category` tinyint(0) NOT NULL DEFAULT 0 COMMENT '赛事类别(0为淘汰赛，1为循环赛)',
+  `is_team_competition` tinyint(0) NOT NULL DEFAULT 0 COMMENT '是否为团体赛事',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `name`(`name`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事项目表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition_item
+-- ----------------------------
+INSERT INTO `competition_item` VALUES (1, '乒乓球男子单打淘汰赛', 0, 0, 0, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (2, '乒乓球男子单打循环赛', 0, 1, 0, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (3, '乒乓球女子单打淘汰赛', 0, 0, 0, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (4, '乒乓球女子单打循环赛', 0, 1, 0, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (5, '乒乓球男子双打淘汰赛', 0, 0, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (6, '乒乓球男子双打循环赛', 0, 1, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (7, '乒乓球女子双打淘汰赛', 0, 0, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (8, '乒乓球女子双打循环赛', 0, 1, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (9, '乒乓球混合双打淘汰赛', 0, 0, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (10, '乒乓球混合双打循环赛', 0, 1, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (11, '篮球男子组淘汰赛', 1, 0, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (12, '篮球男子组循环赛', 1, 1, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (13, '篮球女子组淘汰赛', 1, 0, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (14, '篮球女子组循环赛', 1, 1, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (15, '篮球混合友谊赛', 1, 1, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (16, '篮球公开组淘汰赛', 1, 0, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+INSERT INTO `competition_item` VALUES (17, '篮球公开组循环赛', 1, 1, 1, '2025-04-19 18:23:24', '2025-04-19 18:23:24');
+
+-- ----------------------------
+-- Table structure for competition_item_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `competition_item_relation`;
+CREATE TABLE `competition_item_relation`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `competition_id` bigint(0) NOT NULL COMMENT '赛事id',
+  `competition_item_id` bigint(0) NOT NULL COMMENT '赛事项目id',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与项目关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition_item_relation
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for competition_sign_up_team
+-- ----------------------------
+DROP TABLE IF EXISTS `competition_sign_up_team`;
+CREATE TABLE `competition_sign_up_team`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `competition_id` bigint(0) NOT NULL COMMENT '赛事id',
+  `team_id` bigint(0) NOT NULL COMMENT '团队id',
+  `team_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '团队名字',
+  `leader_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '领队姓名',
+  `leader_phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '联系电话',
+  `depart_id` int(0) NOT NULL COMMENT '部门id',
+  `competition_item_id` bigint(0) NOT NULL COMMENT '赛事项目id',
+  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '备注',
+  `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '状态(0为报名中，1为报名成功，2为报名失败)',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事团体报名表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition_sign_up_team
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for competition_sign_up_user
+-- ----------------------------
+DROP TABLE IF EXISTS `competition_sign_up_user`;
+CREATE TABLE `competition_sign_up_user`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `competition_id` bigint(0) NOT NULL COMMENT '赛事id',
+  `user_id` bigint(0) NOT NULL COMMENT '用户id',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '姓名',
+  `user_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '学号或职工号',
+  `sex` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '性别',
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '电话',
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '邮箱',
+  `depart_id` int(0) NOT NULL COMMENT '部门id',
+  `competition_item_id` bigint(0) NOT NULL COMMENT '赛事项目id',
+  `user_stuorfac` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '区分学生或教职工 0 学生 1教师',
+  `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '备注',
+  `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '状态(0为报名中，1为报名成功，2为报名失败)',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事个人报名表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition_sign_up_user
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for competition_stage
+-- ----------------------------
+DROP TABLE IF EXISTS `competition_stage`;
+CREATE TABLE `competition_stage`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `competition_id` bigint(0) NOT NULL COMMENT '赛事id',
+  `competition_item_id` bigint(0) NOT NULL COMMENT '赛事项目id',
+  `venue_id` bigint(0) NOT NULL COMMENT '场地id',
+  `stage_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '阶段名称',
+  `start_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '开始时间',
+  `end_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '结束时间',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `stage_name`(`stage_name`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事阶段表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition_stage
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for competition_stage_referee_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `competition_stage_referee_relation`;
+CREATE TABLE `competition_stage_referee_relation`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `competition_id` bigint(0) NOT NULL COMMENT '赛事id',
+  `competition_item_id` bigint(0) NOT NULL COMMENT '赛事项目id',
+  `stage_id` bigint(0) NOT NULL COMMENT '阶段id',
+  `referee_id` bigint(0) NOT NULL COMMENT '裁判id',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事阶段与裁判关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition_stage_referee_relation
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for competition_venue_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `competition_venue_relation`;
+CREATE TABLE `competition_venue_relation`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `competition_id` bigint(0) NOT NULL COMMENT '赛事id',
+  `venue_id` bigint(0) NOT NULL COMMENT '场地id',
+  `responsible_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '负责人姓名',
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '联系电话',
+  `start_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '开始时间',
+  `end_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '结束时间',
+  `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '状态(0为预约中，1为预约成功，2为预约失败)',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与场地关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of competition_venue_relation
 -- ----------------------------
 
 -- ----------------------------
@@ -99,13 +309,16 @@ CREATE TABLE `sys_menu`  (
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FK_menu_parent_id`(`parent_id`) USING BTREE,
-  CONSTRAINT `FK_menu_parent_id` FOREIGN KEY (`parent_id`) REFERENCES `sys_menu` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  INDEX `FK_menu_parent_id`(`parent_id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_menu
 -- ----------------------------
+INSERT INTO `sys_menu` VALUES (4, 0, '顶级菜单', '系统管理', 'sys:manage', 'system', '/system', '', '0', 'Setting', '2', '2025-04-19 19:17:26', '2025-04-19 19:17:26');
+INSERT INTO `sys_menu` VALUES (5, 4, '系统管理', '用户管理', 'sys:user:index', 'userList', '/userList', '../views/system/User/UserList.vue', '1', 'UserFilled', '5', '2025-04-19 19:21:24', '2025-04-19 19:31:32');
+INSERT INTO `sys_menu` VALUES (6, 4, '顶级菜单', '角色管理', 'sys:role:index', 'roleList', '/roleList', '../views/system/Role/RoleList.vue', '1', 'Wallet', '6', '2025-04-19 19:26:43', '2025-04-19 19:31:32');
+INSERT INTO `sys_menu` VALUES (7, 4, '系统管理', '菜单管理', 'sys:menu:index', 'menuList', '/menuList', '../views/system/Menu/MenuList.vue', '1', 'Menu', '7', '2025-04-19 19:29:39', '2025-04-19 19:31:32');
 
 -- ----------------------------
 -- Table structure for sys_menu_role
@@ -185,7 +398,7 @@ CREATE TABLE `sys_use_depart`  (
   INDEX `FK_use_depart_role_id`(`depart_id`) USING BTREE,
   CONSTRAINT `FK_use_depart_role_id` FOREIGN KEY (`depart_id`) REFERENCES `sys_depart` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_use_depart_user_id` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户部门关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户部门关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_use_depart
@@ -259,6 +472,43 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 INSERT INTO `sys_user` VALUES (1, '202211701001', '123456', '张三', '男', '22', '12345678912', '12345678912@qq.com', '2025-04-19 09:15:20', '2025-04-19 09:15:20', '学生');
 INSERT INTO `sys_user` VALUES (3, '2552552', '123456', '李四', '男', '44', '25252525', '252542424@qq.com', '2025-04-19 08:00:00', '2025-04-19 12:08:32', '学生');
+
+-- ----------------------------
+-- Table structure for team
+-- ----------------------------
+DROP TABLE IF EXISTS `team`;
+CREATE TABLE `team`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `team_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '团队名字',
+  `leader_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '领队姓名',
+  `leader_phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '联系电话',
+  `depart_id` int(0) NOT NULL COMMENT '部门id',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `team_name`(`team_name`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '团队表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of team
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for team_member_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `team_member_relation`;
+CREATE TABLE `team_member_relation`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `team_id` bigint(0) NOT NULL COMMENT '团队id',
+  `user_id` bigint(0) NOT NULL COMMENT '用户id',
+  `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '团队与队员关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of team_member_relation
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for usages

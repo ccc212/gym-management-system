@@ -53,7 +53,7 @@ public class MenuController {
      */
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable("id") Integer id) {
-        //如果存在下级
+        //如果存在下级,取消删除
         QueryWrapper<Menu> query = new QueryWrapper<>();
         query.lambda().eq(Menu::getParentId, id);
         List<Menu> list = menuService.list(query);

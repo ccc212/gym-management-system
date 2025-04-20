@@ -3,11 +3,11 @@ import type { RouteRecordRaw } from "vue-router"
 import Layout from '../layout/index.vue'
 
 const routes: Array<RouteRecordRaw> = [
-    /* {
-        path: '/home',
-        name: 'Home',
-        component: Layout
-    } */
+   {
+        path: '/login',
+        component: () => import('../views/login/login.vue'),
+        name: 'login',
+   },
    {
       path: '/',
       component: Layout,

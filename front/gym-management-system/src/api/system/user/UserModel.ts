@@ -23,3 +23,15 @@ export type UserListParm = {
     name:string;
     userType:string;
 }
+
+//登录
+export type Login = {
+    userNumber:string;
+    password:string;
+}
+
+//菜单树参数
+export type AssignParm = {
+    roleId:string;
+    userId:string;
+}

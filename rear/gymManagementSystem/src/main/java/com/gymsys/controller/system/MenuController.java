@@ -3,6 +3,7 @@ package com.gymsys.controller.system;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.gymsys.entity.Result;
+import com.gymsys.entity.system.AssignTreeParm;
 import com.gymsys.entity.system.MakeMenuTree;
 import com.gymsys.entity.system.Menu;
 import com.gymsys.service.system.MenuService;
@@ -91,5 +92,6 @@ public class MenuController {
         List<Menu> list = menuService.getParent();
         return Result.success(list);
     }
+
 
 }

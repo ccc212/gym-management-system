@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +45,9 @@ public class UserController {
     public Result add(@RequestBody User user){
         user.setCreateTime(new Date());
         user.setPassword("123456");
+        if(user.getUserNumber().equals("admin")){
+            return Result.error("管理员账号不能添加");
+        }
         userService.saveUser(user);
         return Result.success("添加成功");
     }
@@ -144,5 +148,33 @@ public class UserController {
         } else {
             return Result.error("重置密码失败");
         }
+    }
+
+    /**
+     * 登录
+     * @return
+     */
+    @PostMapping("/login")
+    public Result login(@RequestBody LoginParm Parm){
+        //查询用户信息
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.lambda().eq(User::getUserNumber, Parm.getUserNumber())
+                .eq(User::getPassword, Parm.getPassword());
+        User one = userService.getOne(query);
+        if(one == null){
+            return Result.error("用户名或密码错误");
+        }
+        //返回用户信息和token
+        LoginVo vo = new LoginVo();
+        vo.setId(one.getId());
+        vo.setUserNumber(one.getUserNumber());
+        return Result.success(vo);
+    }
+
+    //查询菜单树
+    @GetMapping("/getAssignTree")
+    public Result getAssingTree(AssignTreeParm parm) {
+        AssignTreeVo assignTree = userService.getAssingTree(parm);
+        return Result.success(assignTree);
     }
 }

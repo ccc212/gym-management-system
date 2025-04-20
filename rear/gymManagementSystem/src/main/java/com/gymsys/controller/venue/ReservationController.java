@@ -1,10 +1,10 @@
 package com.gymsys.controller.venue;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.entity.venue.ReservationEntity;
-import com.gymsys.service.venue.ReservationService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
+import com.gymsys.repository.venue.ReservationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,112 +12,99 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/reservations")
 public class ReservationController {
     
-    private final ReservationService reservationService;
+    @Autowired
+    private ReservationRepository reservationRepository;
     
-    /**
-     * 场地预约
-     */
+    @GetMapping
+    public ResponseEntity<Page<ReservationEntity>> getAllReservations(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        Page<ReservationEntity> reservationPage = reservationRepository.selectPage(
+                new Page<>(page, size),
+                new LambdaQueryWrapper<ReservationEntity>()
+        );
+        return ResponseEntity.ok(reservationPage);
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<ReservationEntity> getReservationById(@PathVariable Long id) {
+        ReservationEntity reservation = reservationRepository.selectById(id);
+        if (reservation != null) {
+            return ResponseEntity.ok(reservation);
+        }
+        return ResponseEntity.notFound().build();
+    }
+    
+    @GetMapping("/venue/{venueId}")
+    public ResponseEntity<Page<ReservationEntity>> getReservationsByVenue(
+            @PathVariable Long venueId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        Page<ReservationEntity> reservationPage = reservationRepository.findByVenueId(venueId, new Page<>(page, size));
+        return ResponseEntity.ok(reservationPage);
+    }
+    
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<ReservationEntity>> getReservationsByUser(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        Page<ReservationEntity> reservationPage = reservationRepository.findByUserId(userId, new Page<>(page, size));
+        return ResponseEntity.ok(reservationPage);
+    }
+    
+    @GetMapping("/status/{status}")
+    public ResponseEntity<Page<ReservationEntity>> getReservationsByStatus(
+            @PathVariable String status,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        Page<ReservationEntity> reservationPage = reservationRepository.findByStatus(status, new Page<>(page, size));
+        return ResponseEntity.ok(reservationPage);
+    }
+    
     @PostMapping
-    public ResponseEntity<ReservationEntity> reserveVenue(
-            @RequestParam Long venueId,
-            @RequestParam String cardNumber,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+    public ResponseEntity<ReservationEntity> createReservation(@RequestBody ReservationEntity reservation) {
+        // 检查时间冲突
+        List<ReservationEntity> overlappingReservations = reservationRepository.findOverlappingReservations(
+                reservation.getVenueId(),
+                reservation.getStartTime(),
+                reservation.getEndTime()
+        );
         
-        ReservationEntity reservation = reservationService.reserveVenue(venueId, cardNumber, startTime, endTime);
-        return new ResponseEntity<>(reservation, HttpStatus.CREATED);
-    }
-    
-    /**
-     * 场地预约退订
-     */
-    @PostMapping("/{id}/cancel")
-    public ResponseEntity<Void> cancelReservation(
-            @PathVariable Long id,
-            @RequestParam String cardNumber) {
+        if (!overlappingReservations.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
         
-        reservationService.cancelReservation(id, cardNumber);
-        return ResponseEntity.noContent().build();
-    }
-    
-    /**
-     * 场地预约修改
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<ReservationEntity> modifyReservation(
-            @PathVariable Long id,
-            @RequestParam String cardNumber,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+        reservation.setStatus("PENDING");
+        reservation.setCreatedAt(LocalDateTime.now());
+        reservation.setUpdatedAt(LocalDateTime.now());
         
-        ReservationEntity reservation = reservationService.modifyReservation(id, cardNumber, startTime, endTime);
+        reservationRepository.insert(reservation);
         return ResponseEntity.ok(reservation);
     }
     
-    /**
-     * 场地预约失约处理
-     */
-    @PostMapping("/{id}/no-show")
-    public ResponseEntity<Void> handleNoShow(@PathVariable Long id) {
-        reservationService.handleNoShow(id);
-        return ResponseEntity.noContent().build();
-    }
-    
-    /**
-     * 校队预留（使用）场地
-     */
-    @PostMapping("/team")
-    public ResponseEntity<ReservationEntity> reserveVenueForTeam(
-            @RequestParam Long venueId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ReservationEntity> updateReservationStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+        ReservationEntity reservation = reservationRepository.selectById(id);
+        if (reservation == null) {
+            return ResponseEntity.notFound().build();
+        }
         
-        ReservationEntity reservation = reservationService.reserveVenueForTeam(venueId, startTime, endTime);
-        return new ResponseEntity<>(reservation, HttpStatus.CREATED);
-    }
-    
-    /**
-     * 上课使用场地
-     */
-    @PostMapping("/class")
-    public ResponseEntity<ReservationEntity> reserveVenueForClass(
-            @RequestParam Long venueId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+        reservation.setStatus(status);
+        reservation.setUpdatedAt(LocalDateTime.now());
+        reservationRepository.updateById(reservation);
         
-        ReservationEntity reservation = reservationService.reserveVenueForClass(venueId, startTime, endTime);
-        return new ResponseEntity<>(reservation, HttpStatus.CREATED);
+        return ResponseEntity.ok(reservation);
     }
     
-    /**
-     * 场地一周信息查询
-     */
-    @GetMapping("/venue/{venueId}/weekly")
-    public ResponseEntity<List<ReservationEntity>> getVenueWeeklyReservations(@PathVariable Long venueId) {
-        List<ReservationEntity> reservations = reservationService.getVenueWeeklyReservations(venueId);
-        return ResponseEntity.ok(reservations);
-    }
-    
-    /**
-     * 获取用户所有预约
-     */
-    @GetMapping("/user/{cardNumber}")
-    public ResponseEntity<List<ReservationEntity>> getUserReservations(@PathVariable String cardNumber) {
-        List<ReservationEntity> reservations = reservationService.findUserReservations(cardNumber);
-        return ResponseEntity.ok(reservations);
-    }
-    
-    /**
-     * 获取预约详情
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<ReservationEntity> getReservation(@PathVariable Long id) {
-        return reservationService.findReservationById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+        reservationRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

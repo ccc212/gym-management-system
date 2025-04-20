@@ -5,20 +5,16 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("venue")
-public class VenueEntity {
+@TableName("user")
+public class UserEntity {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private String name;
-    private String type;
-    private String description;
-    private Boolean isAvailable;
-    private String status;
-    private BigDecimal price;
+    private String username;
+    private String password;
+    private String role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-}
+} 

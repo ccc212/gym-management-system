@@ -40,26 +40,26 @@ const LoginComponent = {
         handleLogin() {
             this.$refs.loginForm.validate(valid => {
                 if (valid) {
-                    // 模拟登录成功
-                    localStorage.setItem('token', 'demo-token');
-                    let user;
-                    if (this.loginForm.username === 'admin' && this.loginForm.password === 'admin123') {
-                        user = {
-                            id: 1,
-                            name: '管理员',
-                            role: 'ADMIN'
-                        };
-                    } else {
-                        user = {
-                            id: 2,
-                            name: '测试用户',
-                            role: 'USER'
-                        };
-                    }
-                    localStorage.setItem('currentUser', JSON.stringify(user));
-                    this.$router.push(user.role === 'ADMIN' ? '/admin/venues' : '/user/venues');
-                    // 通知父组件更新用户信息
-                    this.$root.currentUser = user;
+                    // 调用后端API进行登录
+                    axios.post('/auth/login', this.loginForm)
+                        .then(response => {
+                            const { token, user } = response.data;
+                            // 保存token和用户信息
+                            localStorage.setItem('token', token);
+                            localStorage.setItem('currentUser', JSON.stringify(user));
+                            
+                            // 通知父组件更新用户信息
+                            this.$root.currentUser = user;
+                            
+                            // 根据角色重定向到不同页面
+                            this.$router.push(user.role === 'ADMIN' ? '/admin/venues' : '/user/venues');
+                            
+                            this.$message.success('登录成功');
+                        })
+                        .catch(error => {
+                            console.error('登录失败:', error);
+                            this.$message.error('登录失败，请检查用户名和密码');
+                        });
                 }
             });
         }

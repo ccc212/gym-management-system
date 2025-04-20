@@ -1,78 +1,98 @@
 package com.gymsys.controller.venue;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.entity.venue.UsageEntity;
 import com.gymsys.service.venue.UsageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/usages")
+@RequiredArgsConstructor
 public class UsageController {
     
     private final UsageService usageService;
     
     /**
-     * 场地使用开始
+     * 开始使用场馆
      */
-    @PostMapping("/start")
-    public ResponseEntity<UsageEntity> startVenueUsage(
-            @RequestParam Long venueId,
-            @RequestParam String cardNumber,
-            @RequestParam(required = false) Long reservationId) {
-        
-        UsageEntity usage = usageService.startVenueUsage(venueId, cardNumber, reservationId);
-        return new ResponseEntity<>(usage, HttpStatus.CREATED);
+    @PostMapping
+    public ResponseEntity<UsageEntity> startUsage(@RequestBody UsageEntity usage) {
+        return ResponseEntity.ok(usageService.startUsage(usage));
     }
     
     /**
-     * 场地使用结束
+     * 结束使用场馆
      */
-    @PostMapping("/{id}/end")
-    public ResponseEntity<UsageEntity> endVenueUsage(@PathVariable Long id) {
-        UsageEntity usage = usageService.endVenueUsage(id);
-        return ResponseEntity.ok(usage);
+    @PutMapping("/{id}/end")
+    public ResponseEntity<UsageEntity> endUsage(@PathVariable Long id) {
+        return ResponseEntity.ok(usageService.endUsage(id));
     }
     
     /**
-     * 一卡通付费
+     * 支付使用费用
      */
-    @PostMapping("/{id}/pay")
+    @PutMapping("/{id}/pay")
     public ResponseEntity<UsageEntity> payUsage(@PathVariable Long id) {
-        UsageEntity usage = usageService.payUsage(id);
-        return ResponseEntity.ok(usage);
+        return ResponseEntity.ok(usageService.payUsage(id));
     }
     
     /**
-     * 场地收费标准查询
+     * 获取场馆的使用记录
      */
-    @GetMapping("/price/{venueId}")
-    public ResponseEntity<Map<String, BigDecimal>> getVenuePrice(@PathVariable Long venueId) {
-        BigDecimal price = usageService.getVenuePrice(venueId);
-        return ResponseEntity.ok(Map.of("pricePerHour", price));
+    @GetMapping("/venue/{venueId}")
+    public ResponseEntity<Page<UsageEntity>> getVenueUsages(
+            @PathVariable Long venueId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(usageService.getVenueUsages(venueId, page, size));
     }
     
     /**
-     * 获取当前使用记录
+     * 获取用户的使用记录
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<UsageEntity>> getUserUsages(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(usageService.getUserUsages(userId, page, size));
+    }
+    
+    /**
+     * 获取指定时间范围内的使用记录
+     */
+    @GetMapping("/time-range")
+    public ResponseEntity<Page<UsageEntity>> getUsagesByTimeRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(usageService.getUsagesByTimeRange(startTime, endTime, page, size));
+    }
+    
+    /**
+     * 获取进行中的使用记录
      */
     @GetMapping("/active")
-    public ResponseEntity<List<UsageEntity>> getActiveUsages() {
-        List<UsageEntity> usages = usageService.getActiveUsages();
-        return ResponseEntity.ok(usages);
+    public ResponseEntity<Page<UsageEntity>> getActiveUsages(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(usageService.getActiveUsages(page, size));
     }
     
     /**
-     * 获取用户未付费记录
+     * 获取指定卡号的使用记录
      */
-    @GetMapping("/unpaid/{cardNumber}")
-    public ResponseEntity<List<UsageEntity>> getUnpaidUsages(@PathVariable String cardNumber) {
-        List<UsageEntity> usages = usageService.getUnpaidUsages(cardNumber);
-        return ResponseEntity.ok(usages);
+    @GetMapping("/card/{cardNumber}")
+    public ResponseEntity<Page<UsageEntity>> getUsagesByCardNumber(
+            @PathVariable String cardNumber,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(usageService.getUsagesByCardNumber(cardNumber, page, size));
     }
 }

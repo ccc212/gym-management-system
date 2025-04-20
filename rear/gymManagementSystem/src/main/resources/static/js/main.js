@@ -1,5 +1,5 @@
 // API基础URL
-const API_BASE_URL = '/api';
+const API_BASE_URL = '';
 
 // Axios全局配置
 axios.defaults.baseURL = API_BASE_URL;
@@ -20,11 +20,28 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => {
     return response;
 }, error => {
-    if (error.response && error.response.status === 401) {
-        // 未授权，跳转到登录页面
-        localStorage.removeItem('token');
-        localStorage.removeItem('currentUser');
-        router.push('/login');
+    if (error.response) {
+        if (error.response.status === 401) {
+            // 未授权，跳转到登录页面
+            localStorage.removeItem('token');
+            localStorage.removeItem('currentUser');
+            router.push('/login');
+            
+            // 显示提示
+            Vue.prototype.$message.error('登录已过期，请重新登录');
+        } else if (error.response.status === 403) {
+            // 权限不足
+            Vue.prototype.$message.error('权限不足，无法执行此操作');
+        } else if (error.response.status === 500) {
+            // 服务器错误
+            Vue.prototype.$message.error('服务器错误，请稍后重试');
+        }
+    } else if (error.request) {
+        // 网络问题
+        Vue.prototype.$message.error('网络错误，请检查您的网络连接');
+    } else {
+        // 其他错误
+        Vue.prototype.$message.error('发生错误，请稍后重试');
     }
     return Promise.reject(error);
 });

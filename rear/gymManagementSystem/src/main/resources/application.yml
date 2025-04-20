@@ -1,20 +1,24 @@
+spring:
+  application:
+    name: gym-management-system
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/gym_db?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 12345678
+
 server:
   port: 5678
 
-spring:
-  datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/gymsys?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
-      username: root
-      password: 12345678
-
 mybatis-plus:
-  type-aliases-package: com.gymsys.domain.entity
-  type-handlers-package: com.gymsys.handler
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.gymsys.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: auto
-  configuration:
-    call-setters-on-nulls: true # 解决查询字段值为null而不显示的问题
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0

@@ -1,43 +1,72 @@
 package com.gymsys.entity.venue;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * 预约实体类
+ */
 @Data
-@Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "reservations")
+@TableName("reservation")
 public class ReservationEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
+    /**
+     * 预约ID
+     */
+    @TableId(type = IdType.AUTO)
     private Long id;
     
-    @ManyToOne
-    @JoinColumn(name = "venue_id", nullable = false)
-    private VenueEntity venue;
+    /**
+     * 场馆ID
+     */
+    private Long venueId;
     
-    @Column(name = "card_number", nullable = false)
+    /**
+     * 用户ID
+     */
+    private Long userId;
+    
+    /**
+     * 卡号
+     */
     private String cardNumber;
     
-    @Column(name = "start_time", nullable = false)
+    /**
+     * 预约开始时间
+     */
     private LocalDateTime startTime;
     
-    @Column(name = "end_time", nullable = false)
+    /**
+     * 预约结束时间
+     */
     private LocalDateTime endTime;
     
-    @Column(name = "reservation_type", nullable = false)
-    private String reservationType; // REGULAR, TEAM, CLASS
+    /**
+     * 预约状态（待确认、已确认、已取消、已完成）
+     */
+    private String status;
     
-    @Column(name = "status", nullable = false)
-    private String status; // BOOKED, CANCELLED, COMPLETED, NO_SHOW
+    /**
+     * 预约类型
+     */
+    private String reservationType;
     
-    @Column
+    /**
+     * 备注
+     */
     private String remark;
+    
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createdAt;
+    
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updatedAt;
 }

@@ -199,27 +199,22 @@ const UserVenuesComponent = {
         loadVenueData() {
             this.loading = true;
 
-            // 模拟后端API请求
-            setTimeout(() => {
-                // 模拟数据，实际项目中应通过API获取
-                this.venueList = [
-                    { id: 1, name: '篮球场A', type: '篮球场', location: '体育馆一楼', capacity: 20, pricePerHour: 80, facilities: '照明设备、更衣室', description: '标准篮球场，适合5v5比赛' },
-                    { id: 2, name: '篮球场B', type: '篮球场', location: '体育馆一楼', capacity: 20, pricePerHour: 80, facilities: '照明设备、更衣室', description: '标准篮球场，适合5v5比赛' },
-                    { id: 3, name: '足球场A', type: '足球场', location: '户外运动区', capacity: 30, pricePerHour: 200, facilities: '照明设备、更衣室、淋浴', description: '7人制足球场，人造草皮' },
-                    { id: 4, name: '羽毛球场A', type: '羽毛球场', location: '体育馆二楼', capacity: 4, pricePerHour: 40, facilities: '空调、照明', description: '标准羽毛球场地' },
-                    { id: 5, name: '羽毛球场B', type: '羽毛球场', location: '体育馆二楼', capacity: 4, pricePerHour: 40, facilities: '空调、照明', description: '标准羽毛球场地' },
-                    { id: 6, name: '羽毛球场C', type: '羽毛球场', location: '体育馆二楼', capacity: 4, pricePerHour: 40, facilities: '空调、照明', description: '标准羽毛球场地' },
-                    { id: 7, name: '网球场A', type: '网球场', location: '户外运动区', capacity: 4, pricePerHour: 60, facilities: '照明设备', description: '硬地网球场' },
-                    { id: 8, name: '游泳池', type: '游泳池', location: '体育馆负一楼', capacity: 50, pricePerHour: 30, facilities: '更衣室、淋浴、储物柜', description: '25米标准泳道，6条泳道' },
-                    { id: 9, name: '乒乓球室A', type: '乒乓球室', location: '体育馆三楼', capacity: 4, pricePerHour: 20, facilities: '空调、照明', description: '配备2张标准乒乓球桌' },
-                    { id: 10, name: '乒乓球室B', type: '乒乓球室', location: '体育馆三楼', capacity: 4, pricePerHour: 20, facilities: '空调、照明', description: '配备2张标准乒乓球桌' }
-                ];
-                this.pagination.total = this.venueList.length;
-                this.loading = false;
-
-                // 根据筛选条件过滤
-                this.filterVenues();
-            }, 500);
+            // 调用后端API获取场馆数据
+            axios.get('/api/venues')
+                .then(response => {
+                    this.venueList = response.data;
+                    this.pagination.total = this.venueList.length;
+                    
+                    // 根据筛选条件过滤
+                    this.filterVenues();
+                })
+                .catch(error => {
+                    console.error('获取场馆数据失败:', error);
+                    this.$message.error('获取场馆数据失败，请稍后重试');
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         // 搜索场馆
         searchVenues() {
@@ -279,14 +274,34 @@ const UserVenuesComponent = {
                 remarks: ''
             };
 
-            // 模拟加载时间段数据
+            // 加载时间段数据
             this.loadTimeSlots();
 
             this.timeSlotDialogVisible = true;
         },
         // 加载时间段数据
         loadTimeSlots() {
-            // 模拟数据，实际项目中应通过API获取
+            // 调用后端API获取场地时间槽数据
+            const venueId = this.selectedVenue.id;
+            const date = this.searchForm.date;
+            
+            axios.get(`/api/reservations/venue/${venueId}/timeslots`, {
+                params: { date: date }
+            })
+            .then(response => {
+                this.timeSlots = response.data;
+            })
+            .catch(error => {
+                console.error('获取时间槽数据失败:', error);
+                this.$message.error('获取时间槽数据失败，请稍后重试');
+                
+                // 加载失败时使用默认数据
+                this.generateDefaultTimeSlots();
+            });
+        },
+        
+        // 生成默认时间槽数据（当API调用失败时使用）
+        generateDefaultTimeSlots() {
             const slots = [];
             const startHour = 8; // 早上8点开始
             const endHour = 22;  // 晚上10点结束
@@ -298,9 +313,8 @@ const UserVenuesComponent = {
                     const endHourMin = minute === 0 ? `${hour}:30` : `${hour + 1}:00`;
                     const endTime = endHourMin.split(':').map(num => num.toString().padStart(2, '0')).join(':');
 
-                    // 随机状态，实际应从后端获取
-                    const statuses = ['AVAILABLE', 'BOOKED', 'SPECIAL'];
-                    const randomStatus = Math.random() < 0.7 ? 'AVAILABLE' : statuses[Math.floor(Math.random() * 3)];
+                    // 默认大部分时间段可用
+                    const randomStatus = Math.random() < 0.7 ? 'AVAILABLE' : 'BOOKED';
 
                     slots.push({
                         id: `${hour}-${minute}`,
@@ -355,24 +369,44 @@ const UserVenuesComponent = {
                         startTime: this.selectedTimeSlot.startTime,
                         endTime: this.selectedTimeSlot.endTime,
                         numberOfPeople: this.bookingForm.numberOfPeople,
-                        remarks: this.bookingForm.remarks,
-                        estimatedCost: this.calculateEstimatedCost()
+                        remarks: this.bookingForm.remarks
                     };
 
-                    // 模拟提交预约请求
+                    // 构建日期时间字符串
+                    const startDateTime = `${this.searchForm.date}T${this.selectedTimeSlot.startTime}:00`;
+                    const endDateTime = `${this.searchForm.date}T${this.selectedTimeSlot.endTime}:00`;
+                    
+                    // 获取当前用户的一卡通号码
+                    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                    const cardNumber = currentUser.cardNumber || '12345678'; // 默认卡号
+                    
+                    // 调用后端预约API
                     this.loading = true;
-                    setTimeout(() => {
-                        this.loading = false;
+                    axios.post('/api/reservations', null, {
+                        params: {
+                            venueId: this.selectedVenue.id,
+                            cardNumber: cardNumber,
+                            startTime: startDateTime,
+                            endTime: endDateTime
+                        }
+                    })
+                    .then(response => {
                         this.timeSlotDialogVisible = false;
-
-                        // 提示预约成功
                         this.$message.success('预约成功！');
-
                         // 可以跳转到我的预约页面
                         // this.$router.push('/user/myreservations');
-                    }, 1000);
-
-                    console.log('提交预约数据:', bookingData);
+                    })
+                    .catch(error => {
+                        console.error('预约失败:', error);
+                        let errorMsg = '预约失败，请稍后重试';
+                        if (error.response && error.response.data && error.response.data.message) {
+                            errorMsg = error.response.data.message;
+                        }
+                        this.$message.error(errorMsg);
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    });
                 }
             });
         },

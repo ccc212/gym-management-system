@@ -1,5 +1,7 @@
 package com.gymsys.service.venue;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.entity.venue.ReservationEntity;
 import com.gymsys.entity.venue.VenueEntity;
 import com.gymsys.repository.venue.ReservationRepository;
@@ -8,10 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,211 +21,166 @@ public class ReservationService {
     private final VenueRepository venueRepository;
     
     /**
-     * 场地预约（用一卡通号码预约，一周内预约）
+     * 创建预约
      */
     @Transactional
-    public ReservationEntity reserveVenue(Long venueId, String cardNumber, 
-                                        LocalDateTime startTime, LocalDateTime endTime) {
-        // 检查预约时间是否在一周内
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime oneWeekLater = now.plusWeeks(1);
-        
-        if (startTime.isBefore(now) || startTime.isAfter(oneWeekLater)) {
-            throw new IllegalArgumentException("预约时间必须在一周内");
+    public ReservationEntity createReservation(ReservationEntity reservation) {
+        // 检查场馆是否存在且可用
+        VenueEntity venue = venueRepository.selectById(reservation.getVenueId());
+        if (venue == null) {
+            throw new RuntimeException("场馆不存在");
         }
         
-        // 检查场地是否存在
-        Optional<VenueEntity> venueOpt = venueRepository.findById(venueId);
-        if (venueOpt.isEmpty()) {
-            throw new IllegalArgumentException("场地不存在");
+        if (!venue.getIsAvailable()) {
+            throw new RuntimeException("场馆不可用");
         }
         
-        VenueEntity venue = venueOpt.get();
+        // 检查时间冲突
+        List<ReservationEntity> overlappingReservations = reservationRepository.findOverlappingReservations(
+                reservation.getVenueId(),
+                reservation.getStartTime(),
+                reservation.getEndTime()
+        );
         
-        // 检查场地是否可用
-        if (!venue.isAvailable()) {
-            throw new IllegalArgumentException("场地不可用");
+        if (!overlappingReservations.isEmpty()) {
+            throw new RuntimeException("该时间段已被预约");
         }
         
-        // 检查时间段是否已被预约
-        List<ReservationEntity> existingReservations = reservationRepository
-                .findByVenueAndStartTimeBetween(venue, startTime.minusMinutes(1), endTime.plusMinutes(1));
+        // 设置预约状态和时间
+        reservation.setStatus("PENDING");
+        reservation.setCreatedAt(LocalDateTime.now());
+        reservation.setUpdatedAt(LocalDateTime.now());
         
-        if (!existingReservations.isEmpty()) {
-            throw new IllegalArgumentException("该时段已被预约");
-        }
-        
-        // 创建预约
-        ReservationEntity reservation = new ReservationEntity();
-        reservation.setVenue(venue);
-        reservation.setCardNumber(cardNumber);
-        reservation.setStartTime(startTime);
-        reservation.setEndTime(endTime);
-        reservation.setReservationType("REGULAR");
-        reservation.setStatus("BOOKED");
-        
-        return reservationRepository.save(reservation);
+        // 保存预约
+        reservationRepository.insert(reservation);
+        return reservation;
     }
     
     /**
-     * 场地预约退订
+     * 确认预约
      */
     @Transactional
-    public void cancelReservation(Long reservationId, String cardNumber) {
-        Optional<ReservationEntity> reservationOpt = reservationRepository.findById(reservationId);
-        
-        if (reservationOpt.isEmpty()) {
-            throw new IllegalArgumentException("预约不存在");
+    public ReservationEntity confirmReservation(Long id) {
+        ReservationEntity reservation = reservationRepository.selectById(id);
+        if (reservation == null) {
+            throw new RuntimeException("预约不存在");
         }
         
-        ReservationEntity reservation = reservationOpt.get();
-        
-        // 验证一卡通号码
-        if (!reservation.getCardNumber().equals(cardNumber)) {
-            throw new IllegalArgumentException("无权取消此预约");
+        if (!reservation.getCardNumber().equals(reservation.getCardNumber())) {
+            throw new RuntimeException("卡号不匹配");
         }
         
-        // 检查是否已经开始或已经取消
-        if (reservation.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("预约已开始，无法取消");
+        reservation.setStatus("CONFIRMED");
+        reservation.setUpdatedAt(LocalDateTime.now());
+        reservationRepository.updateById(reservation);
+        
+        return reservation;
+    }
+    
+    /**
+     * 取消预约
+     */
+    @Transactional
+    public ReservationEntity cancelReservation(Long id) {
+        ReservationEntity reservation = reservationRepository.selectById(id);
+        if (reservation == null) {
+            throw new RuntimeException("预约不存在");
         }
         
-        if ("CANCELLED".equals(reservation.getStatus())) {
-            throw new IllegalArgumentException("预约已经取消");
+        if (!reservation.getCardNumber().equals(reservation.getCardNumber())) {
+            throw new RuntimeException("卡号不匹配");
         }
         
-        // 更新状态
         reservation.setStatus("CANCELLED");
-        reservationRepository.save(reservation);
+        reservation.setUpdatedAt(LocalDateTime.now());
+        reservationRepository.updateById(reservation);
+        
+        return reservation;
     }
     
     /**
-     * 场地预约修改
+     * 完成预约
      */
     @Transactional
-    public ReservationEntity modifyReservation(Long reservationId, String cardNumber,
-                                             LocalDateTime newStartTime, LocalDateTime newEndTime) {
-        // 验证预约是否存在
-        Optional<ReservationEntity> reservationOpt = reservationRepository.findById(reservationId);
-        
-        if (reservationOpt.isEmpty()) {
-            throw new IllegalArgumentException("预约不存在");
+    public ReservationEntity completeReservation(Long id) {
+        ReservationEntity reservation = reservationRepository.selectById(id);
+        if (reservation == null) {
+            throw new RuntimeException("预约不存在");
         }
         
-        ReservationEntity reservation = reservationOpt.get();
-        
-        // 验证一卡通号码
-        if (!reservation.getCardNumber().equals(cardNumber)) {
-            throw new IllegalArgumentException("无权修改此预约");
+        if (!reservation.getCardNumber().equals(reservation.getCardNumber())) {
+            throw new RuntimeException("卡号不匹配");
         }
         
-        // 检查是否已经开始或已经取消
-        if (reservation.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("预约已开始，无法修改");
-        }
+        reservation.setStatus("COMPLETED");
+        reservation.setUpdatedAt(LocalDateTime.now());
+        reservationRepository.updateById(reservation);
         
-        if ("CANCELLED".equals(reservation.getStatus())) {
-            throw new IllegalArgumentException("预约已经取消，无法修改");
-        }
-        
-        // 检查新的时间是否在一周内
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime oneWeekLater = now.plusWeeks(1);
-        
-        if (newStartTime.isBefore(now) || newStartTime.isAfter(oneWeekLater)) {
-            throw new IllegalArgumentException("预约时间必须在一周内");
-        }
-        
-        // 检查新时段是否可用（排除当前预约）
-        List<ReservationEntity> existingReservations = reservationRepository
-                .findByVenueAndStartTimeBetween(reservation.getVenue(), 
-                                              newStartTime.minusMinutes(1), 
-                                              newEndTime.plusMinutes(1));
-        
-        boolean timeSlotAvailable = existingReservations.isEmpty() || 
-                (existingReservations.size() == 1 && existingReservations.get(0).getId().equals(reservationId));
-        
-        if (!timeSlotAvailable) {
-            throw new IllegalArgumentException("该时段已被预约");
-        }
-        
-        // 更新预约
-        reservation.setStartTime(newStartTime);
-        reservation.setEndTime(newEndTime);
-        
-        return reservationRepository.save(reservation);
+        return reservation;
     }
     
     /**
-     * 场地预约失约处理
+     * 修改预约类型
      */
     @Transactional
-    public void handleNoShow(Long reservationId) {
-        Optional<ReservationEntity> reservationOpt = reservationRepository.findById(reservationId);
-        
-        if (reservationOpt.isEmpty()) {
-            throw new IllegalArgumentException("预约不存在");
+    public ReservationEntity updateReservationType(Long id, String type) {
+        ReservationEntity reservation = reservationRepository.selectById(id);
+        if (reservation == null) {
+            throw new RuntimeException("预约不存在");
         }
         
-        ReservationEntity reservation = reservationOpt.get();
+        reservation.setReservationType(type);
+        reservation.setUpdatedAt(LocalDateTime.now());
+        reservationRepository.updateById(reservation);
         
-        // 只有已预约的才能标记为失约
-        if (!"BOOKED".equals(reservation.getStatus())) {
-            throw new IllegalArgumentException("只有已预约的才能标记为失约");
-        }
-        
-        reservation.setStatus("NO_SHOW");
-        reservationRepository.save(reservation);
+        return reservation;
     }
     
     /**
-     * 校队预留（使用）场地
+     * 获取场馆的预约列表
      */
-    @Transactional
-    public ReservationEntity reserveVenueForTeam(Long venueId, 
-                                               LocalDateTime startTime, 
-                                               LocalDateTime endTime) {
-        // 通过调用普通预约方法，但使用特殊的"TEAM"标识
-        ReservationEntity reservation = reserveVenue(venueId, "TEAM", startTime, endTime);
-        reservation.setReservationType("TEAM");
-        return reservationRepository.save(reservation);
+    public Page<ReservationEntity> getVenueReservations(Long venueId, int page, int size) {
+        return reservationRepository.findByVenueId(venueId, new Page<>(page, size));
     }
     
     /**
-     * 上课使用场地
+     * 获取用户的预约列表
      */
-    @Transactional
-    public ReservationEntity reserveVenueForClass(Long venueId, 
-                                                LocalDateTime startTime, 
-                                                LocalDateTime endTime) {
-        // 通过调用普通预约方法，但使用特殊的"CLASS"标识
-        ReservationEntity reservation = reserveVenue(venueId, "CLASS", startTime, endTime);
-        reservation.setReservationType("CLASS");
-        return reservationRepository.save(reservation);
+    public Page<ReservationEntity> getUserReservations(Long userId, int page, int size) {
+        return reservationRepository.findByUserId(userId, new Page<>(page, size));
     }
     
     /**
-     * 场地一周信息查询
+     * 获取指定状态的预约列表
      */
-    public List<ReservationEntity> getVenueWeeklyReservations(Long venueId) {
-        LocalDate today = LocalDate.now();
-        LocalDateTime weekStart = today.atStartOfDay();
-        LocalDateTime weekEnd = today.plusDays(7).atStartOfDay();
-        
-        return reservationRepository.findVenueWeeklyReservations(venueId, weekStart, weekEnd);
+    public Page<ReservationEntity> getReservationsByStatus(String status, int page, int size) {
+        return reservationRepository.findByStatus(status, new Page<>(page, size));
     }
     
     /**
-     * 根据ID查询预约
+     * 获取场馆的每周预约统计
      */
-    public Optional<ReservationEntity> findReservationById(Long id) {
-        return reservationRepository.findById(id);
+    public List<ReservationEntity> getVenueWeeklyReservations(Long venueId, LocalDateTime startTime, LocalDateTime endTime) {
+        LambdaQueryWrapper<ReservationEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ReservationEntity::getVenueId, venueId)
+                .between(ReservationEntity::getStartTime, startTime, endTime);
+        return reservationRepository.selectList(wrapper);
     }
     
     /**
-     * 查询用户所有预约
+     * 获取预约详情
      */
-    public List<ReservationEntity> findUserReservations(String cardNumber) {
-        return reservationRepository.findByCardNumberAndStatus(cardNumber, "BOOKED");
+    public ReservationEntity getReservationById(Long id) {
+        return reservationRepository.selectById(id);
+    }
+    
+    /**
+     * 根据卡号和状态查询预约
+     */
+    public List<ReservationEntity> getReservationsByCardNumberAndStatus(String cardNumber, String status) {
+        LambdaQueryWrapper<ReservationEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ReservationEntity::getCardNumber, cardNumber)
+                .eq(ReservationEntity::getStatus, status);
+        return reservationRepository.selectList(wrapper);
     }
 }

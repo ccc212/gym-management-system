@@ -1,8 +1,7 @@
 <template>
     <el-main>
        <el-button  icon="Plus" type="primary" @click="addBtn">新增</el-button>
-
-       <el-table :data="tableList" row-key="id" style="margin-top: 20px;" default-expand-all border stripe>
+       <el-table :height="tableHeight" :data="tableList" row-key="id" style="margin-top: 20px;" default-expand-all border stripe>
         <el-table-column label="菜单名称" prop="title"></el-table-column>
         <el-table-column label="菜单图标" prop="icon">
             <template #default="scope">
@@ -142,6 +141,9 @@ import { ElMessage } from 'element-plus'
 import type { MenuType } from '../../../api/system/menu/MenuModel'
 import { nextTick } from 'vue'
 import useInstance from '../../../hooks/useInstance'
+
+const tableHeight = ref(0)
+
 
 // 获取全局
 const { global } = useInstance()
@@ -365,6 +367,10 @@ async function getList() {
         tableList.value = res.data
     }
 }
+
+nextTick(() => {
+    tableHeight.value = window.innerHeight - 200
+})
 
 getList()
 </script>

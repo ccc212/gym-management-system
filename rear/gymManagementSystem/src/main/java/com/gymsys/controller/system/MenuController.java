@@ -119,7 +119,7 @@ public class MenuController {
         //过滤菜单数据,去掉按钮
         List<Menu> collect = Optional.ofNullable(menuList).orElse(new ArrayList<>())
                 .stream()
-                .filter(item -> StringUtils.isNotEmpty(item.getType())&& !item.getType().equals("2")).collect(Collectors.toList());
+                .filter(item -> item != null && StringUtils.isNotEmpty(item.getType())&& !item.getType().equals("2")).collect(Collectors.toList());
         //组装路由数据
         List<RouterVO> router = MakeMenuTree.makeRouter(collect, 0);
         return Result.success(router);

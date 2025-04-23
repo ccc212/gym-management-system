@@ -9,7 +9,6 @@ router.beforeEach(async (to:any, from:any, next:any) => {
   const uStore = userStore()
   const mStore = menuStore()
   const token = uStore.token
-    
   if (token) {
     if (to.path === '/login') {
       next({ path: '/' })
@@ -21,7 +20,6 @@ router.beforeEach(async (to:any, from:any, next:any) => {
           next({ ...to, replace: true }) // 确保 addRoute 生效
         } catch (err) {
           console.error('获取菜单失败', err)
-
           next('/login')
         }
       } else {

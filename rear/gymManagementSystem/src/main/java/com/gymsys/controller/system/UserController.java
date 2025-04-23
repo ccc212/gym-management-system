@@ -230,7 +230,7 @@ public class UserController {
         //获取菜单表code字段
         List<String> collect = Optional.ofNullable(menuList).orElse(new ArrayList<>())
                 .stream()
-                .filter(item -> StringUtils.isNotEmpty(item.getCode()))
+                .filter(item -> item != null && StringUtils.isNotEmpty(item.getCode()))
                 .map(item ->item.getCode())
                 .collect(Collectors.toList());
         //设置返回值

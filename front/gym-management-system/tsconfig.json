@@ -5,9 +5,9 @@
     { "path": "./tsconfig.node.json" }
   ],
 
-  "moduleResolution": "node",
+ /*  "moduleResolution": "node", */
 
 
-
+  
 }
 

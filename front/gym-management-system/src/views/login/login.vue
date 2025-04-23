@@ -8,7 +8,7 @@
                 <el-input v-model="loginModel.userNumber" placeholder="请输入学号或工号"></el-input>
             </el-form-item>
             <el-form-item prop="password">
-                <el-input v-model="loginModel.password" placeholder="请输入密码"></el-input>
+                <el-input type="password" v-model="loginModel.password" placeholder="请输入密码"></el-input>
             </el-form-item>
 
             <el-row :gutter="20">
@@ -29,16 +29,19 @@ import {reactive,ref} from 'vue';
 import {loginApi} from '../../../src/api/system/user/index';
 import {userStore} from '../../store/user/index';
 import {useRouter} from 'vue-router';
+import {menuStore} from '../../store/menu/index'
+
 
 const router = useRouter()
 const store = userStore()
+const mstore = menuStore()
 
 //表单ref属性
 const form = ref<FormInstance>()
 //表单绑定对象
 const loginModel = reactive({
-    userNumber:'',
-    password:'',
+    userNumber:'admin',
+    password:'123456',
 })
 //表单验证规则
 const rules = reactive({
@@ -62,9 +65,11 @@ function submitForm() {
             let res = await loginApi(loginModel)
             if (res && res.code == 0) {
                 //存储用户信息，跳转首页
-                console.log(res.data)
                 store.setId(res.data.id)
                 store.setUserNumber(res.data.userNumber)
+                store.setToken(res.data.token)
+                store.getInfo()
+                mstore.getMenuList(router, store.getId)
                 //跳转
                 router.push({path:'/'})
             }

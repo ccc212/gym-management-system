@@ -1,5 +1,5 @@
 import http from "../../../http/index";
-import type { User, UserListParm,Login,AssignParm } from "./UserModel";
+import type { User, UserListParm,Login,AssignParm,UpdateParm } from "./UserModel";
 
 //新增用户
 export function addUser(parm:User){
@@ -46,4 +46,14 @@ export function loginApi(parm:Login){
 //查询菜单树
 export function getAssignTreeApi(parm:AssignParm){
     return http.get("/api/system/user/getAssignTree",parm)
+}
+
+//修改密码参数
+export function updatePasswordApi(parm:UpdateParm){
+    return http.post("/api/system/user/updatePassword",parm)
+}
+
+//获取用户信息
+export function getInfoApi(id:string){
+    return http.get("/api/system/user/getInfo",{id:id})
 }

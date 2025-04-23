@@ -34,11 +34,13 @@
         <el-table-column prop="phone" label="手机"width="150px"></el-table-column>
         <el-table-column prop="age" label="年龄"width="100px"></el-table-column>
         <el-table-column prop="email" label="邮箱" width="200px"></el-table-column>
-        <el-table-column label="操作" width="350px">
+        <el-table-column label="操作" width="350px" >
             <template #default="scope">
+                <div v-if="scope.row.userNumber !== 'admin'">
                 <el-button type="warning" icon="Edit" size="small" @click="resetPasswordBtn(scope.row)">重置密码</el-button>
                 <el-button type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
                 <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
+                </div>
             </template>
         </el-table-column>
        </el-table>

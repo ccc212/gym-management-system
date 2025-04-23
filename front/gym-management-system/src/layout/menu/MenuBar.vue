@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+/* import { reactive } from 'vue'; */
 import {computed} from 'vue'
 import MenuItem from './MenuItem.vue';
 import {useRoute} from 'vue-router'
@@ -24,6 +24,7 @@ import { menuStore }  from '../../store/menu/index';
 
 //获取store
 const store = menuStore()
+
 //获取状态
 const isCollapse = computed(() => {
     return store.getCollapse
@@ -38,8 +39,14 @@ const defaultActive = computed(() => {
     return path
 })
 
+const menuList = computed(() => {
+    return store.getMenu
+})
+
+
+
 //菜单数据
-let menuList = reactive([
+/* let menuList = reactive([
     {
         path: '/dashboard',
         component: '/dashboard/Index',
@@ -143,7 +150,7 @@ let menuList = reactive([
             roles:["sys:competition"]
         },
     },
-])
+]) */
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }

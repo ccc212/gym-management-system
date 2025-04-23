@@ -28,3 +28,9 @@ mybatis-plus:
     call-setters-on-nulls: true # 解决查询字段值为null而不显示的问题
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+jwt:
+  issuer: gymsys
+  secret: com.gymsys
+  expiration: 999999999
+
+

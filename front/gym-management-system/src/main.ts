@@ -8,9 +8,11 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import myconfirm from './utils/myconfirm'
 import App from './App.vue'
 import { createPinia } from 'pinia'
+import './permission'
 
 const app = createApp(App)
 const pinia = createPinia()
+
 pinia.use(piniaPluginPersistedstate)
 
 app.use(router)

@@ -25,3 +25,8 @@ export function editApi(parm:MenuType) {
 export function deleteApi(id:string){
     return http.delete(`/api/system/menu/${id}`)
 }
+
+//获取菜单数据
+export function getMenuListApi(id:string) {
+    return http.get("/api/system/menu/getMenuList",{id:id});
+}

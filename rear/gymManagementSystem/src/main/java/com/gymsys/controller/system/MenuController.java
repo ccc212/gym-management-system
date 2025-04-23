@@ -2,22 +2,29 @@ package com.gymsys.controller.system;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.gymsys.entity.Result;
-import com.gymsys.entity.system.AssignTreeParm;
-import com.gymsys.entity.system.MakeMenuTree;
-import com.gymsys.entity.system.Menu;
+import com.gymsys.entity.system.*;
 import com.gymsys.service.system.MenuService;
+import com.gymsys.service.system.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/system/menu")
 @RestController
 public class MenuController {
     @Autowired
     private MenuService menuService;
+
+    @Autowired
+    private UserService userService;
+
 
     /**
      * 添加菜单
@@ -93,5 +100,29 @@ public class MenuController {
         return Result.success(list);
     }
 
+    /**
+     * 获取菜单
+     * @return
+     */
+    @GetMapping("/getMenuList")
+    public Result getMenuList(Integer id){
+        //获取用户的信息
+        User user = userService.getById(id);
+        //获取菜单数据
+        List<Menu> menuList = null;
+        //判断是否为超级管理员
+        if(user != null && user.getUserNumber().equals("admin")){
+            menuList = menuService.list();
+        }else{
+            menuList = menuService.getMenuByUserId(id);
+        }
+        //过滤菜单数据,去掉按钮
+        List<Menu> collect = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                .stream()
+                .filter(item -> StringUtils.isNotEmpty(item.getType())&& !item.getType().equals("2")).collect(Collectors.toList());
+        //组装路由数据
+        List<RouterVO> router = MakeMenuTree.makeRouter(collect, 0);
+        return Result.success(router);
+    }
 
 }

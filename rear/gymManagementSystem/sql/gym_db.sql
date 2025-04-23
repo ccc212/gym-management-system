@@ -11,7 +11,7 @@
  Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 19/04/2025 20:39:40
+ Date: 23/04/2025 16:37:17
 */
 
 SET NAMES utf8mb4;
@@ -29,7 +29,7 @@ CREATE TABLE `announcements`  (
   `publish_time` datetime(6) NOT NULL,
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 231 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 251 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of announcements
@@ -60,7 +60,7 @@ CREATE TABLE `competition`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of competition
@@ -79,7 +79,7 @@ CREATE TABLE `competition_equipment_relation`  (
   `end_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '结束时间',
   `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '状态(0为预约中，1为预约成功，2为预约失败)',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与器材关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与器材关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of competition_equipment_relation
@@ -131,7 +131,7 @@ CREATE TABLE `competition_item_relation`  (
   `competition_id` bigint(0) NOT NULL COMMENT '赛事id',
   `competition_item_id` bigint(0) NOT NULL COMMENT '赛事项目id',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与项目关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与项目关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of competition_item_relation
@@ -153,7 +153,7 @@ CREATE TABLE `competition_sign_up_team`  (
   `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '备注',
   `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '状态(0为报名中，1为报名成功，2为报名失败)',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事团体报名表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事团体报名表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of competition_sign_up_team
@@ -178,7 +178,7 @@ CREATE TABLE `competition_sign_up_user`  (
   `remark` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '备注',
   `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '状态(0为报名中，1为报名成功，2为报名失败)',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事个人报名表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事个人报名表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of competition_sign_up_user
@@ -200,7 +200,7 @@ CREATE TABLE `competition_stage`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `stage_name`(`stage_name`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事阶段表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事阶段表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of competition_stage
@@ -219,7 +219,7 @@ CREATE TABLE `competition_stage_referee_relation`  (
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事阶段与裁判关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事阶段与裁判关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of competition_stage_referee_relation
@@ -239,7 +239,7 @@ CREATE TABLE `competition_venue_relation`  (
   `end_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '结束时间',
   `status` tinyint(0) NOT NULL DEFAULT 0 COMMENT '状态(0为预约中，1为预约成功，2为预约失败)',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与场地关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '赛事与场地关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of competition_venue_relation
@@ -261,7 +261,7 @@ CREATE TABLE `reservations`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FKfghu9w3k11q38ti8x2xiyp3gj`(`venue_id`) USING BTREE,
   CONSTRAINT `FKfghu9w3k11q38ti8x2xiyp3gj` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 606 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 658 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of reservations
@@ -278,17 +278,15 @@ CREATE TABLE `sys_depart`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '部门表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '部门表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_depart
 -- ----------------------------
-INSERT INTO `sys_depart` VALUES (9, '软件工程系', '2025-04-18 21:37:16', '2025-04-18 21:37:15', '软件系老师所属部门');
-INSERT INTO `sys_depart` VALUES (10, '软件系学生会', '2025-04-18 21:39:26', '2025-04-18 21:39:25', '所属于软件系相关同学以及部门教职工的部门');
-INSERT INTO `sys_depart` VALUES (11, '软件系团委', '2025-04-18 21:40:00', '2025-04-18 21:40:00', '所属于软件系相关同学以及部分教职工的部门');
 INSERT INTO `sys_depart` VALUES (12, '广东海洋大学体育馆管理组', '2025-04-18 21:41:47', '2025-04-18 21:41:47', '所属于部分教职工的部门');
 INSERT INTO `sys_depart` VALUES (13, '广东海洋大学数学与计算机学院', '2025-04-19 08:00:00', '2025-04-19 09:10:35', '所属于该学院的学生与教职工');
 INSERT INTO `sys_depart` VALUES (14, '广东海洋大学机械工程学院', '2025-04-19 09:10:30', '2025-04-19 09:10:30', '所属于该学院的学生与教职工');
+INSERT INTO `sys_depart` VALUES (15, '广东海洋大学化学与环境学院', '2025-04-21 21:20:31', '2025-04-21 21:20:31', '无');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -310,15 +308,17 @@ CREATE TABLE `sys_menu`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK_menu_parent_id`(`parent_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '菜单表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_menu
 -- ----------------------------
 INSERT INTO `sys_menu` VALUES (4, 0, '顶级菜单', '系统管理', 'sys:manage', 'system', '/system', '', '0', 'Setting', '2', '2025-04-19 19:17:26', '2025-04-19 19:17:26');
-INSERT INTO `sys_menu` VALUES (5, 4, '系统管理', '用户管理', 'sys:user:index', 'userList', '/userList', '../views/system/User/UserList.vue', '1', 'UserFilled', '5', '2025-04-19 19:21:24', '2025-04-19 19:31:32');
-INSERT INTO `sys_menu` VALUES (6, 4, '顶级菜单', '角色管理', 'sys:role:index', 'roleList', '/roleList', '../views/system/Role/RoleList.vue', '1', 'Wallet', '6', '2025-04-19 19:26:43', '2025-04-19 19:31:32');
-INSERT INTO `sys_menu` VALUES (7, 4, '系统管理', '菜单管理', 'sys:menu:index', 'menuList', '/menuList', '../views/system/Menu/MenuList.vue', '1', 'Menu', '7', '2025-04-19 19:29:39', '2025-04-19 19:31:32');
+INSERT INTO `sys_menu` VALUES (5, 4, '系统管理', '用户管理', 'sys:user:index', 'userList', '/userList', 'views/system/User/UserList.vue', '1', 'UserFilled', '5', '2025-04-19 19:21:24', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (6, 4, '顶级菜单', '角色管理', 'sys:role:index', 'roleList', '/roleList', 'views/system/Role/RoleList.vue', '1', 'Wallet', '6', '2025-04-19 19:26:43', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (7, 4, '系统管理', '菜单管理', 'sys:menu:index', 'menuList', '/menuList', 'views/system/Menu/MenuList.vue', '1', 'Menu', '7', '2025-04-19 19:29:39', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (8, 4, '系统管理', '部门管理', 'sys:department:index', 'departmentList', '/departmentList', 'views/system/Department/DepartmentList.vue', '1', 'UserFilled', '3', '2025-04-21 08:00:00', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (9, 4, '系统管理', '班级管理', 'sys:section:index', 'sectionList', '/sectionList', 'views/system/Section/SectionList.vue', '1', 'UserFilled', '4', '2025-04-21 21:35:34', '2025-04-22 15:26:37');
 
 -- ----------------------------
 -- Table structure for sys_menu_role
@@ -333,11 +333,17 @@ CREATE TABLE `sys_menu_role`  (
   INDEX `FK_menu_role_menu_id`(`menu_id`) USING BTREE,
   CONSTRAINT `FK_menu_role_menu_id` FOREIGN KEY (`menu_id`) REFERENCES `sys_menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_menu_role_role_id` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色菜单关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色菜单关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_menu_role
 -- ----------------------------
+INSERT INTO `sys_menu_role` VALUES (15, 11, 4);
+INSERT INTO `sys_menu_role` VALUES (16, 11, 5);
+INSERT INTO `sys_menu_role` VALUES (17, 11, 6);
+INSERT INTO `sys_menu_role` VALUES (18, 11, 7);
+INSERT INTO `sys_menu_role` VALUES (19, 11, 8);
+INSERT INTO `sys_menu_role` VALUES (20, 11, 9);
 
 -- ----------------------------
 -- Table structure for sys_role
@@ -375,7 +381,7 @@ CREATE TABLE `sys_section`  (
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '班级表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '班级表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_section
@@ -398,13 +404,17 @@ CREATE TABLE `sys_use_depart`  (
   INDEX `FK_use_depart_role_id`(`depart_id`) USING BTREE,
   CONSTRAINT `FK_use_depart_role_id` FOREIGN KEY (`depart_id`) REFERENCES `sys_depart` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_use_depart_user_id` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户部门关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户部门关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_use_depart
 -- ----------------------------
-INSERT INTO `sys_use_depart` VALUES (1, 1, 13);
-INSERT INTO `sys_use_depart` VALUES (4, 3, 10);
+INSERT INTO `sys_use_depart` VALUES (6, 5, 13);
+INSERT INTO `sys_use_depart` VALUES (10, 4, 13);
+INSERT INTO `sys_use_depart` VALUES (11, 6, 13);
+INSERT INTO `sys_use_depart` VALUES (12, 7, 13);
+INSERT INTO `sys_use_depart` VALUES (13, 8, 12);
+INSERT INTO `sys_use_depart` VALUES (14, 9, 13);
 
 -- ----------------------------
 -- Table structure for sys_use_role
@@ -419,13 +429,17 @@ CREATE TABLE `sys_use_role`  (
   INDEX `FK_use_role_role_id`(`role_id`) USING BTREE,
   CONSTRAINT `FK_use_role_role_id` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_use_role_user_id` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户角色关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户角色关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_use_role
 -- ----------------------------
-INSERT INTO `sys_use_role` VALUES (1, 1, 5);
-INSERT INTO `sys_use_role` VALUES (4, 3, 6);
+INSERT INTO `sys_use_role` VALUES (6, 5, 5);
+INSERT INTO `sys_use_role` VALUES (10, 4, 5);
+INSERT INTO `sys_use_role` VALUES (11, 6, 5);
+INSERT INTO `sys_use_role` VALUES (12, 7, 5);
+INSERT INTO `sys_use_role` VALUES (13, 8, 7);
+INSERT INTO `sys_use_role` VALUES (14, 9, 11);
 
 -- ----------------------------
 -- Table structure for sys_use_section
@@ -440,13 +454,15 @@ CREATE TABLE `sys_use_section`  (
   INDEX `FK_use_section_role_id`(`section_id`) USING BTREE,
   CONSTRAINT `FK_use_section_role_id` FOREIGN KEY (`section_id`) REFERENCES `sys_section` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_use_section_user_id` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户班级关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户班级关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_use_section
 -- ----------------------------
-INSERT INTO `sys_use_section` VALUES (1, 1, 1);
-INSERT INTO `sys_use_section` VALUES (2, 3, 2);
+INSERT INTO `sys_use_section` VALUES (4, 5, 2);
+INSERT INTO `sys_use_section` VALUES (8, 4, 1);
+INSERT INTO `sys_use_section` VALUES (9, 6, 3);
+INSERT INTO `sys_use_section` VALUES (10, 7, 4);
 
 -- ----------------------------
 -- Table structure for sys_user
@@ -465,13 +481,18 @@ CREATE TABLE `sys_user`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   `user_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户类型',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生用户表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
-INSERT INTO `sys_user` VALUES (1, '202211701001', '123456', '张三', '男', '22', '12345678912', '12345678912@qq.com', '2025-04-19 09:15:20', '2025-04-19 09:15:20', '学生');
-INSERT INTO `sys_user` VALUES (3, '2552552', '123456', '李四', '男', '44', '25252525', '252542424@qq.com', '2025-04-19 08:00:00', '2025-04-19 12:08:32', '学生');
+INSERT INTO `sys_user` VALUES (1, 'admin', '123456', '', '', ' ', ' ', ' ', '2025-04-20 14:53:34', '2025-04-23 15:52:48', ' ');
+INSERT INTO `sys_user` VALUES (4, '202211701001', '123456', '张三', '男', '18', '12345678998', '12345678998@163.com', '2025-04-21 08:00:00', '2025-04-23 16:21:12', '学生');
+INSERT INTO `sys_user` VALUES (5, '202211701002', '123456', '李四', '男', '19', '12345678997', '12345678997@qq.com', '2025-04-21 21:39:37', '2025-04-21 21:39:37', '学生');
+INSERT INTO `sys_user` VALUES (6, '202211701003', '123456', '王五', '男', '20', '12345678996', '12345678996@163.com', '2025-04-23 16:23:19', '2025-04-23 16:23:18', '学生');
+INSERT INTO `sys_user` VALUES (7, '202211701004', '123456', '赵六', '女', '22', '12345678995', '12345678995@163.com', '2025-04-23 16:24:16', '2025-04-23 16:24:16', '学生');
+INSERT INTO `sys_user` VALUES (8, '20221001', '123456', '林国瑞', '男', '41', '12345678994', '12345678994@163.com', '2025-04-23 16:30:08', '2025-04-23 16:30:07', '职工');
+INSERT INTO `sys_user` VALUES (9, '20221002', '123456', '吴俊伯', '男', '46', '12345678993', '12345678993@qq.com', '2025-04-23 16:33:13', '2025-04-23 16:33:12', '职工');
 
 -- ----------------------------
 -- Table structure for team
@@ -487,7 +508,7 @@ CREATE TABLE `team`  (
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `team_name`(`team_name`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '团队表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '团队表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of team
@@ -504,7 +525,7 @@ CREATE TABLE `team_member_relation`  (
   `create_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '团队与队员关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '团队与队员关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of team_member_relation
@@ -529,7 +550,7 @@ CREATE TABLE `usages`  (
   INDEX `FKo3fufdtu3cfgnv9gxjdp2wm3i`(`venue_id`) USING BTREE,
   CONSTRAINT `FKld3pe2uigikuc9dpknq5f2yp4` FOREIGN KEY (`reservation_id`) REFERENCES `reservations` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FKo3fufdtu3cfgnv9gxjdp2wm3i` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 313 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 339 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of usages
@@ -562,7 +583,7 @@ CREATE TABLE `venues`  (
   `price_per_hour` decimal(19, 2) NOT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 592 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 642 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of venues

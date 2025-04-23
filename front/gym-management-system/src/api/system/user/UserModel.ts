@@ -35,3 +35,9 @@ export type AssignParm = {
     roleId:string;
     userId:string;
 }
+//修改密码参数
+export type UpdateParm = {
+    id:string;
+    oldPassword:string;
+    password:string;
+}

@@ -7,7 +7,7 @@
         <el-form-item>
             <el-button icon="Search" @click="searchBtn">搜索</el-button>
             <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
-            <el-button icon="Plus" type="primary" @click="addBtn">新增</el-button>
+            <el-button v-permission="['sys:role:add']" icon="Plus" type="primary" @click="addBtn">新增</el-button>
         </el-form-item>
        </el-form>
 
@@ -18,9 +18,9 @@
         <el-table-column prop="remark" label="角色备注"></el-table-column>
         <el-table-column label="操作" width="320px">
             <template #default="scope" >
-                <el-button type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
-                <el-button type="success" icon="Edit" size="small" @click="assignBtn(scope.row)">分配菜单</el-button>
-                <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
+                <el-button v-permission="['sys:role:edit']" type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
+                <el-button v-permission="['sys:role:assign']" type="success" icon="Edit" size="small" @click="assignBtn(scope.row)">分配菜单</el-button>
+                <el-button v-permission="['sys:role:delete']" type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
             </template>
         </el-table-column>
        </el-table>

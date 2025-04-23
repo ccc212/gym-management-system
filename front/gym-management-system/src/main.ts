@@ -9,16 +9,21 @@ import myconfirm from './utils/myconfirm'
 import App from './App.vue'
 import { createPinia } from 'pinia'
 import './permission'
+//按钮权限
+import {permission} from './directive/permission'
 
 const app = createApp(App)
 const pinia = createPinia()
 
 pinia.use(piniaPluginPersistedstate)
 
+app.directive('permission',permission)
+
 app.use(router)
   .use(ElementPlus, { locale: zhCn })
   .use(pinia)
   .mount('#app')
+
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)

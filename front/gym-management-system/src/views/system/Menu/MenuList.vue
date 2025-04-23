@@ -1,6 +1,6 @@
 <template>
     <el-main>
-       <el-button icon="Plus" type="primary" @click="addBtn">新增</el-button>
+       <el-button  icon="Plus" type="primary" @click="addBtn">新增</el-button>
 
        <el-table :data="tableList" row-key="id" style="margin-top: 20px;" default-expand-all border stripe>
         <el-table-column label="菜单名称" prop="title"></el-table-column>
@@ -22,11 +22,12 @@
         <el-table-column label="路由名称" prop="name"></el-table-column>
         <el-table-column label="路由地址" prop="path"></el-table-column>
         <el-table-column label="组件路径" prop="url"></el-table-column>
+        <el-table-column label="权限字段" prop="code"></el-table-column>
         <el-table-column label="序号" prop="orderNum"></el-table-column>
         <el-table-column label="操作" width="220" align="center">
             <template #default="scope">
-                <el-button type="primary" icon="Edit" size="default" @click="editBtn(scope.row)">编辑</el-button>
-                <el-button type="danger" icon="Delete" size="default" @click="deleteBtn(scope.row.id)">删除</el-button>
+                <el-button v-permission="['sys:menu:edit']" type="primary" icon="Edit" size="default" @click="editBtn(scope.row)">编辑</el-button>
+                <el-button v-permission="['sys:menu:delete']" type="danger" icon="Delete" size="default" @click="deleteBtn(scope.row.id)">删除</el-button>
             </template>
         </el-table-column>
        </el-table>

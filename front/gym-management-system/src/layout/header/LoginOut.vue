@@ -41,12 +41,14 @@ import {updatePasswordApi} from '../../api/system/user/index'
 import {useRouter} from 'vue-router'
 import {userStore} from '../../store/user/index'
 import useInstance from '../../hooks/useInstance'
+import {tabStore} from '../../store/tabs/index'
 
 
 
 const{global} = useInstance()
 const store = userStore()
 const router = useRouter()
+const tStore = tabStore()
 const form = ref<FormInstance>()
 
 const openPassword = ref(false)
@@ -103,6 +105,7 @@ function submitFormEdit(){
         // 这里可以添加提交表单的逻辑
         let res = await updatePasswordApi(upModel)
         if(res && res.code === 0){
+          tStore.clearTab()
           store.setToken('')
           router.push({path:'/login'})
           ElMessage.success(res.msg)
@@ -122,6 +125,7 @@ function cancel(){
 async function loginOutBtn(){
   const confirm = await global.$myconfirm("是否退出登录")
   if(confirm){
+    tStore.clearTab()
     store.setToken('')
     localStorage.clear();
     router.replace({path:'/login'})

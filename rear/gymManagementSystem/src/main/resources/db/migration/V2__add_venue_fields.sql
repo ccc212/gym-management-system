@@ -1,4 +1,0 @@
-ALTER TABLE venues
-ADD COLUMN status VARCHAR(50),
-ADD COLUMN created_at TIMESTAMP,
-ADD COLUMN updated_at TIMESTAMP; 

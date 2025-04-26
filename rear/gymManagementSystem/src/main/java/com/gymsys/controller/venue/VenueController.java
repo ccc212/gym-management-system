@@ -7,8 +7,6 @@ import com.gymsys.entity.venue.TimeSlot;
 import com.gymsys.entity.reservation.ReservationEntity;
 import com.gymsys.dto.ReservationRequest;
 import com.gymsys.repository.venue.VenueRepository;
-import com.gymsys.repository.venue.TimeSlotRepository;
-import com.gymsys.service.reservation.ReservationService;
 import com.gymsys.service.reservation.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api/venues")
@@ -26,10 +25,19 @@ public class VenueController {
     private VenueRepository venueRepository;
     
     @Autowired
-    private TimeSlotRepository timeSlotRepository;
-    
-    @Autowired
     private ReservationService reservationService;
+    
+    @GetMapping("/types")
+    public ResponseEntity<List<String>> getVenueTypes() {
+        return ResponseEntity.ok(Arrays.asList(
+            "basketball",
+            "football",
+            "badminton",
+            "tennis",
+            "swimming",
+            "table_tennis"
+        ));
+    }
     
     @GetMapping
     public ResponseEntity<Page<VenueEntity>> getAllVenues(
@@ -69,8 +77,11 @@ public class VenueController {
     @GetMapping("/{venueId}/time-slots")
     public ResponseEntity<List<TimeSlot>> getTimeSlots(
             @PathVariable Long venueId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String date) {
-        List<TimeSlot> timeSlots = reservationService.getAvailableTimeSlots(venueId, date);
+            @RequestParam String date) {
+        String formattedDate = date.replace("年", "-")
+                                 .replace("月", "-")
+                                 .replace("日", "");
+        List<TimeSlot> timeSlots = reservationService.getAvailableTimeSlots(venueId, formattedDate);
         return ResponseEntity.ok(timeSlots);
     }
     
@@ -115,13 +126,5 @@ public class VenueController {
         }
         venueRepository.deleteById(id);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/{id}/time-slots")
-    public ResponseEntity<List<TimeSlot>> getVenueTimeSlots(
-            @PathVariable Long id,
-            @RequestParam String date) {
-        List<TimeSlot> timeSlots = timeSlotRepository.findByVenueIdAndDate(id, date);
-        return ResponseEntity.ok(timeSlots);
     }
 }

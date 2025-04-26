@@ -130,14 +130,7 @@ const UserScheduleComponent = {
                 venueId: ''
             },
             // 场馆类型选项
-            venueTypes: [
-                { value: 'basketball', label: '篮球场' },
-                { value: 'football', label: '足球场' },
-                { value: 'badminton', label: '羽毛球场' },
-                { value: 'tennis', label: '网球场' },
-                { value: 'swimming', label: '游泳池' },
-                { value: 'table_tennis', label: '乒乓球室' }
-            ],
+            venueTypes: [],
             // 场馆列表
             venues: [],
             // 当前周的开始日期
@@ -224,25 +217,40 @@ const UserScheduleComponent = {
         // 加载场馆数据
         loadVenueData() {
             this.loading = true;
-
-            // 模拟API请求
-            setTimeout(() => {
-                // 模拟数据
-                this.venues = [
-                    { id: 1, name: '篮球场A', type: '篮球场', location: '体育馆一楼' },
-                    { id: 2, name: '篮球场B', type: '篮球场', location: '体育馆一楼' },
-                    { id: 3, name: '足球场A', type: '足球场', location: '户外运动区' },
-                    { id: 4, name: '羽毛球场A', type: '羽毛球场', location: '体育馆二楼' },
-                    { id: 5, name: '羽毛球场B', type: '羽毛球场', location: '体育馆二楼' },
-                    { id: 6, name: '羽毛球场C', type: '羽毛球场', location: '体育馆二楼' },
-                    { id: 7, name: '网球场A', type: '网球场', location: '户外运动区' },
-                    { id: 8, name: '游泳池', type: '游泳池', location: '体育馆负一楼' },
-                    { id: 9, name: '乒乓球室A', type: '乒乓球室', location: '体育馆三楼' },
-                    { id: 10, name: '乒乓球室B', type: '乒乓球室', location: '体育馆三楼' }
-                ];
-
-                this.loading = false;
-            }, 300);
+            console.log('开始加载场馆数据...');
+            
+            // 先获取场地类型
+            axios.get('/api/venues/types')
+                .then(response => {
+                    console.log('获取到场地类型:', response.data);
+                    if (Array.isArray(response.data)) {
+                        this.venueTypes = response.data.map(type => ({
+                            value: type,
+                            label: this.getVenueTypeLabel(type)
+                        }));
+                    } else {
+                        console.error('场地类型数据格式错误');
+                        this.$message.error('场地类型数据格式错误');
+                    }
+                    
+                    // 获取场馆列表
+                    return axios.get('/api/venues');
+                })
+                .then(response => {
+                    console.log('获取到场馆列表:', response.data);
+                    if (response.data && response.data.records) {
+                        this.venues = response.data.records;
+                    } else {
+                        this.venues = [];
+                    }
+                })
+                .catch(error => {
+                    console.error('加载场馆数据失败:', error);
+                    this.$message.error('加载场馆数据失败: ' + error.message);
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         // 初始化时间段
         initTimeSlots() {
@@ -269,53 +277,53 @@ const UserScheduleComponent = {
         // 加载场地安排数据
         loadScheduleData() {
             this.loading = true;
-
-            // 模拟API请求
-            setTimeout(() => {
-                // 生成本周的日期范围
-                const dateRange = this.weekDays.map(day => day.date);
-
-                // 模拟数据
-                this.scheduleData = [];
-
-                // 为每个场地生成一些随机安排
-                this.venues.forEach(venue => {
-                    dateRange.forEach(date => {
-                        this.timeSlots.forEach(timeSlot => {
-                            // 随机生成不同状态的安排，实际应该从后端获取
-                            if (Math.random() > 0.7) { // 30%的概率有安排
-                                const statuses = ['AVAILABLE', 'BOOKED', 'IN_USE', 'SPECIAL', 'MAINTENANCE'];
-                                const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-
-                                const schedule = {
-                                    id: `${venue.id}-${date}-${timeSlot.id}`,
-                                    venueId: venue.id,
-                                    venueName: venue.name,
-                                    venueType: venue.type,
-                                    date: date,
-                                    timeRange: timeSlot.timeRange,
-                                    status: randomStatus
-                                };
-
-                                // 如果是已预约状态，添加预约人信息
-                                if (randomStatus === 'BOOKED' || randomStatus === 'IN_USE') {
-                                    schedule.bookedBy = '测试用户';
-                                    schedule.numberOfPeople = Math.floor(Math.random() * 10) + 1;
-                                    schedule.remarks = Math.random() > 0.5 ? '临时预约' : '';
-                                }
-
-                                this.scheduleData.push(schedule);
-                            }
-                        });
-                    });
+            console.log('开始加载场地安排数据...');
+            
+            // 构建查询参数
+            const params = {
+                startDate: this.formatDate(this.currentWeekStart),
+                endDate: this.formatDate(new Date(this.currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000))
+            };
+            
+            if (this.searchForm.venueType) {
+                params.venueType = this.searchForm.venueType;
+            }
+            if (this.searchForm.venueId) {
+                params.venueId = this.searchForm.venueId;
+            }
+            
+            console.log('查询参数:', params);
+            
+            axios.get('/api/venue-schedules/weekly', { params })
+                .then(response => {
+                    console.log('获取到场地安排数据:', response.data);
+                    // 检查响应格式
+                    if (response.data && response.data.code === 200) {
+                        const schedules = response.data.data || [];
+                        this.scheduleData = schedules.map(schedule => ({
+                            venueId: schedule.venueId,
+                            venueName: schedule.venueName,
+                            venueType: schedule.type,
+                            date: this.formatDate(new Date(schedule.date)),
+                            timeRange: schedule.timeSlot,
+                            status: schedule.status
+                        }));
+                    } else {
+                        console.error('响应格式错误:', response.data);
+                        this.scheduleData = [];
+                        this.$message.error(response.data.msg || '加载场地安排数据失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('加载场地安排数据失败:', error);
+                    this.scheduleData = [];
+                    this.$message.error('加载场地安排数据失败: ' + error.message);
+                })
+                .finally(() => {
+                    this.loading = false;
                 });
-
-                // 根据筛选条件过滤
-                this.filterSchedule();
-
-                this.loading = false;
-            }, 500);
-        },        // 搜索场地安排
+        },
+        // 搜索场地安排
         searchSchedule() {
             this.loadScheduleData();
         },
@@ -420,6 +428,18 @@ const UserScheduleComponent = {
 
             return `${this.formatDate(start)} 至 ${this.formatDate(end)}`;
         },
+        // 获取场地类型标签
+        getVenueTypeLabel(type) {
+            const typeMap = {
+                'basketball': '篮球场',
+                'football': '足球场',
+                'badminton': '羽毛球场',
+                'tennis': '网球场',
+                'swimming': '游泳池',
+                'table_tennis': '乒乓球室'
+            };
+            return typeMap[type] || type;
+        },
         // 获取状态文本
         getStatusText(status) {
             const texts = {
@@ -427,7 +447,9 @@ const UserScheduleComponent = {
                 'BOOKED': '已预约',
                 'IN_USE': '使用中',
                 'SPECIAL': '特殊场地',
-                'MAINTENANCE': '维护中'
+                'MAINTENANCE': '维护中',
+                'PENDING': '待确认',
+                'PAST': '已过期'
             };
             return texts[status] || '未知';
         },

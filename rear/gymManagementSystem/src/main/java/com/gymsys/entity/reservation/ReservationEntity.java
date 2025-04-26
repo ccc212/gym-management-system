@@ -64,7 +64,7 @@ public class ReservationEntity {
     /**
      * 备注
      */
-    private String remarks;
+    private String remark;
     
     /**
      * 总价格

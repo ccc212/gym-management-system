@@ -85,16 +85,19 @@ const UserVenuesComponent = {
                     
                     <div class="time-slots-container">
                         <el-row :gutter="10">
-                            <el-col :span="6" v-for="timeSlot in timeSlots" :key="timeSlot.id">
+                            <el-col :span="6" v-for="timeSlot in timeSlots" :key="timeSlot.startTime">
                                 <div 
                                     :class="['time-slot', {
                                         'available': timeSlot.status === 'AVAILABLE',
                                         'booked': timeSlot.status === 'BOOKED',
                                         'special': timeSlot.status === 'SPECIAL',
-                                        'selected': selectedTimeSlot && selectedTimeSlot.id === timeSlot.id
+                                        'selected': selectedTimeSlot && selectedTimeSlot.startTime === timeSlot.startTime
                                     }]"
-                                    @click="selectTimeSlot(timeSlot)">
+                                    @click="timeSlot.status === 'AVAILABLE' && selectTimeSlot(timeSlot)">
                                     {{ timeSlot.startTime }} - {{ timeSlot.endTime }}
+                                    <div class="time-slot-price" v-if="timeSlot.status === 'AVAILABLE'">
+                                        {{ timeSlot.price }}元
+                                    </div>
                                 </div>
                             </el-col>
                         </el-row>
@@ -276,48 +279,46 @@ const UserVenuesComponent = {
         },
         // 加载时间段数据
         async loadTimeSlots() {
-            if (!this.selectedVenue || !this.searchForm.date) {
-                this.$message.warning('请先选择场地和日期');
-                return;
-            }
-
             try {
+                const date = this.searchForm.date;
                 const response = await axios.get(`${this.apiBaseUrl}/${this.selectedVenue.id}/time-slots`, {
-                    params: {
-                        date: this.searchForm.date
-                    }
+                    params: { date: date }
                 });
-                this.timeSlots = response.data;
+                
+                console.log('获取到的时间段数据:', response.data);
+                
+                if (response.data && Array.isArray(response.data)) {
+                    this.timeSlots = response.data.map(slot => ({
+                        ...slot,
+                        startTime: slot.startTime.format ? slot.startTime.format('HH:mm') : slot.startTime,
+                        endTime: slot.endTime.format ? slot.endTime.format('HH:mm') : slot.endTime,
+                        price: Number(slot.price).toFixed(2)
+                    }));
+                    console.log('处理后的时间段数据:', this.timeSlots);
+                } else {
+                    this.timeSlots = [];
+                    this.$message.warning('没有可用的时间段');
+                }
             } catch (error) {
-                this.$message.error('加载时间段失败');
                 console.error('加载时间段失败:', error);
+                this.$message.error('加载时间段失败: ' + error.message);
+                this.timeSlots = [];
             }
         },
         // 选择时间段
         selectTimeSlot(timeSlot) {
-            if (timeSlot.status !== 'AVAILABLE') {
-                this.$message.warning('该时间段不可预约');
-                return;
+            if (timeSlot.status === 'AVAILABLE') {
+                this.selectedTimeSlot = timeSlot;
+                this.bookingForm.startTime = timeSlot.startTime;
+                this.bookingForm.endTime = timeSlot.endTime;
             }
-
-            this.selectedTimeSlot = timeSlot;
         },
         // 计算预估费用
         calculateEstimatedCost() {
-            if (!this.selectedTimeSlot || !this.selectedVenue) return 0;
-
-            // 解析时间计算小时数
-            const startTime = this.selectedTimeSlot.startTime.split(':');
-            const endTime = this.selectedTimeSlot.endTime.split(':');
-
-            const startMinutes = parseInt(startTime[0]) * 60 + parseInt(startTime[1]);
-            const endMinutes = parseInt(endTime[0]) * 60 + parseInt(endTime[1]);
-
-            // 计算小时数（取整到0.5小时）
-            const hours = (endMinutes - startMinutes) / 60;
-
-            // 计算费用
-            return (this.selectedVenue.pricePerHour * hours).toFixed(2);
+            if (this.selectedTimeSlot) {
+                return this.selectedTimeSlot.price;
+            }
+            return 0;
         },
         // 确认预约
         confirmBooking() {

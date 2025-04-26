@@ -83,7 +83,7 @@ public class ReservationController {
                 reservation.getStartTime(),
                 reservation.getEndTime(),
                 reservation.getNumberOfPeople(),
-                reservation.getRemarks()
+                reservation.getRemark()
         );
         
         return ResponseEntity.ok(createdReservation);

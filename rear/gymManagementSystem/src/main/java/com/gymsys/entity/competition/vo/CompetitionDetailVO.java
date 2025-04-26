@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.gymsys.entity.competition.CompetitionEquipmentRelation;
 import com.gymsys.entity.competition.CompetitionVenueRelation;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder
+@Accessors(chain = true)
 public class CompetitionDetailVO implements Serializable {
 
     @Serial

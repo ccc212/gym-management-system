@@ -3,7 +3,7 @@ package com.gymsys.entity.competition.dto.competition;
 import com.gymsys.entity.BaseDTO;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,9 +11,14 @@ import java.util.List;
 public class UpdateCompetitionDTO extends BaseDTO {
 
     /**
+     *
+     */
+    @NotNull(message = "赛事id不能为空")
+    private Long id;
+
+    /**
      * 赛事名称
      */
-    @NotBlank(message = "赛事名称不能为空")
     private String name;
 
     /**

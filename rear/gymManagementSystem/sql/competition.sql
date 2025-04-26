@@ -119,7 +119,8 @@ create table `competition_sign_up_user`
     competition_item_id bigint                  not null comment '赛事项目id',
     user_stuorfac       varchar(255)            not null comment '区分学生或教职工 0 学生 1教师',
     remark              text comment '备注',
-    status              tinyint      default 0  not null comment '状态(0为报名中，1为报名成功，2为报名失败)'
+    status              tinyint      default 0  not null comment '状态(0为报名中，1为报名成功，2为报名失败)',
+    reject_reason              text comment '拒绝原因'
 ) engine = innodb
   default charset = utf8mb4 comment ='赛事个人报名表';
 
@@ -135,7 +136,8 @@ create table `competition_sign_up_team`
     depart_id           int                     not null comment '部门id',
     competition_item_id bigint                  not null comment '赛事项目id',
     remark              text comment '备注',
-    status              tinyint      default 0  not null comment '状态(0为报名中，1为报名成功，2为报名失败)'
+    status              tinyint      default 0  not null comment '状态(0为报名中，1为报名成功，2为报名失败)',
+    reject_reason              text comment '拒绝原因'
 ) engine = innodb
   default charset = utf8mb4 comment ='赛事团体报名表';
 

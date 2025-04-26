@@ -33,7 +33,12 @@ public enum StatusCodeEnum {
     // 赛事管理相关
     COMPETITION_NOT_EXIST(-10401, "赛事不存在"),
     COMPETITION_EQUIPMENT_RELATION_NOT_EXIST(-10402, "赛事与器材关联不存在"),
-    COMPETITION_VENUE_RELATION_NOT_EXIST(-10403, "赛事与场地关联不存在")
+    COMPETITION_VENUE_RELATION_NOT_EXIST(-10403, "赛事与场地关联不存在"),
+    COMPETITION_SIGN_UP_USER_NOT_EXIST(-10404, "个人报名不存在"),
+    COMPETITION_SIGN_UP_TEAM_NOT_EXIST(-10405, "团队报名不存在"),
+    TEAM_NOT_EXIST(-10406, "团队不存在"),
+    TEAM_MEMBER_RELATION_NOT_EXIST(-10407, "团队成员关联不存在"),
+
 
     // 器材管理相关
 

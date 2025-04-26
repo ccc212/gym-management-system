@@ -2,8 +2,8 @@ package com.gymsys.entity.competition;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
  * @since 2025-04-19
  */
 @Data
-@Builder
+@Accessors(chain = true)
 public class Competition implements Serializable {
 
     @Serial

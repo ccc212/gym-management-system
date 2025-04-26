@@ -5,20 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gymsys.entity.competition.Competition;
-import com.gymsys.entity.competition.CompetitionEquipmentRelation;
-import com.gymsys.entity.competition.CompetitionItemRelation;
-import com.gymsys.entity.competition.CompetitionVenueRelation;
+import com.gymsys.entity.competition.*;
 import com.gymsys.entity.competition.dto.competition.AddCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
 import com.gymsys.entity.competition.vo.CompetitionDetailVO;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
-import com.gymsys.mapper.competition.CompetitionEquipmentRelationMapper;
-import com.gymsys.mapper.competition.CompetitionItemRelationMapper;
-import com.gymsys.mapper.competition.CompetitionMapper;
-import com.gymsys.mapper.competition.CompetitionVenueRelationMapper;
+import com.gymsys.mapper.competition.*;
 import com.gymsys.service.competition.ICompetitionService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +38,8 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
 
     private final CompetitionEquipmentRelationMapper competitionEquipmentRelationMapper;
 
+    private final CompetitionItemMapper competitionItemMapper;
+
     @Override
     public void addCompetition(AddCompetitionDTO addCompetitionDTO) {
         // 添加赛事
@@ -53,10 +49,9 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
         // 添加赛事与项目的关联
         List<Long> competitionItemIds = addCompetitionDTO.getCompetitionItemIds();
         List<CompetitionItemRelation> competitionItemRelations = competitionItemIds.stream()
-                .map(competitionItemId -> CompetitionItemRelation.builder()
-                        .competitionId(competition.getId())
-                        .competitionItemId(competitionItemId)
-                        .build())
+                .map(competitionItemId -> new CompetitionItemRelation()
+                        .setCompetitionId(competition.getId())
+                        .setCompetitionItemId(competitionItemId))
                 .toList();
         competitionItemRelationMapper.insert(competitionItemRelations);
     }
@@ -75,7 +70,8 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
         String competitionName = updateCompetitionDTO.getName();
 
         // 更新赛事信息
-        lambdaUpdate().eq(Competition::getName, competitionName)
+        lambdaUpdate().eq(Competition::getId, updateCompetitionDTO.getId())
+                .set(updateCompetitionDTO.getName() != null, Competition::getName, updateCompetitionDTO.getName())
                 .set(updateCompetitionDTO.getType() != null, Competition::getType, updateCompetitionDTO.getType())
                 .set(updateCompetitionDTO.getCategory() != null, Competition::getCategory, updateCompetitionDTO.getCategory())
                 .set(updateCompetitionDTO.getHoster() != null, Competition::getHoster, updateCompetitionDTO.getHoster())
@@ -97,10 +93,9 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
             competitionItemRelationMapper.delete(new LambdaQueryWrapper<CompetitionItemRelation>()
                     .eq(CompetitionItemRelation::getCompetitionId, competition.getId()));
             competitionItemRelationMapper.insert(competitionItemIds.stream()
-                    .map(competitionItemId -> CompetitionItemRelation.builder()
-                            .competitionId(competition.getId())
-                            .competitionItemId(competitionItemId)
-                            .build())
+                    .map(competitionItemId -> new CompetitionItemRelation()
+                            .setCompetitionId(competition.getId())
+                            .setCompetitionItemId(competitionItemId))
                     .toList());
         }
     }
@@ -125,20 +120,30 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
         List<CompetitionEquipmentRelation> competitionEquipmentRelations = competitionEquipmentRelationMapper.selectList(new LambdaQueryWrapper<CompetitionEquipmentRelation>()
                 .eq(CompetitionEquipmentRelation::getCompetitionId, id));
 
-        return CompetitionDetailVO.builder()
-                .id(competition.getId())
-                .name(competition.getName())
-                .type(competition.getType())
-                .category(competition.getCategory())
-                .hoster(competition.getHoster())
-                .startTime(competition.getStartTime())
-                .endTime(competition.getEndTime())
-                .signUpDeadline(competition.getSignUpDeadline())
-                .isTeamCompetition(competition.getIsTeamCompetition())
-                .venueRelations(competitionVenueRelations)
-                .equipmentRelations(competitionEquipmentRelations)
-                .requirement(competition.getRequirement())
-                .description(competition.getDescription())
-                .build();
+        return new CompetitionDetailVO()
+                .setId(competition.getId())
+                .setName(competition.getName())
+                .setType(competition.getType())
+                .setCategory(competition.getCategory())
+                .setHoster(competition.getHoster())
+                .setStartTime(competition.getStartTime())
+                .setEndTime(competition.getEndTime())
+                .setSignUpDeadline(competition.getSignUpDeadline())
+                .setIsTeamCompetition(competition.getIsTeamCompetition())
+                .setVenueRelations(competitionVenueRelations)
+                .setEquipmentRelations(competitionEquipmentRelations)
+                .setRequirement(competition.getRequirement())
+                .setDescription(competition.getDescription());
+    }
+
+    @Override
+    public List<CompetitionItem> listItem() {
+        return competitionItemMapper.selectList(null);
+    }
+
+    @Override
+    public List<CompetitionItemRelation> listItemByCompetitionId(Long competitionId) {
+        return competitionItemRelationMapper.selectList(new LambdaQueryWrapper<CompetitionItemRelation>()
+                .eq(CompetitionItemRelation::getCompetitionId, competitionId));
     }
 }

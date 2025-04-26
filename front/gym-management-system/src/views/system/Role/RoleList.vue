@@ -7,7 +7,7 @@
         <el-form-item>
             <el-button icon="Search" @click="searchBtn">搜索</el-button>
             <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
-            <el-button icon="Plus" type="primary" @click="addBtn">新增</el-button>
+            <el-button v-permission="['sys:role:add']" icon="Plus" type="primary" @click="addBtn">新增</el-button>
         </el-form-item>
        </el-form>
 
@@ -16,10 +16,11 @@
         <el-table-column prop="id" label="序号"></el-table-column>
         <el-table-column prop="roleName" label="角色名称"></el-table-column>
         <el-table-column prop="remark" label="角色备注"></el-table-column>
-        <el-table-column label="操作" width="200px">
-            <template #default="scope">
-                <el-button type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
-                <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
+        <el-table-column label="操作" width="320px">
+            <template #default="scope" >
+                <el-button v-permission="['sys:role:edit']" type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
+                <el-button v-permission="['sys:role:assign']" type="success" icon="Edit" size="small" @click="assignBtn(scope.row)">分配菜单</el-button>
+                <el-button v-permission="['sys:role:delete']" type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
             </template>
         </el-table-column>
        </el-table>
@@ -73,7 +74,8 @@
       </template>
     </el-dialog>
 
-
+    <!-- 分配菜单 -->
+     <AssignTree ref="assignTree"></AssignTree>
     </el-main>
 </template>
 
@@ -85,6 +87,10 @@ import {addRole,getRoleList,deleteRole,editRole} from '../../../api/system/role/
 import type {Role} from '../../../api/system/role/RoleModel'
 import { nextTick } from 'vue'
 import useInstance from '../../../hooks/useInstance'
+import AssignTree from './AssignTree.vue'
+
+//菜单树ref
+const assignTree = ref()
 
 //获取全局
 const {global} = useInstance()
@@ -159,21 +165,30 @@ const openAdd = ref(false)
 //编辑角色对话框
 const openEdit = ref(false)
 
+//分配菜单按钮
+function assignBtn(row:Role){
+    assignTree.value.show(row.id,row.roleName)
+}
+
 // 取消按钮
 function cancel() {
   openEdit.value = false;
   openAdd.value = false;
+  addRef.value?.resetFields()
 }
 //新增角色
 function addBtn(){
-    openAdd.value = true
     addRef.value?.resetFields()
+    openAdd.value = true
+    
 }
 
 //编辑角色
 function editBtn(row:Role){
-    openEdit.value = true;
     addRef.value?.resetFields()
+
+    openEdit.value = true;
+    
     nextTick(()=>{
         Object.assign(addModel,row)
     })

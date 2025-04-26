@@ -3,7 +3,7 @@ package com.gymsys.controller.system;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gymsys.domain.entity.Result;
+import com.gymsys.entity.Result;
 import com.gymsys.entity.system.*;
 import com.gymsys.service.system.SectionService;
 import org.apache.commons.lang3.StringUtils;

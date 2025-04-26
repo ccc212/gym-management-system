@@ -3,10 +3,12 @@ package com.gymsys.controller.system;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gymsys.domain.entity.Result;
+import com.gymsys.entity.Result;
 import com.gymsys.entity.system.Role;
 import com.gymsys.entity.system.RoleParm;
+import com.gymsys.entity.system.SaveMenuParm;
 import com.gymsys.entity.system.SelectItme;
+import com.gymsys.service.system.MenuRoleService;
 import com.gymsys.service.system.RoleService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private MenuRoleService menuRoleService;
 
     /**
      * 添加角色
@@ -96,6 +100,17 @@ public class RoleController {
                     selectList.add(vo);
                 });
         return Result.success(selectList);
+    }
+
+    /**
+     * 保存角色菜单
+     * @param parm
+     * @return
+     */
+    @PostMapping("/saveRoleMenu")
+    public Result saveRoleMenu(@RequestBody SaveMenuParm parm){
+        menuRoleService.saveMenuRole(parm);
+        return Result.success("添加菜单成功");
     }
 }
 

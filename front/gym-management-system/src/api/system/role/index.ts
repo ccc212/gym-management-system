@@ -1,5 +1,5 @@
 import http from "../../../http/index";
-import type { Role, RoleListParm } from "./RoleModel";
+import type { Role, RoleListParm,SaveMenuParm } from "./RoleModel";
 
 //新增角色
 export function addRole(parm:Role){
@@ -24,4 +24,9 @@ export function editRole(parm:Role){
 //下拉角色
 export function getRoleSelect(){
     return http.get("/api/system/role/selectList")
+}
+
+//分配菜单保存
+export function saveRoleMenuApi(parm:SaveMenuParm){
+    return http.post("/api/system/role/saveRoleMenu",parm)
 }

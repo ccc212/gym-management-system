@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("venue")
+@TableName("venues")
 public class VenueEntity {
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -17,8 +17,10 @@ public class VenueEntity {
     private String type;
     private String description;
     private Boolean isAvailable;
+    private String location;
+    private Integer capacity;
+    private BigDecimal pricePerHour;
     private String status;
-    private BigDecimal price;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

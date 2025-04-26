@@ -69,7 +69,7 @@ public class UsageService {
         // 计算费用
         VenueEntity venue = venueRepository.selectById(usage.getVenueId());
         long hours = ChronoUnit.HOURS.between(usage.getStartTime(), usage.getEndTime());
-        usage.setCost(venue.getPrice().multiply(BigDecimal.valueOf(hours)));
+        usage.setCost(venue.getPricePerHour().multiply(BigDecimal.valueOf(hours)));
         
         // 更新使用记录
         usageRepository.updateById(usage);

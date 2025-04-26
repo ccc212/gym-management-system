@@ -12,15 +12,15 @@ import java.util.List;
 @Mapper
 public interface VenueRepository extends BaseMapper<VenueEntity> {
     
-    @Select("SELECT * FROM venue WHERE is_available = #{isAvailable}")
+    @Select("SELECT * FROM venues WHERE is_available = #{isAvailable}")
     List<VenueEntity> findByIsAvailable(@Param("isAvailable") boolean isAvailable);
     
-    @Select("SELECT * FROM venue WHERE status = #{status}")
+    @Select("SELECT * FROM venues WHERE status = #{status}")
     Page<VenueEntity> findByStatus(@Param("status") String status, Page<VenueEntity> page);
     
-    @Select("SELECT * FROM venue WHERE type = #{type}")
+    @Select("SELECT * FROM venues WHERE type = #{type}")
     Page<VenueEntity> findByTypeWithPage(@Param("type") String type, Page<VenueEntity> page);
     
-    @Select("SELECT * FROM venue WHERE type = #{type} AND status = #{status}")
+    @Select("SELECT * FROM venues WHERE type = #{type} AND status = #{status}")
     Page<VenueEntity> findByTypeAndStatus(@Param("type") String type, @Param("status") String status, Page<VenueEntity> page);
 }

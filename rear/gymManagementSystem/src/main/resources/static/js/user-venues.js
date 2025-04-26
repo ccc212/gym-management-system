@@ -39,16 +39,23 @@ const UserVenuesComponent = {
                     border>
                     <el-table-column prop="name" label="场地名称" width="150"></el-table-column>
                     <el-table-column prop="type" label="场地类型" width="120"></el-table-column>
-                    <el-table-column prop="location" label="场地位置"></el-table-column>
-                    <el-table-column prop="capacity" label="容纳人数" width="120"></el-table-column>
-                    <el-table-column prop="pricePerHour" label="每小时价格" width="120">
+                    <el-table-column prop="description" label="场地描述"></el-table-column>
+                    <el-table-column prop="pricePerHour" label="价格" width="120">
                         <template slot-scope="scope">
-                            {{ scope.row.pricePerHour }} 元
+                            {{ scope.row.pricePerHour }} 元/小时
+                        </template>
+                    </el-table-column>
+                   
+                    <el-table-column prop="status" label="状态" width="120">
+                        <template slot-scope="scope">
+                            <el-tag :type="scope.row.isAvailable ? 'success' : 'danger'">
+                                {{ scope.row.isAvailable ? '可用' : '不可用' }}
+                            </el-tag>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="180">
                         <template slot-scope="scope">
-                            <el-button type="primary" size="mini" @click="showTimeSlots(scope.row)">预约</el-button>
+                            <el-button type="primary" size="mini" @click="showTimeSlots(scope.row)" :disabled="!scope.row.isAvailable">预约</el-button>
                             <el-button type="info" size="mini" @click="showVenueDetails(scope.row)">详情</el-button>
                         </template>
                     </el-table-column>
@@ -96,9 +103,6 @@ const UserVenuesComponent = {
                     <el-divider></el-divider>
                     
                     <el-form :model="bookingForm" :rules="bookingRules" ref="bookingForm" label-width="100px" size="small">
-                        <el-form-item label="预约人数" prop="numberOfPeople">
-                            <el-input-number v-model="bookingForm.numberOfPeople" :min="1" :max="selectedVenue.capacity"></el-input-number>
-                        </el-form-item>
                         <el-form-item label="备注信息" prop="remarks">
                             <el-input type="textarea" v-model="bookingForm.remarks" placeholder="请输入预约备注信息"></el-input>
                         </el-form-item>
@@ -124,11 +128,13 @@ const UserVenuesComponent = {
                     <div class="venue-info">
                         <h3>{{ selectedVenue.name }}</h3>
                         <p><strong>类型:</strong> {{ selectedVenue.type }}</p>
-                        <p><strong>位置:</strong> {{ selectedVenue.location }}</p>
-                        <p><strong>容纳人数:</strong> {{ selectedVenue.capacity }} 人</p>
-                        <p><strong>每小时费用:</strong> {{ selectedVenue.pricePerHour }} 元</p>
-                        <p><strong>设施:</strong> {{ selectedVenue.facilities || '无特殊设施' }}</p>
                         <p><strong>描述:</strong> {{ selectedVenue.description || '暂无描述' }}</p>
+                        <p><strong>价格:</strong> {{ selectedVenue.pricePerHour }} 元/小时</p>
+                        <p><strong>状态:</strong> 
+                            <el-tag :type="selectedVenue.isAvailable ? 'success' : 'danger'">
+                                {{ selectedVenue.isAvailable ? '可用' : '不可用' }}
+                            </el-tag>
+                        </p>
                     </div>
                 </div>
             </el-dialog>
@@ -177,17 +183,17 @@ const UserVenuesComponent = {
             selectedTimeSlot: null,
             // 预约表单
             bookingForm: {
-                numberOfPeople: 1,
                 remarks: ''
             },
             // 表单验证规则
             bookingRules: {
-                numberOfPeople: [
-                    { required: true, message: '请输入预约人数', trigger: 'blur' }
+                remarks: [
+                    { required: false, message: '请输入预约备注信息', trigger: 'blur' }
                 ]
             },
             // 场馆详情弹窗
-            venueDetailDialogVisible: false
+            venueDetailDialogVisible: false,
+            apiBaseUrl: '/api/venues', // 添加API基础URL
         };
     },
     created() {
@@ -196,30 +202,46 @@ const UserVenuesComponent = {
     },
     methods: {
         // 加载场馆数据
-        loadVenueData() {
+        async loadVenueData() {
             this.loading = true;
-
-            // 调用后端API获取场馆数据
-            axios.get('/api/venues')
-                .then(response => {
-                    this.venueList = response.data;
-                    this.pagination.total = this.venueList.length;
-                    
-                    // 根据筛选条件过滤
-                    this.filterVenues();
-                })
-                .catch(error => {
-                    console.error('获取场馆数据失败:', error);
-                    this.$message.error('获取场馆数据失败，请稍后重试');
-                })
-                .finally(() => {
-                    this.loading = false;
+            try {
+                const response = await axios.get(`${this.apiBaseUrl}`, {
+                    params: {
+                        page: this.pagination.currentPage,
+                        size: this.pagination.pageSize
+                    }
                 });
+                this.venueList = response.data.records;
+                this.pagination.total = response.data.total;
+            } catch (error) {
+                this.$message.error('加载场地数据失败');
+                console.error('加载场地数据失败:', error);
+            } finally {
+                this.loading = false;
+            }
         },
         // 搜索场馆
-        searchVenues() {
-            this.pagination.currentPage = 1;
-            this.loadVenueData();
+        async searchVenues() {
+            this.loading = true;
+            try {
+                const params = {
+                    page: this.pagination.currentPage,
+                    size: this.pagination.pageSize
+                };
+                
+                if (this.searchForm.venueType) {
+                    params.type = this.searchForm.venueType;
+                }
+                
+                const response = await axios.get(`${this.apiBaseUrl}`, { params });
+                this.venueList = response.data.records;
+                this.pagination.total = response.data.total;
+            } catch (error) {
+                this.$message.error('搜索场地失败');
+                console.error('搜索场地失败:', error);
+            } finally {
+                this.loading = false;
+            }
         },
         // 重置搜索条件
         resetSearch() {
@@ -228,32 +250,6 @@ const UserVenuesComponent = {
                 date: new Date().toISOString().split('T')[0]
             };
             this.searchVenues();
-        },
-        // 根据条件过滤场馆
-        filterVenues() {
-            if (this.searchForm.venueType) {
-                // 将中文类型转换为对应的英文value值
-                const typeMap = {
-                    '篮球场': 'basketball',
-                    '足球场': 'football',
-                    '羽毛球场': 'badminton',
-                    '网球场': 'tennis',
-                    '游泳池': 'swimming',
-                    '乒乓球室': 'table_tennis'
-                };
-
-                // 反向映射，从value获取中文类型
-                const reverseTypeMap = {};
-                Object.keys(typeMap).forEach(key => {
-                    reverseTypeMap[typeMap[key]] = key;
-                });
-
-                this.venueList = this.venueList.filter(venue => {
-                    return venue.type === reverseTypeMap[this.searchForm.venueType];
-                });
-            }
-
-            this.pagination.total = this.venueList.length;
         },
         // 分页大小变化处理
         handleSizeChange(val) {
@@ -270,7 +266,6 @@ const UserVenuesComponent = {
             this.selectedVenue = venue;
             this.selectedTimeSlot = null;
             this.bookingForm = {
-                numberOfPeople: 1,
                 remarks: ''
             };
 
@@ -280,52 +275,23 @@ const UserVenuesComponent = {
             this.timeSlotDialogVisible = true;
         },
         // 加载时间段数据
-        loadTimeSlots() {
-            // 调用后端API获取场地时间槽数据
-            const venueId = this.selectedVenue.id;
-            const date = this.searchForm.date;
-            
-            axios.get(`/api/reservations/venue/${venueId}/timeslots`, {
-                params: { date: date }
-            })
-            .then(response => {
-                this.timeSlots = response.data;
-            })
-            .catch(error => {
-                console.error('获取时间槽数据失败:', error);
-                this.$message.error('获取时间槽数据失败，请稍后重试');
-                
-                // 加载失败时使用默认数据
-                this.generateDefaultTimeSlots();
-            });
-        },
-        
-        // 生成默认时间槽数据（当API调用失败时使用）
-        generateDefaultTimeSlots() {
-            const slots = [];
-            const startHour = 8; // 早上8点开始
-            const endHour = 22;  // 晚上10点结束
-
-            for (let hour = startHour; hour < endHour; hour++) {
-                // 创建整点和半点的时间段
-                for (let minute of [0, 30]) {
-                    const startTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                    const endHourMin = minute === 0 ? `${hour}:30` : `${hour + 1}:00`;
-                    const endTime = endHourMin.split(':').map(num => num.toString().padStart(2, '0')).join(':');
-
-                    // 默认大部分时间段可用
-                    const randomStatus = Math.random() < 0.7 ? 'AVAILABLE' : 'BOOKED';
-
-                    slots.push({
-                        id: `${hour}-${minute}`,
-                        startTime,
-                        endTime,
-                        status: randomStatus
-                    });
-                }
+        async loadTimeSlots() {
+            if (!this.selectedVenue || !this.searchForm.date) {
+                this.$message.warning('请先选择场地和日期');
+                return;
             }
 
-            this.timeSlots = slots;
+            try {
+                const response = await axios.get(`${this.apiBaseUrl}/${this.selectedVenue.id}/time-slots`, {
+                    params: {
+                        date: this.searchForm.date
+                    }
+                });
+                this.timeSlots = response.data;
+            } catch (error) {
+                this.$message.error('加载时间段失败');
+                console.error('加载时间段失败:', error);
+            }
         },
         // 选择时间段
         selectTimeSlot(timeSlot) {
@@ -362,16 +328,6 @@ const UserVenuesComponent = {
 
             this.$refs.bookingForm.validate(valid => {
                 if (valid) {
-                    // 组装预约数据
-                    const bookingData = {
-                        venueId: this.selectedVenue.id,
-                        date: this.searchForm.date,
-                        startTime: this.selectedTimeSlot.startTime,
-                        endTime: this.selectedTimeSlot.endTime,
-                        numberOfPeople: this.bookingForm.numberOfPeople,
-                        remarks: this.bookingForm.remarks
-                    };
-
                     // 构建日期时间字符串
                     const startDateTime = `${this.searchForm.date}T${this.selectedTimeSlot.startTime}:00`;
                     const endDateTime = `${this.searchForm.date}T${this.selectedTimeSlot.endTime}:00`;
@@ -387,7 +343,8 @@ const UserVenuesComponent = {
                             venueId: this.selectedVenue.id,
                             cardNumber: cardNumber,
                             startTime: startDateTime,
-                            endTime: endDateTime
+                            endTime: endDateTime,
+                            remarks: this.bookingForm.remarks
                         }
                     })
                     .then(response => {

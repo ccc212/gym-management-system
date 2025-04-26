@@ -1,17 +1,18 @@
-package com.gymsys.entity.venue;
+package com.gymsys.entity.reservation;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * 预约实体类
  */
 @Data
-@TableName("reservation")
+@TableName("reservations")
 public class ReservationEntity {
     
     /**
@@ -31,7 +32,7 @@ public class ReservationEntity {
     private Long userId;
     
     /**
-     * 卡号
+     * 一卡通号
      */
     private String cardNumber;
     
@@ -46,19 +47,29 @@ public class ReservationEntity {
     private LocalDateTime endTime;
     
     /**
+     * 预约人数
+     */
+    private Integer numberOfPeople;
+    
+    /**
      * 预约状态（待确认、已确认、已取消、已完成）
      */
     private String status;
     
     /**
-     * 预约类型
+     * 预约类型（普通、特殊）
      */
     private String reservationType;
     
     /**
      * 备注
      */
-    private String remark;
+    private String remarks;
+    
+    /**
+     * 总价格
+     */
+    private BigDecimal totalPrice;
     
     /**
      * 创建时间
@@ -69,4 +80,4 @@ public class ReservationEntity {
      * 更新时间
      */
     private LocalDateTime updatedAt;
-}
+} 

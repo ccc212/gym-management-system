@@ -4,38 +4,41 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5f1e8b11-9fc9-4e83-95fc-35cef020537c" name="更改" comment="6.0.0 管理员功能添加完成，同时index完成了拆分">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+    <list default="true" id="5f1e8b11-9fc9-4e83-95fc-35cef020537c" name="更改" comment="7.0.0 把所有jpa都变成了mybatis-plus,同时完成了登录的前后端交互">
+      <change afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/dto/ReservationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/GymManagementSystemApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/GymManagementSystemApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/config/MyBatisPlusConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/config/MyBatisPlusConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/AnnouncementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/AnnouncementController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/ReservationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/UsageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/UsageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/ReservationController.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/VenueController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/VenueController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/AnnouncementEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/AnnouncementEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/ReservationEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/ReservationEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/UsageEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/UsageEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/ReservationEntity.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/VenueEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/venue/VenueEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/AnnouncementRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/AnnouncementRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/ReservationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/ReservationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/UsageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/UsageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/ReservationRepository.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/VenueRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/repository/venue/VenueRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/AnnouncementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/AnnouncementService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/ReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/ReservationService.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/UsageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/UsageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/VenueService.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/VenueService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/components.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/components.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/main.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-venues.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-venues.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/GymApplicationIntegrationTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/controller/venue/AnnouncementControllerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/controller/venue/ReservationControllerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/controller/venue/UsageControllerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/controller/venue/VenueControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/controller/venue/VenueControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/repository/venue/AnnouncementRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/repository/venue/ReservationRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/repository/venue/UsageRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/repository/venue/VenueRepositoryTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/service/venue/AnnouncementServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/service/venue/ReservationServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/service/venue/UsageServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/test/java/com/gymsys/service/venue/VenueServiceTest.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -52,6 +55,10 @@
     &quot;accountId&quot;: &quot;9c75f68b-e6d6-4e51-9ad8-343594b616be&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+    <option name="showPreview" value="true" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 6
@@ -61,43 +68,50 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "JUnit.AnnouncementControllerTest.executor": "Run",
-    "JUnit.AnnouncementRepositoryTest.executor": "Debug",
-    "JUnit.AnnouncementServiceTest.executor": "Run",
-    "JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements.executor": "Run",
-    "JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements.executor": "Debug",
-    "JavaScript 调试.index.html.executor": "Run",
-    "Maven.gym-management-system [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.GymManagementSystemApplication.executor": "Run",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Code/github项目",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "project.propCompiler",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JUnit.AnnouncementControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AnnouncementRepositoryTest.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.AnnouncementServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.VenueControllerTest (1).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.VenueControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.VenueControllerTest.testDeleteVenue.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.VenueControllerTest.testGetAllVenues (1).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.VenueControllerTest.testGetAllVenues.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.VenueControllerTest.testRemoveVenue.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.VenueControllerTest.testUpdateVenue.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript 调试.index.html.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.gym-management-system [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.GymManagementSystemApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Code/github项目&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propCompiler&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Spring Boot.GymManagementSystemApplication">
-    <configuration name="AnnouncementControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="VenueControllerTest (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="gym-management-system" />
       <extension name="coverage">
         <pattern>
@@ -106,69 +120,71 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.gymsys.controller.venue" />
-      <option name="MAIN_CLASS_NAME" value="com.gymsys.controller.venue.AnnouncementControllerTest" />
+      <option name="MAIN_CLASS_NAME" value="com.gymsys.controller.venue.VenueControllerTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AnnouncementRepositoryTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="VenueControllerTest.testDeleteVenue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="gym-management-system" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.gymsys.repository.venue.*" />
+          <option name="PATTERN" value="com.gymsys.controller.venue.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.gymsys.repository.venue" />
-      <option name="MAIN_CLASS_NAME" value="com.gymsys.repository.venue.AnnouncementRepositoryTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AnnouncementServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="gym-management-system" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.gymsys.service.venue.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.gymsys.service.venue" />
-      <option name="MAIN_CLASS_NAME" value="com.gymsys.service.venue.AnnouncementServiceTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="gym-management-system" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.gymsys.service.venue.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.gymsys.service.venue" />
-      <option name="MAIN_CLASS_NAME" value="com.gymsys.service.venue.AnnouncementServiceTest" />
-      <option name="METHOD_NAME" value="testGetLatestAnnouncementContent_NoAnnouncements" />
+      <option name="PACKAGE_NAME" value="com.gymsys.controller.venue" />
+      <option name="MAIN_CLASS_NAME" value="com.gymsys.controller.venue.VenueControllerTest" />
+      <option name="METHOD_NAME" value="testDeleteVenue" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="VenueControllerTest.testGetAllVenues (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="gym-management-system" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.gymsys.service.venue.*" />
+          <option name="PATTERN" value="com.gymsys.controller.venue.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.gymsys.service.venue" />
-      <option name="MAIN_CLASS_NAME" value="com.gymsys.service.venue.AnnouncementServiceTest" />
-      <option name="METHOD_NAME" value="testGetLatestAnnouncementContent_WithAnnouncements" />
+      <option name="PACKAGE_NAME" value="com.gymsys.controller.venue" />
+      <option name="MAIN_CLASS_NAME" value="com.gymsys.controller.venue.VenueControllerTest" />
+      <option name="METHOD_NAME" value="testGetAllVenues" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VenueControllerTest.testRemoveVenue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="gym-management-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.gymsys.controller.venue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.gymsys.controller.venue" />
+      <option name="MAIN_CLASS_NAME" value="com.gymsys.controller.venue.VenueControllerTest" />
+      <option name="METHOD_NAME" value="testRemoveVenue" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VenueControllerTest.testUpdateVenue" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="gym-management-system" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.gymsys.controller.venue.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.gymsys.controller.venue" />
+      <option name="MAIN_CLASS_NAME" value="com.gymsys.controller.venue.VenueControllerTest" />
+      <option name="METHOD_NAME" value="testUpdateVenue" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -192,21 +208,21 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="JUnit.AnnouncementRepositoryTest" />
-      <item itemvalue="JUnit.AnnouncementServiceTest" />
-      <item itemvalue="JUnit.AnnouncementControllerTest" />
-      <item itemvalue="JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements" />
-      <item itemvalue="JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements" />
+      <item itemvalue="JUnit.VenueControllerTest (1)" />
+      <item itemvalue="JUnit.VenueControllerTest.testDeleteVenue" />
+      <item itemvalue="JUnit.VenueControllerTest.testGetAllVenues (1)" />
+      <item itemvalue="JUnit.VenueControllerTest.testRemoveVenue" />
+      <item itemvalue="JUnit.VenueControllerTest.testUpdateVenue" />
       <item itemvalue="npm.dev" />
       <item itemvalue="Spring Boot.GymManagementSystemApplication" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.AnnouncementRepositoryTest" />
-        <item itemvalue="JUnit.AnnouncementServiceTest" />
-        <item itemvalue="JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_WithAnnouncements" />
-        <item itemvalue="JUnit.AnnouncementServiceTest.testGetLatestAnnouncementContent_NoAnnouncements" />
-        <item itemvalue="JUnit.AnnouncementControllerTest" />
+        <item itemvalue="JUnit.VenueControllerTest (1)" />
+        <item itemvalue="JUnit.VenueControllerTest.testDeleteVenue" />
+        <item itemvalue="JUnit.VenueControllerTest.testGetAllVenues (1)" />
+        <item itemvalue="JUnit.VenueControllerTest.testRemoveVenue" />
+        <item itemvalue="JUnit.VenueControllerTest.testUpdateVenue" />
       </list>
     </recent_temporary>
   </component>
@@ -247,7 +263,10 @@
       <workItem from="1744509028471" duration="596000" />
       <workItem from="1744895377572" duration="595000" />
       <workItem from="1745045192810" duration="3195000" />
-      <workItem from="1745144446412" duration="5300000" />
+      <workItem from="1745144446412" duration="7285000" />
+      <workItem from="1745476739695" duration="3943000" />
+      <workItem from="1745627290010" duration="4537000" />
+      <workItem from="1745632551895" duration="621000" />
     </task>
     <task id="LOCAL-00001" summary="成功运行了前端代码，修改了路由错误">
       <option name="closed" value="true" />
@@ -289,7 +308,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744357167781</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="7.0.0 把所有jpa都变成了mybatis-plus,同时完成了登录的前后端交互">
+      <option name="closed" value="true" />
+      <created>1745149930617</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1745149930617</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -301,6 +328,7 @@
     <MESSAGE value="5.0.0 场地安排，收费标准等的前端也已经写好" />
     <MESSAGE value="5.0.3 添加了管理员账户" />
     <MESSAGE value="6.0.0 管理员功能添加完成，同时index完成了拆分" />
-    <option name="LAST_COMMIT_MESSAGE" value="6.0.0 管理员功能添加完成，同时index完成了拆分" />
+    <MESSAGE value="7.0.0 把所有jpa都变成了mybatis-plus,同时完成了登录的前后端交互" />
+    <option name="LAST_COMMIT_MESSAGE" value="7.0.0 把所有jpa都变成了mybatis-plus,同时完成了登录的前后端交互" />
   </component>
 </project>

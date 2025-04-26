@@ -176,6 +176,15 @@ const UserReservationsComponent = {
         loadReservationData() {
             this.loading = true;
             
+            // 获取当前用户ID（从localStorage或其他地方）
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userId = currentUser && currentUser.id ? currentUser.id : null;
+            if (!userId) {
+                this.$message.error('请先登录');
+                this.loading = false;
+                return;
+            }
+
             // 构建查询参数
             const params = new URLSearchParams({
                 page: this.pagination.currentPage,
@@ -192,9 +201,6 @@ const UserReservationsComponent = {
                 params.append('startDate', this.searchForm.dateRange[0]);
                 params.append('endDate', this.searchForm.dateRange[1]);
             }
-            
-            // 获取当前用户ID（从localStorage或其他地方）
-            const userId = localStorage.getItem('userId');
             
             // 发送请求到后端
             axios.get(`/api/reservations/user/${userId}?${params.toString()}`)

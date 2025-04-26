@@ -329,24 +329,28 @@ const UserVenuesComponent = {
 
             this.$refs.bookingForm.validate(valid => {
                 if (valid) {
-                    // 构建日期时间字符串
-                    const startDateTime = `${this.searchForm.date}T${this.selectedTimeSlot.startTime}:00`;
-                    const endDateTime = `${this.searchForm.date}T${this.selectedTimeSlot.endTime}:00`;
-                    
-                    // 获取当前用户的一卡通号码
+                    // 只取时间段的HH:mm部分
+                    const startTime = this.selectedTimeSlot.startTime;
+                    const endTime = this.selectedTimeSlot.endTime;
+
+                    // 获取当前用户
                     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-                    const cardNumber = currentUser.cardNumber || '12345678'; // 默认卡号
-                    
-                    // 调用后端预约API
+                    const userId = currentUser && currentUser.id ? currentUser.id : null;
+                    const cardNumber = currentUser && currentUser.cardNumber ? currentUser.cardNumber : '12345678';
+
+                    // 获取预约人数（如有输入框可用bookingForm.numberOfPeople，否则默认1）
+                    const numberOfPeople = this.bookingForm.numberOfPeople ? this.bookingForm.numberOfPeople : 1;
+
+                    // 调用后端预约API，使用JSON body
                     this.loading = true;
-                    axios.post('/api/reservations', null, {
-                        params: {
-                            venueId: this.selectedVenue.id,
-                            cardNumber: cardNumber,
-                            startTime: startDateTime,
-                            endTime: endDateTime,
-                            remarks: this.bookingForm.remarks
-                        }
+                    axios.post('/api/reservations', {
+                        venueId: this.selectedVenue.id,
+                        userId: userId,
+                        cardNumber: cardNumber,
+                        startTime: startTime, // 只传 "HH:mm"
+                        endTime: endTime,     // 只传 "HH:mm"
+                        numberOfPeople: numberOfPeople, // 新增预约人数
+                        remarks: this.bookingForm.remarks
                     })
                     .then(response => {
                         this.timeSlotDialogVisible = false;

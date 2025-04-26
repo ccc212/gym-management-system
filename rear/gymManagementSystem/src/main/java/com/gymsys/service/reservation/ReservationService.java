@@ -130,6 +130,7 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
     @Transactional
     public ReservationEntity createReservation(Long venueId, Long userId,
                                              String startTime, String endTime, Integer numberOfPeople, String remarks) {
+        System.out.println("准备写入预约: " + venueId + "," + userId + "," + startTime + "," + endTime);
         ReservationEntity reservation = new ReservationEntity();
         reservation.setVenueId(venueId);
         reservation.setUserId(userId);

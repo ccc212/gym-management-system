@@ -110,8 +110,10 @@ public class VenueScheduleService {
         
         // 检查是否已被预约
         for (ReservationEntity reservation : venueReservations) {
-            if (!(slotEndTime.isBefore(reservation.getStartTime()) ||
-                    slotStartTime.isAfter(reservation.getEndTime()))) {
+            LocalDateTime reservedStart = LocalDateTime.parse(reservation.getStartTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            LocalDateTime reservedEnd = LocalDateTime.parse(reservation.getEndTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            if (!(slotEndTime.isBefore(reservedStart) ||
+                    slotStartTime.isAfter(reservedEnd))) {
                 if ("IN_USE".equals(reservation.getStatus())) {
                     return "IN_USE";
                 } else if ("CONFIRMED".equals(reservation.getStatus())) {

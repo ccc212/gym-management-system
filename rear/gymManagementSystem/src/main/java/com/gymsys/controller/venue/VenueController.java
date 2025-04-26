@@ -89,12 +89,23 @@ public class VenueController {
     public ResponseEntity<ReservationEntity> createReservation(
             @PathVariable Long venueId,
             @RequestBody ReservationRequest request) {
+        String startTimeStr;
+        String endTimeStr;
+        if (request.getStartTime() instanceof LocalDateTime) {
+            startTimeStr = ((LocalDateTime)request.getStartTime()).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        } else {
+            startTimeStr = String.valueOf(request.getStartTime());
+        }
+        if (request.getEndTime() instanceof LocalDateTime) {
+            endTimeStr = ((LocalDateTime)request.getEndTime()).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        } else {
+            endTimeStr = String.valueOf(request.getEndTime());
+        }
         ReservationEntity reservation = reservationService.createReservation(
                 venueId,
                 request.getUserId(),
-                request.getCardNumber(),
-                request.getStartTime(),
-                request.getEndTime(),
+                startTimeStr,
+                endTimeStr,
                 request.getNumberOfPeople(),
                 request.getRemarks()
         );

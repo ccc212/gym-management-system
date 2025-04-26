@@ -175,68 +175,43 @@ const UserReservationsComponent = {
         // 加载预约数据
         loadReservationData() {
             this.loading = true;
-
-            // 模拟后端API请求
-            setTimeout(() => {
-                // 模拟数据，实际项目中应通过API获取
-                this.reservationList = [
-                    {
-                        id: 1,
-                        venueInfo: { id: 1, name: '篮球场A', type: '篮球场' },
-                        date: '2025-04-01',
-                        startTime: '13:00',
-                        endTime: '15:00',
-                        numberOfPeople: 8,
-                        cost: 160,
-                        status: 'PENDING',
-                        createdTime: '2025-03-31 10:30:00',
-                        remarks: '团队活动'
-                    },
-                    {
-                        id: 2,
-                        venueInfo: { id: 4, name: '羽毛球场A', type: '羽毛球场' },
-                        date: '2025-04-02',
-                        startTime: '09:00',
-                        endTime: '10:00',
-                        numberOfPeople: 2,
-                        cost: 40,
-                        status: 'PENDING',
-                        createdTime: '2025-03-31 09:15:00',
-                        remarks: ''
-                    },
-                    {
-                        id: 3,
-                        venueInfo: { id: 8, name: '游泳池', type: '游泳池' },
-                        date: '2025-03-30',
-                        startTime: '16:00',
-                        endTime: '17:30',
-                        numberOfPeople: 1,
-                        cost: 45,
-                        status: 'USED',
-                        createdTime: '2025-03-29 14:20:00',
-                        remarks: ''
-                    },
-                    {
-                        id: 4,
-                        venueInfo: { id: 3, name: '足球场A', type: '足球场' },
-                        date: '2025-03-29',
-                        startTime: '15:00',
-                        endTime: '17:00',
-                        numberOfPeople: 14,
-                        cost: 400,
-                        status: 'CANCELED',
-                        createdTime: '2025-03-28 09:30:00',
-                        cancelReason: '天气原因',
-                        remarks: '学院足球队训练'
-                    }
-                ];
-
-                this.pagination.total = this.reservationList.length;
-                this.loading = false;
-
-                // 根据筛选条件过滤
-                this.filterReservations();
-            }, 500);
+            
+            // 构建查询参数
+            const params = new URLSearchParams({
+                page: this.pagination.currentPage,
+                size: this.pagination.pageSize
+            });
+            
+            // 添加状态过滤
+            if (this.searchForm.status) {
+                params.append('status', this.searchForm.status);
+            }
+            
+            // 添加日期范围过滤
+            if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
+                params.append('startDate', this.searchForm.dateRange[0]);
+                params.append('endDate', this.searchForm.dateRange[1]);
+            }
+            
+            // 获取当前用户ID（从localStorage或其他地方）
+            const userId = localStorage.getItem('userId');
+            
+            // 发送请求到后端
+            axios.get(`/api/reservations/user/${userId}?${params.toString()}`)
+                .then(response => {
+                    const { records, total, current, size } = response.data;
+                    this.reservationList = records;
+                    this.pagination.total = total;
+                    this.pagination.currentPage = current;
+                    this.pagination.pageSize = size;
+                })
+                .catch(error => {
+                    console.error('获取预约列表失败:', error);
+                    this.$message.error('获取预约列表失败，请稍后重试');
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         // 搜索预约
         searchReservations() {
@@ -303,26 +278,27 @@ const UserReservationsComponent = {
         // 确认取消预约
         confirmCancelReservation() {
             if (!this.selectedReservation) return;
-
-            // 模拟API请求
+            
             this.loading = true;
-            setTimeout(() => {
-                // 更新本地数据
-                const index = this.reservationList.findIndex(item => item.id === this.selectedReservation.id);
-                if (index !== -1) {
-                    this.reservationList[index].status = 'CANCELED';
-                    this.reservationList[index].cancelReason = this.cancelForm.reason;
+            
+            // 发送取消请求到后端
+            axios.put(`/api/reservations/${this.selectedReservation.id}/cancel`, null, {
+                params: {
+                    reason: this.cancelForm.reason
                 }
-
-                this.loading = false;
-                this.cancelDialogVisible = false;
-
-                // 显示成功提示
+            })
+            .then(response => {
                 this.$message.success('预约已成功取消');
-
-                // 刷新数据
-                this.loadReservationData();
-            }, 500);
+                this.cancelDialogVisible = false;
+                this.loadReservationData(); // 重新加载数据
+            })
+            .catch(error => {
+                console.error('取消预约失败:', error);
+                this.$message.error('取消预约失败，请稍后重试');
+            })
+            .finally(() => {
+                this.loading = false;
+            });
         },
         // 获取状态对应的样式类型
         getStatusType(status) {

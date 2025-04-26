@@ -2,17 +2,15 @@ package com.gymsys.service.system.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gymsys.entity.system.SysUserDepart;
-import com.gymsys.entity.system.SysUserRole;
-import com.gymsys.entity.system.SysUserSection;
-import com.gymsys.entity.system.User;
+import com.gymsys.entity.system.*;
 import com.gymsys.mapper.system.UserMapper;
-import com.gymsys.service.system.SysUserDepartService;
-import com.gymsys.service.system.SysUserRoleService;
-import com.gymsys.service.system.SysUserSectionService;
-import com.gymsys.service.system.UserService;
+import com.gymsys.service.system.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
@@ -25,6 +23,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private SysUserSectionService sysUserSectionService;
+
+    @Autowired
+    private MenuService menuService;
 
     /**
      * 新增用户信息
@@ -116,4 +117,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             sysUserSectionService.remove(query3);
         }
     }
+
+    /**
+     * 查询菜单树
+     * @param parm
+     * @return
+     */
+    @Override
+    public AssignTreeVo getAssingTree(AssignTreeParm parm) {
+        //查询用户信息
+        User user =this.baseMapper.selectById(parm.getUserId());
+        List<Menu> menuList = null;
+        //判断是否是超级管理员
+        if(user != null && user.getUserNumber().equals("admin")){
+            //是超级管理员
+            menuList = menuService.list();
+        }else{
+            menuList = menuService.getMenuByUserId(parm.getUserId());
+        }
+        List<Menu> makeTree = MakeMenuTree.makeTree(menuList, 0);
+        //查询角色原来的菜单
+        List<Menu> roleList = menuService.getMenuByRoleId(parm.getRoleId());
+        List<Integer> ids = new ArrayList<>();
+        Optional.ofNullable(roleList).orElse(new ArrayList<>())
+                .stream()
+                .filter(item -> item != null)
+                .forEach(item -> {
+                    ids.add(item.getId());
+                });
+        //组装返回数据
+        AssignTreeVo vo = new AssignTreeVo();
+        vo.setCheckList(ids.toArray());
+        vo.setMenuList(makeTree);
+        return vo;
+    }
+
+
 }

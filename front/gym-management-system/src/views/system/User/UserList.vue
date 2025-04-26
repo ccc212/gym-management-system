@@ -20,7 +20,7 @@
         <el-form-item>
             <el-button icon="Search" @click="searchBtn">搜索</el-button>
             <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
-            <el-button icon="Plus" type="primary" @click="addBtn">新增</el-button>
+            <el-button v-permission="['sys:user:add']" icon="Plus" type="primary" @click="addBtn">新增</el-button>
         </el-form-item>
        </el-form>
 
@@ -34,11 +34,13 @@
         <el-table-column prop="phone" label="手机"width="150px"></el-table-column>
         <el-table-column prop="age" label="年龄"width="100px"></el-table-column>
         <el-table-column prop="email" label="邮箱" width="200px"></el-table-column>
-        <el-table-column label="操作" width="350px">
+        <el-table-column label="操作" width="350px" >
             <template #default="scope">
-                <el-button type="warning" icon="Edit" size="small" @click="resetPasswordBtn(scope.row)">重置密码</el-button>
-                <el-button type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
-                <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
+                <div v-if="scope.row.userNumber !== 'admin'">
+                <el-button v-permission="['sys:user:reset']" type="warning" icon="Edit" size="small" @click="resetPasswordBtn(scope.row)">重置密码</el-button>
+                <el-button v-permission="['sys:user:edit']" type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
+                <el-button v-permission="['sys:user:delete']" type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
+                </div>
             </template>
         </el-table-column>
        </el-table>

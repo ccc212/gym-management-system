@@ -5,9 +5,9 @@
             <el-input v-model="searchParm.departName" placeholder="请输入部门名称"></el-input>
         </el-form-item>
         <el-form-item>
-            <el-button icon="Search" @click="searchBtn">搜索</el-button>
+            <el-button  icon="Search" @click="searchBtn">搜索</el-button>
             <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
-            <el-button icon="Plus" type="primary" @click="addBtn">新增</el-button>
+            <el-button v-permission="['sys:department:add']" icon="Plus" type="primary" @click="addBtn">新增</el-button>
         </el-form-item>
        </el-form>
 
@@ -18,8 +18,8 @@
         <el-table-column prop="remark" label="备注"></el-table-column>
         <el-table-column label="操作" width="200px">
             <template #default="scope">
-                <el-button type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
-                <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
+                <el-button v-permission="['sys:department:edit']" type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
+                <el-button v-permission="['sys:department:delete']" type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
             </template>
         </el-table-column>
        </el-table>

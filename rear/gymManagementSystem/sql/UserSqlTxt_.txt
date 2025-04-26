@@ -125,9 +125,5 @@ ALTER TABLE sys_menu_role
             ON DELETE CASCADE
             ON UPDATE CASCADE;
 
--- 添加 sys_menu 表的外键约束
-ALTER TABLE sys_menu
-    ADD CONSTRAINT FK_menu_parent_id
-        FOREIGN KEY (parent_id) REFERENCES sys_menu(id)
-            ON DELETE SET NULL
-            ON UPDATE CASCADE;
+alter table sys_menu
+    drop foreign key FK_menu_parent_id;

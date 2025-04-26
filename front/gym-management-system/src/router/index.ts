@@ -2,12 +2,40 @@ import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import Layout from '../layout/index.vue'
 
-const routes: Array<RouteRecordRaw> = [
-    /* {
-        path: '/home',
-        name: 'Home',
-        component: Layout
-    } */
+//动态生成
+export const constantRoutes:Array<RouteRecordRaw>=[
+    {
+        path:"/login",
+        component: () => import('../views/login/login.vue'),
+        name: 'login',
+    },
+    {
+        path: '/',
+        component: Layout,
+        redirect: '/dashboard',
+        children: [
+           {
+              path: '/dashboard',
+              component: () => import('../views/dashboard/Index.vue'),
+              name: 'dashboard',
+              meta: {
+                 title: '首页',
+                 icon: 'HomeFilled',
+              }
+           }
+        ]
+     },
+    
+]
+
+
+//静态路由
+/* const routes: Array<RouteRecordRaw> = [
+   {
+        path: '/login',
+        component: () => import('../views/login/login.vue'),
+        name: 'login',
+   },
    {
       path: '/',
       component: Layout,
@@ -116,11 +144,12 @@ const routes: Array<RouteRecordRaw> = [
         roles:["sys:competition"]
     },
 },
-]
+] */
 
 const router = createRouter({
     history: createWebHistory(),
-    routes
+    routes: constantRoutes
+    /* routes */
 })
 
 export default router

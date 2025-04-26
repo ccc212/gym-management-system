@@ -6,16 +6,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.entity.Result;
 import com.gymsys.entity.system.*;
+import com.gymsys.jwt.JwtUtils;
 import com.gymsys.service.system.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api/system/user")
 @RestController
@@ -33,6 +33,13 @@ public class UserController {
     @Autowired
     private SysUserSectionService sysUserSectionService;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private MenuService menuService;
+
+
 
 
     /**
@@ -44,6 +51,9 @@ public class UserController {
     public Result add(@RequestBody User user){
         user.setCreateTime(new Date());
         user.setPassword("123456");
+        if(user.getUserNumber().equals("admin")){
+            return Result.error("管理员账号不能添加");
+        }
         userService.saveUser(user);
         return Result.success("添加成功");
     }
@@ -145,4 +155,91 @@ public class UserController {
             return Result.error("重置密码失败");
         }
     }
+
+    /**
+     * 登录
+     * @return
+     */
+    @PostMapping("/login")
+    public Result login(@RequestBody LoginParm Parm){
+        //查询用户信息
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.lambda().eq(User::getUserNumber, Parm.getUserNumber())
+                .eq(User::getPassword, Parm.getPassword());
+        User one = userService.getOne(query);
+        if(one == null){
+            return Result.error("用户名或密码错误");
+        }
+        //返回用户信息
+        LoginVo vo = new LoginVo();
+        vo.setId(one.getId());
+        vo.setUserNumber(one.getUserNumber());
+        //生成token
+        Map<String,String> map = new HashMap<>();
+        map.put("id",Integer.toString(one.getId()));
+        String token = jwtUtils.generateToken(map);
+        vo.setToken(token);
+        return Result.success(vo);
+    }
+
+    //查询菜单树
+    @GetMapping("/getAssignTree")
+    public Result getAssingTree(AssignTreeParm parm) {
+        AssignTreeVo assignTree = userService.getAssingTree(parm);
+        return Result.success(assignTree);
+    }
+
+    /**
+     * 用户个人修改密码
+     * @param parm
+     * @return
+     */
+    @PostMapping("/updatePassword")
+    public Result updatePassword(@RequestBody UpdatePasswordParm parm){
+        User user = userService.getById(parm.getId());
+        if(!parm.getOldPassword().equals(user.getPassword())){
+            return Result.error("原密码不正确");
+        }
+        //更新条件
+        UpdateWrapper<User> query = new UpdateWrapper<>();
+        query.lambda().set(User::getPassword, parm.getPassword())
+                .eq(User::getId, parm.getId());
+        if(userService.update(query)){
+            return Result.success("密码修改成功");
+        }
+        return Result.error("密码修改失败");
+    }
+
+    /**
+     * 获取用户信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/getInfo")
+    public Result getInfo(Integer id){
+        //根据id查询用户信息
+        User user = userService.getById(id);
+        List<Menu> menuList = null;
+        //判断是否为超级管理员
+        if(user != null && user.getUserNumber().equals("admin")){
+            //是超级管理员
+            menuList = menuService.list();
+        }else{
+            menuList = menuService.getMenuByUserId(user.getId());
+        }
+        //获取菜单表code字段
+        List<String> collect = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                .stream()
+                .filter(item -> item != null && StringUtils.isNotEmpty(item.getCode()))
+                .map(item ->item.getCode())
+                .collect(Collectors.toList());
+        //设置返回值
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserNumber(user.getUserNumber());
+        userInfo.setId(user.getId());
+        userInfo.setPermissions(collect.toArray());
+        return Result.success(userInfo);
+    }
+
+
 }

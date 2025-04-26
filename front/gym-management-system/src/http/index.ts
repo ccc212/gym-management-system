@@ -1,6 +1,7 @@
 import axios from "axios";
 import type {AxiosInstance,InternalAxiosRequestConfig,AxiosResponse,AxiosRequestConfig} from "axios";
 import {ElMessage} from 'element-plus'
+import { userStore } from "../store/user";
 
 
 //配置axios
@@ -32,7 +33,9 @@ class Http{
     private interceptors(){
         //请求发送之前的处理:请求头携带token
         this.instance.interceptors.request.use((config:InternalAxiosRequestConfig)=>{
-            let token = '';//获取token
+            let store = userStore();
+            
+            let token = store.getToken;//获取token
             if(token){
                 config.headers['token'] = token;
             }

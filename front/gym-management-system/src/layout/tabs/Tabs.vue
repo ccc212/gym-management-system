@@ -89,7 +89,7 @@ watch(
     //添加选项卡数据
     addTab()
     // 存储到 localStorage
-    localStorage.setItem('tabsList', JSON.stringify(store.tabList))
+    /* localStorage.setItem('tabsList', JSON.stringify(store.tabList)) */
   }
 )
 
@@ -101,10 +101,10 @@ const setActiveTab = () => {
 //刷新
 onMounted(() => {
   // 从 localStorage 恢复数据
-  const storedTabs = localStorage.getItem('tabsList')
+  /* const storedTabs = localStorage.getItem('tabsList')
   if (storedTabs) {
     store.tabList = JSON.parse(storedTabs)
-  }
+  } */
   setActiveTab()
   addTab()
 })

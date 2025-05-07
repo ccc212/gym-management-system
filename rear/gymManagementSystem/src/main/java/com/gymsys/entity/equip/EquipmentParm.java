@@ -1,4 +1,4 @@
-package com.gymsys.entity.system;
+package com.gymsys.entity.equip;
 
 import lombok.Data;
 

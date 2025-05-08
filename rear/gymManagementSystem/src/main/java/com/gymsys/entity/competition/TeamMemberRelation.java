@@ -7,18 +7,19 @@ import lombok.experimental.Accessors;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
- * 赛事与项目关联表
+ * 团队与队员关联表
  * </p>
  *
  * @author ccc212
- * @since 2025-04-19
+ * @since 2025-04-26
  */
 @Data
 @Accessors(chain = true)
-public class CompetitionItemRelation implements Serializable {
+public class TeamMemberRelation implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -27,14 +28,24 @@ public class CompetitionItemRelation implements Serializable {
     private Long id;
 
     /**
-     * 赛事id
+     * 团队id
      */
-    private Long competitionId;
+    private Long teamId;
 
     /**
-     * 赛事项目id
+     * 用户id
      */
-    private Long competitionItemId;
+    private Long userId;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
+
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
 
 
 }

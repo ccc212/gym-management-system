@@ -8,6 +8,8 @@ import com.gymsys.service.competition.ICompetitionVenueRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * <p>
  * 赛事与场地关联表 前端控制器
@@ -24,7 +26,7 @@ public class CompetitionVenueRelationController {
     private final ICompetitionVenueRelationService competitionVenueRelationService;
 
     @PostMapping("/add")
-    public Result<?> addCompetitionVenueRelation(@RequestBody AddCompetitionVenueRelationDTO addCompetitionVenueRelationDTO) {
+    public Result<?> addCompetitionVenueRelation(@RequestBody @Valid AddCompetitionVenueRelationDTO addCompetitionVenueRelationDTO) {
         competitionVenueRelationService.addCompetitionVenueRelation(addCompetitionVenueRelationDTO);
         return Result.success(MessageConstant.ADD_SUCCESS);
     }

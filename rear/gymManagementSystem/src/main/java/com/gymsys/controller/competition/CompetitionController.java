@@ -1,16 +1,22 @@
 package com.gymsys.controller.competition;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gymsys.constant.MessageConstant;
 import com.gymsys.entity.Result;
+import com.gymsys.entity.competition.Competition;
+import com.gymsys.entity.competition.CompetitionItem;
+import com.gymsys.entity.competition.CompetitionItemRelation;
 import com.gymsys.entity.competition.dto.competition.AddCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
+import com.gymsys.entity.competition.vo.CompetitionDetailVO;
 import com.gymsys.service.competition.ICompetitionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -46,12 +52,22 @@ public class CompetitionController {
     }
 
     @GetMapping("/list")
-    public Result<?> listCompetition(@Valid ListCompetitionDTO listCompetitionDTO) {
+    public Result<IPage<Competition>> listCompetition(@Valid ListCompetitionDTO listCompetitionDTO) {
         return Result.success(competitionService.listCompetition(listCompetitionDTO));
     }
 
     @GetMapping("/getDetail/{id}")
-    public Result<?> getDetail(@PathVariable Long id) {
+    public Result<CompetitionDetailVO> getDetail(@PathVariable Long id) {
         return Result.success(competitionService.getDetail(id));
+    }
+
+    @GetMapping("/listItem")
+    public Result<List<CompetitionItem>> listItem() {
+        return Result.success(competitionService.listItem());
+    }
+
+    @GetMapping("/listItemByCompetitionId/{competitionId}")
+    public Result<List<CompetitionItemRelation>> listItemByCompetitionId(@PathVariable Long competitionId) {
+        return Result.success(competitionService.listItemByCompetitionId(competitionId));
     }
 }

@@ -3,6 +3,7 @@ package com.gymsys.entity.competition.dto.competitionVenueRelation;
 import com.gymsys.entity.BaseDTO;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -24,13 +25,13 @@ public class AddCompetitionVenueRelationDTO extends BaseDTO {
     /**
      * 负责人姓名
      */
-    @NotNull(message = "负责人姓名不能为空")
+    @NotBlank(message = "负责人姓名不能为空")
     private String responsibleName;
 
     /**
      * 联系电话
      */
-    @NotNull(message = "联系电话不能为空")
+    @NotBlank(message = "联系电话不能为空")
     private String phone;
 
     /**

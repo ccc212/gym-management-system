@@ -9,6 +9,8 @@ import com.gymsys.service.competition.ICompetitionEquipmentRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * <p>
  * 赛事与器材关联表 前端控制器
@@ -25,7 +27,7 @@ public class CompetitionEquipmentRelationController {
     private final ICompetitionEquipmentRelationService competitionEquipmentRelationService;
 
     @PostMapping("/add")
-    public Result<?> addCompetitionEquipmentRelation(@RequestBody AddCompetitionEquipmentRelationDTO addCompetitionEquipmentRelationDTO) {
+    public Result<?> addCompetitionEquipmentRelation(@RequestBody @Valid AddCompetitionEquipmentRelationDTO addCompetitionEquipmentRelationDTO) {
         competitionEquipmentRelationService.addCompetitionEquipmentRelation(addCompetitionEquipmentRelationDTO);
         return Result.success(MessageConstant.ADD_SUCCESS);
     }

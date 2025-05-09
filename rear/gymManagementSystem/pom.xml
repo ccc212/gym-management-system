@@ -73,10 +73,7 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
+
         <!-- 确保有Jackson JSR310模块依赖，用于处理Java 8日期/时间 -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

@@ -4,9 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5f1e8b11-9fc9-4e83-95fc-35cef020537c" name="更改" comment="8.9.0 成功实现http://localhost:5678/#/user/myreservations前后端交互，目前在http://localhost:5678/#/user/venues预约后，结果可以在http://localhost:5678/#/user/myreservations呈现">
+    <list default="true" id="5f1e8b11-9fc9-4e83-95fc-35cef020537c" name="更改" comment="8.9.1 修复了http://localhost:5678/#/user/schedule选择场地名称时无数据的bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/reservation/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/controller/reservation/ReservationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/dto/VenueScheduleDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/dto/VenueScheduleDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/reservation/ReservationEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/entity/reservation/ReservationEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/VenueScheduleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/VenueScheduleService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-reservations.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-reservations.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-schedule.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-schedule.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-usage.js" beforeDir="false" afterPath="$PROJECT_DIR$/rear/gymManagementSystem/src/main/resources/static/js/user-usage.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,7 +252,7 @@
       <workItem from="1745659547946" duration="1659000" />
       <workItem from="1746188358257" duration="727000" />
       <workItem from="1746649286216" duration="2000" />
-      <workItem from="1746686774426" duration="3588000" />
+      <workItem from="1746686774426" duration="5690000" />
     </task>
     <task id="LOCAL-00001" summary="成功运行了前端代码，修改了路由错误">
       <option name="closed" value="true" />
@@ -328,7 +334,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745656957086</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="8.9.1 修复了http://localhost:5678/#/user/schedule选择场地名称时无数据的bug">
+      <option name="closed" value="true" />
+      <created>1746754007089</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1746754007089</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -345,6 +359,7 @@
     <MESSAGE value="8.5.0 成功实现了http://localhost:5678/#/user/schedule的前后端交互，和数据库之间数据的连接，取消了使用api模拟申请，同时修复了http://localhost:5678/#/user/venues的预约请求问题，修复了前后端交互" />
     <MESSAGE value="8.8.0 修复了时间格式错误，改为了yyyy-MM-dd HH:mm" />
     <MESSAGE value="8.9.0 成功实现http://localhost:5678/#/user/myreservations前后端交互，目前在http://localhost:5678/#/user/venues预约后，结果可以在http://localhost:5678/#/user/myreservations呈现" />
-    <option name="LAST_COMMIT_MESSAGE" value="8.9.0 成功实现http://localhost:5678/#/user/myreservations前后端交互，目前在http://localhost:5678/#/user/venues预约后，结果可以在http://localhost:5678/#/user/myreservations呈现" />
+    <MESSAGE value="8.9.1 修复了http://localhost:5678/#/user/schedule选择场地名称时无数据的bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="8.9.1 修复了http://localhost:5678/#/user/schedule选择场地名称时无数据的bug" />
   </component>
 </project>

@@ -205,15 +205,27 @@ const UserReservationsComponent = {
             // 发送请求到后端
             axios.get(`/api/reservations/user/${userId}?${params.toString()}`)
                 .then(response => {
-                    const { records, total, current, size } = response.data;
-                    this.reservationList = records;
-                    this.pagination.total = total;
-                    this.pagination.currentPage = current;
-                    this.pagination.pageSize = size;
+                    console.log('获取预约列表响应:', response.data);
+                    if (response.data && response.data.records) {
+                        const { records, total, current, size } = response.data;
+                        this.reservationList = records.map(reservation => {
+                            // 确保日期是Date对象
+                            if (typeof reservation.date === 'string') {
+                                reservation.date = new Date(reservation.date);
+                            }
+                            return reservation;
+                        });
+                        this.pagination.total = total;
+                        this.pagination.currentPage = current;
+                        this.pagination.pageSize = size;
+                    } else {
+                        console.error('预约数据格式不正确:', response.data);
+                        this.$message.error('获取预约列表失败：数据格式不正确');
+                    }
                 })
                 .catch(error => {
                     console.error('获取预约列表失败:', error);
-                    this.$message.error('获取预约列表失败，请稍后重试');
+                    this.$message.error('获取预约列表失败：' + (error.response?.data?.message || error.message));
                 })
                 .finally(() => {
                     this.loading = false;
@@ -306,23 +318,29 @@ const UserReservationsComponent = {
                 this.loading = false;
             });
         },
+        // 获取状态文本
+        getStatusText(status) {
+            const statusMap = {
+                'PENDING': '待使用',
+                'CONFIRMED': '已确认',
+                'IN_USE': '使用中',
+                'COMPLETED': '已完成',
+                'CANCELED': '已取消',
+                'NO_SHOW': '未签到'
+            };
+            return statusMap[status] || '未知';
+        },
         // 获取状态对应的样式类型
         getStatusType(status) {
-            const types = {
-                'PENDING': 'primary',
-                'USED': 'success',
-                'CANCELED': 'info'
+            const typeMap = {
+                'PENDING': 'warning',
+                'CONFIRMED': 'primary',
+                'IN_USE': 'success',
+                'COMPLETED': 'info',
+                'CANCELED': 'danger',
+                'NO_SHOW': 'danger'
             };
-            return types[status] || 'info';
-        },
-        // 获取状态显示文本
-        getStatusText(status) {
-            const texts = {
-                'PENDING': '待使用',
-                'USED': '已使用',
-                'CANCELED': '已取消'
-            };
-            return texts[status] || '未知';
+            return typeMap[status] || 'info';
         },
         // 格式化日期
         formatDate(dateStr) {

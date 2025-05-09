@@ -44,11 +44,9 @@ public class VenueScheduleService {
         List<VenueEntity> venues = venueRepository.selectList(venueWrapper);
         
         // 获取日期范围内的所有预约
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
         LambdaQueryWrapper<ReservationEntity> reservationWrapper = new LambdaQueryWrapper<>();
-        reservationWrapper.between(ReservationEntity::getStartTime, startDateTime, endDateTime)
-                        .in(ReservationEntity::getStatus, "CONFIRMED", "IN_USE", "PENDING");
+        reservationWrapper.between(ReservationEntity::getDate, startDate, endDate)
+                        .in(ReservationEntity::getStatus, Arrays.asList("CONFIRMED", "IN_USE", "PENDING"));
         List<ReservationEntity> reservations = reservationRepository.selectList(reservationWrapper);
         
         // 按场地ID分组预约
@@ -59,32 +57,29 @@ public class VenueScheduleService {
         LocalTime startTime = LocalTime.parse("08:00", TIME_FORMATTER);
         LocalTime endTime = LocalTime.parse("22:00", TIME_FORMATTER);
         
-        // 为每个时间段生成每个场地的安排
-        for (LocalTime currentTime = startTime; currentTime.isBefore(endTime); currentTime = currentTime.plusMinutes(30)) {
-            final LocalTime timeSlot = currentTime;
+        // 为每个场地生成每天的时间段安排
+        for (VenueEntity venue : venues) {
+            List<ReservationEntity> venueReservations = reservationsByVenue.getOrDefault(venue.getId(), new ArrayList<>());
+            
+            // 遍历每一天
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-                final LocalDate currentDate = date;
-                for (VenueEntity venue : venues) {
+                // 遍历每个时间段
+                LocalTime currentTime = startTime;
+                while (currentTime.isBefore(endTime)) {
                     VenueScheduleDTO schedule = new VenueScheduleDTO();
                     schedule.setVenueId(venue.getId());
                     schedule.setVenueName(venue.getName());
                     schedule.setType(venue.getType());
-                    schedule.setTimeSlot(String.format("%s - %s",
-                            timeSlot.format(TIME_FORMATTER),
-                            timeSlot.plusMinutes(30).format(TIME_FORMATTER)));
-                    schedule.setDate(currentDate.atTime(timeSlot));
+                    schedule.setDate(date);
+                    schedule.setTimeSlot(currentTime.format(TIME_FORMATTER) + " - " + 
+                                      currentTime.plusMinutes(30).format(TIME_FORMATTER));
                     
-                    // 检查该时间段的状态
-                    String status = determineTimeSlotStatus(venue, currentDate, timeSlot,
-                            reservationsByVenue.getOrDefault(venue.getId(), new ArrayList<>()));
+                    // 确定该时间段的状态
+                    String status = determineTimeSlotStatus(venue, date, currentTime, venueReservations);
                     schedule.setStatus(status);
                     
-                    // 如果场地不可用，标记为维护中
-                    if (!venue.getIsAvailable()) {
-                        schedule.setStatus("MAINTENANCE");
-                    }
-                    
                     schedules.add(schedule);
+                    currentTime = currentTime.plusMinutes(30);
                 }
             }
         }
@@ -94,54 +89,50 @@ public class VenueScheduleService {
     
     private String determineTimeSlotStatus(VenueEntity venue, LocalDate date, LocalTime time,
                                          List<ReservationEntity> venueReservations) {
-        LocalDateTime slotStartTime = date.atTime(time);
-        LocalDateTime slotEndTime = date.atTime(time.plusMinutes(30));
-        LocalDateTime now = LocalDateTime.now();
-        
-        // 检查是否在维护时间
-        if (isMaintenanceTime(venue, slotStartTime)) {
+        // 检查场地是否可用
+        if (!venue.getIsAvailable()) {
             return "MAINTENANCE";
         }
         
-        // 检查是否是特殊场地时间
-        if (isSpecialTime(venue, slotStartTime)) {
+        // 检查是否是维护时间（周一 8:00-10:00）
+        if (date.getDayOfWeek().getValue() == 1 && 
+            time.getHour() >= 8 && time.getHour() < 10) {
+            return "MAINTENANCE";
+        }
+        
+        // 检查是否是特殊场地时间（周六 14:00-18:00）
+        if (date.getDayOfWeek().getValue() == 6 && 
+            time.getHour() >= 14 && time.getHour() < 18) {
             return "SPECIAL";
         }
         
+        // 检查是否是过去的时间
+        LocalDateTime slotDateTime = date.atTime(time);
+        if (slotDateTime.isBefore(LocalDateTime.now())) {
+            return "PAST";
+        }
+        
         // 检查是否已被预约
+        String timeStr = time.format(TIME_FORMATTER);
         for (ReservationEntity reservation : venueReservations) {
-            LocalDateTime reservedStart = LocalDateTime.parse(reservation.getStartTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-            LocalDateTime reservedEnd = LocalDateTime.parse(reservation.getEndTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-            if (!(slotEndTime.isBefore(reservedStart) ||
-                    slotStartTime.isAfter(reservedEnd))) {
-                if ("IN_USE".equals(reservation.getStatus())) {
-                    return "IN_USE";
-                } else if ("CONFIRMED".equals(reservation.getStatus())) {
-                    return "BOOKED";
-                } else if ("PENDING".equals(reservation.getStatus())) {
-                    return "PENDING";
+            if (reservation.getDate().equals(date)) {
+                LocalTime reservedStart = LocalTime.parse(reservation.getStartTime(), TIME_FORMATTER);
+                LocalTime reservedEnd = LocalTime.parse(reservation.getEndTime(), TIME_FORMATTER);
+                
+                if (!(time.plusMinutes(30).isBefore(reservedStart) || time.isAfter(reservedEnd))) {
+                    switch (reservation.getStatus()) {
+                        case "IN_USE":
+                            return "IN_USE";
+                        case "CONFIRMED":
+                            return "BOOKED";
+                        case "PENDING":
+                            return "PENDING";
+                    }
                 }
             }
         }
         
-        // 检查是否是过去的时间段
-        if (slotEndTime.isBefore(now)) {
-            return "PAST";
-        }
-        
         return "AVAILABLE";
-    }
-    
-    private boolean isMaintenanceTime(VenueEntity venue, LocalDateTime dateTime) {
-        // 每周一早上8点到10点是维护时间
-        return dateTime.getDayOfWeek().getValue() == 1 &&
-                dateTime.getHour() >= 8 && dateTime.getHour() < 10;
-    }
-    
-    private boolean isSpecialTime(VenueEntity venue, LocalDateTime dateTime) {
-        // 每周六下午2点到6点是特殊场地时间
-        return dateTime.getDayOfWeek().getValue() == 6 &&
-                dateTime.getHour() >= 14 && dateTime.getHour() < 18;
     }
     
     public List<String> getVenueTypes() {

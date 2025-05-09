@@ -89,6 +89,36 @@ public class ReservationEntity {
      */
     private LocalDateTime updatedTime;
 
+    /**
+     * 实际开始时间
+     */
+    private String actualStartTime;
+    
+    /**
+     * 实际结束时间
+     */
+    private String actualEndTime;
+    
+    /**
+     * 使用时长
+     */
+    private String duration;
+    
+    /**
+     * 实际费用
+     */
+    private BigDecimal actualCost;
+    
+    /**
+     * 支付方式
+     */
+    private String paymentMethod;
+    
+    /**
+     * 支付时间
+     */
+    private LocalDateTime paymentTime;
+
     @TableField(exist = false)
     private VenueEntity venueInfo;
 } 

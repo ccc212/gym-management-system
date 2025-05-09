@@ -242,30 +242,33 @@ const UserScheduleComponent = {
         },
         // 初始化时间段
         initTimeSlots() {
-            const slots = [];
-            const startHour = 8; // 早上8点开始
-            const endHour = 22;  // 晚上10点结束
-
-            for (let hour = startHour; hour < endHour; hour++) {
-                // 创建整点和半点的时间段
-                for (let minute of [0, 30]) {
-                    const startTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                    const endHourMin = minute === 0 ? `${hour}:30` : `${hour + 1}:00`;
-                    const endTime = endHourMin.split(':').map(num => num.toString().padStart(2, '0')).join(':');
-
-                    slots.push({
-                        id: `${hour}-${minute}`,
-                        timeRange: `${startTime} - ${endTime}`
-                    });
-                }
+            const timeSlots = [];
+            let startTime = new Date();
+            startTime.setHours(8, 0, 0, 0);  // 从早上8点开始
+            
+            const endTime = new Date();
+            endTime.setHours(22, 0, 0, 0);  // 到晚上10点结束
+            
+            while (startTime < endTime) {
+                const endTimeSlot = new Date(startTime.getTime() + 30 * 60000);  // 加30分钟
+                timeSlots.push({
+                    id: timeSlots.length + 1,
+                    timeRange: `${this.formatTime(startTime)} - ${this.formatTime(endTimeSlot)}`
+                });
+                startTime = endTimeSlot;
             }
-
-            this.timeSlots = slots;
+            
+            this.timeSlots = timeSlots;
+        },
+        // 格式化时间
+        formatTime(date) {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
         },
         // 加载场地安排数据
         loadScheduleData() {
             this.loading = true;
-            console.log('开始加载场地安排数据...');
             
             // 构建查询参数
             const params = {
@@ -276,36 +279,26 @@ const UserScheduleComponent = {
             if (this.searchForm.venueType) {
                 params.venueType = this.searchForm.venueType;
             }
+            
             if (this.searchForm.venueId) {
                 params.venueId = this.searchForm.venueId;
             }
             
-            console.log('查询参数:', params);
+            console.log("获取场地安排，参数：", params);
             
+            // 发送请求获取场地安排数据
             axios.get('/api/venue-schedules/weekly', { params })
                 .then(response => {
-                    console.log('获取到场地安排数据:', response.data);
-                    // 检查响应格式
                     if (response.data && response.data.code === 200) {
-                        const schedules = response.data.data || [];
-                        this.scheduleData = schedules.map(schedule => ({
-                            venueId: schedule.venueId,
-                            venueName: schedule.venueName,
-                            venueType: schedule.type,
-                            date: this.formatDate(new Date(schedule.date)),
-                            timeRange: schedule.timeSlot,
-                            status: schedule.status
-                        }));
+                        console.log("获取到场地安排数据:", response.data.data);
+                        this.scheduleData = response.data.data || [];
                     } else {
-                        console.error('响应格式错误:', response.data);
-                        this.scheduleData = [];
-                        this.$message.error(response.data.msg || '加载场地安排数据失败');
+                        this.$message.error(response.data.msg || '获取场地安排失败');
                     }
                 })
                 .catch(error => {
-                    console.error('加载场地安排数据失败:', error);
-                    this.scheduleData = [];
-                    this.$message.error('加载场地安排数据失败: ' + error.message);
+                    console.error("获取场地安排失败：", error);
+                    this.$message.error('获取场地安排失败：' + (error.response?.data?.msg || error.message));
                 })
                 .finally(() => {
                     this.loading = false;
@@ -362,11 +355,11 @@ const UserScheduleComponent = {
             this.setWeekStartToSunday();
             this.loadScheduleData();
         },
-        // 根据时间段和日期获取安排数据
+        // 获取指定时间和日期的场地安排
         getScheduleForTimeAndDay(timeSlot, day) {
-            return this.scheduleData.find(schedule =>
-                schedule.timeRange === timeSlot.timeRange &&
-                schedule.date === day.date
+            return this.scheduleData.find(schedule => 
+                schedule.date === day.date && 
+                schedule.timeSlot === timeSlot.timeRange
             );
         },
         // 获取单元格的CSS类
@@ -430,27 +423,29 @@ const UserScheduleComponent = {
         },
         // 获取状态文本
         getStatusText(status) {
-            const texts = {
+            const statusMap = {
                 'AVAILABLE': '可预约',
                 'BOOKED': '已预约',
                 'IN_USE': '使用中',
                 'SPECIAL': '特殊场地',
                 'MAINTENANCE': '维护中',
-                'PENDING': '待确认',
-                'PAST': '已过期'
+                'PAST': '已过期',
+                'PENDING': '待确认'
             };
-            return texts[status] || '未知';
+            return statusMap[status] || status;
         },
-        // 获取状态对应的Tag类型
+        // 获取状态类型（用于显示不同颜色）
         getStatusType(status) {
-            const types = {
+            const typeMap = {
                 'AVAILABLE': 'success',
                 'BOOKED': 'warning',
-                'IN_USE': 'primary',
-                'SPECIAL': 'danger',
-                'MAINTENANCE': 'info'
+                'IN_USE': 'danger',
+                'SPECIAL': 'info',
+                'MAINTENANCE': 'info',
+                'PAST': '',
+                'PENDING': 'warning'
             };
-            return types[status] || 'info';
+            return typeMap[status] || '';
         }
     }
 };

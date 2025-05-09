@@ -211,80 +211,152 @@ const UserUsageComponent = {
     methods: {
         // 加载今日预约
         loadTodayReservations() {
-            // 模拟API请求
-            setTimeout(() => {
-                const today = new Date().toISOString().split('T')[0];
-
-                // 模拟数据
-                this.todayReservations = [
-                    {
-                        id: 1,
-                        venueInfo: { id: 1, name: '篮球场A', type: '篮球场', pricePerHour: 80 },
-                        date: today,
-                        startTime: '13:00',
-                        endTime: '15:00',
-                        numberOfPeople: 8,
-                        cost: 160,
-                        usageStatus: 'NOT_STARTED'
-                    },
-                    {
-                        id: 2,
-                        venueInfo: { id: 4, name: '羽毛球场A', type: '羽毛球场', pricePerHour: 40 },
-                        date: today,
-                        startTime: '16:00',
-                        endTime: '17:00',
-                        numberOfPeople: 2,
-                        cost: 40,
-                        usageStatus: 'NOT_STARTED'
-                    },
-                    {
-                        id: 3,
-                        venueInfo: { id: 8, name: '游泳池', type: '游泳池', pricePerHour: 30 },
-                        date: today,
-                        startTime: '18:00',
-                        endTime: '19:30',
-                        numberOfPeople: 1,
-                        cost: 45,
-                        usageStatus: 'NOT_STARTED'
-                    }
-                ];
-
-                // 检查本地存储是否有使用中的记录
-                const ongoingUsageStr = localStorage.getItem('ongoingUsage');
-                if (ongoingUsageStr) {
-                    try {
-                        const ongoingUsage = JSON.parse(ongoingUsageStr);
-                        const index = this.todayReservations.findIndex(item => item.id === ongoingUsage.id);
-                        if (index !== -1) {
-                            this.todayReservations[index].usageStatus = 'IN_PROGRESS';
-                        }
-                    } catch (e) {
-                        localStorage.removeItem('ongoingUsage');
-                    }
+            console.log('开始加载今日预约...');
+            
+            // 获取当前用户ID
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userId = currentUser && currentUser.id ? currentUser.id : null;
+            if (!userId) {
+                this.$message.error('请先登录');
+                return;
+            }
+            
+            // 获取今日预约
+            axios.get(`/api/reservations/user/${userId}`, {
+                params: {
+                    page: 1,
+                    size: 100,
+                    status: 'PENDING,CONFIRMED,IN_USE'  // 获取所有可用状态的预约
                 }
-            }, 500);
+            })
+            .then(response => {
+                console.log('获取到预约数据:', response.data);
+                
+                if (response.data && response.data.records) {
+                    // 处理预约数据
+                    this.todayReservations = response.data.records
+                        .filter(reservation => {
+                            // 确保日期是Date对象
+                            if (typeof reservation.date === 'string') {
+                                reservation.date = new Date(reservation.date);
+                            }
+                            
+                            // 只显示今天的预约
+                            const today = new Date();
+                            const reservationDate = new Date(reservation.date);
+                            return reservationDate.toDateString() === today.toDateString();
+                        })
+                        .map(reservation => {
+                            // 添加使用状态
+                            const usageStatus = this.getUsageStatus(reservation);
+                            console.log(`预约 ${reservation.id} 的使用状态: ${usageStatus}`);
+                            
+                            return {
+                                ...reservation,
+                                usageStatus
+                            };
+                        });
+                    
+                    console.log('处理后的预约数据:', this.todayReservations);
+                    
+                    // 检查本地存储是否有使用中的记录
+                    const ongoingUsageStr = localStorage.getItem('ongoingUsage');
+                    if (ongoingUsageStr) {
+                        try {
+                            const ongoingUsage = JSON.parse(ongoingUsageStr);
+                            const index = this.todayReservations.findIndex(item => item.id === ongoingUsage.id);
+                            if (index !== -1) {
+                                console.log(`找到进行中的预约: ${ongoingUsage.id}`);
+                                this.todayReservations[index].usageStatus = 'IN_PROGRESS';
+                            }
+                        } catch (e) {
+                            console.error('解析进行中的使用记录失败:', e);
+                            localStorage.removeItem('ongoingUsage');
+                        }
+                    }
+                } else {
+                    console.error('预约数据格式不正确:', response.data);
+                    this.$message.error('获取预约列表失败：数据格式不正确');
+                }
+            })
+            .catch(error => {
+                console.error('加载今日预约失败:', error);
+                if (error.response) {
+                    console.error('错误响应:', error.response.data);
+                    this.$message.error('加载今日预约失败: ' + (error.response.data.msg || error.message));
+                } else {
+                    this.$message.error('加载今日预约失败: ' + error.message);
+                }
+            });
         },
-        // 检查是否有进行中的使用
-        checkOngoingUsage() {
+        
+        // 获取使用状态
+        getUsageStatus(reservation) {
+            const now = new Date();
+            
+            // 解析日期和时间
+            const [hours, minutes] = reservation.startTime.split(':').map(Number);
+            const [endHours, endMinutes] = reservation.endTime.split(':').map(Number);
+            
+            // 将日期字符串转换为Date对象
+            const reservationDate = new Date(reservation.date);
+            
+            // 设置开始时间和结束时间
+            const startTime = new Date(reservationDate);
+            startTime.setHours(hours, minutes, 0, 0);
+            
+            const endTime = new Date(reservationDate);
+            endTime.setHours(endHours, endMinutes, 0, 0);
+            
+            // 检查是否有进行中的使用记录
             const ongoingUsageStr = localStorage.getItem('ongoingUsage');
             if (ongoingUsageStr) {
                 try {
                     const ongoingUsage = JSON.parse(ongoingUsageStr);
-                    const startTimeStr = localStorage.getItem('usageStartTime');
-
-                    this.currentUsage = ongoingUsage;
-                    this.usageStartTime = startTimeStr;
-
-                    // 计算已使用时间
-                    if (startTimeStr) {
-                        const startTime = new Date(startTimeStr);
-                        const now = new Date();
-                        this.elapsedTime = Math.floor((now - startTime) / 1000);
+                    if (ongoingUsage.id === reservation.id) {
+                        return 'IN_PROGRESS';
                     }
-
+                } catch (e) {
+                    localStorage.removeItem('ongoingUsage');
+                }
+            }
+            
+            // 检查预约状态
+            if (reservation.status === 'COMPLETED') {
+                return 'COMPLETED';
+            }
+            
+            // 根据时间判断状态
+            if (now < startTime) {
+                return 'NOT_STARTED';
+            } else if (now >= endTime) {
+                return 'COMPLETED';
+            } else {
+                return 'NOT_STARTED';
+            }
+        },
+        // 检查是否有进行中的使用
+        checkOngoingUsage() {
+            const ongoingUsageStr = localStorage.getItem('ongoingUsage');
+            const usageStartTime = localStorage.getItem('usageStartTime');
+            
+            if (ongoingUsageStr && usageStartTime) {
+                try {
+                    const ongoingUsage = JSON.parse(ongoingUsageStr);
+                    const startTime = new Date(usageStartTime);
+                    const now = new Date();
+                    
+                    // 计算已经过的时间（秒）
+                    this.elapsedTime = Math.floor((now - startTime) / 1000);
+                    
+                    // 设置当前使用
+                    this.currentUsage = ongoingUsage;
+                    this.usageStartTime = usageStartTime;
+                    
                     // 启动计时器
                     this.startTimer();
                 } catch (e) {
+                    console.error('解析进行中的使用记录失败:', e);
                     localStorage.removeItem('ongoingUsage');
                     localStorage.removeItem('usageStartTime');
                 }
@@ -315,11 +387,15 @@ const UserUsageComponent = {
                 this.currentUsage = this.todayReservations[index];
 
                 // 记录开始时间
-                this.usageStartTime = new Date().toLocaleString();
+                const now = new Date();
+                this.usageStartTime = now.toLocaleString();
                 this.elapsedTime = 0;
 
                 // 保存到本地存储
-                localStorage.setItem('ongoingUsage', JSON.stringify(this.currentUsage));
+                localStorage.setItem('ongoingUsage', JSON.stringify({
+                    ...this.currentUsage,
+                    startTime: this.usageStartTime
+                }));
                 localStorage.setItem('usageStartTime', this.usageStartTime);
 
                 // 启动计时器
@@ -331,10 +407,9 @@ const UserUsageComponent = {
         },
         // 启动计时器
         startTimer() {
-            // 清除已有计时器
-            this.clearTimer();
-
-            // 启动新计时器
+            if (this.timer) {
+                clearInterval(this.timer);
+            }
             this.timer = setInterval(() => {
                 this.elapsedTime++;
             }, 1000);
@@ -348,23 +423,34 @@ const UserUsageComponent = {
         },
         // 结束使用
         endUsage(reservation) {
+            // 检查是否是当前使用中的场地
+            if (!this.currentUsage || this.currentUsage.id !== reservation.id) {
+                this.$message.error('只能结束当前正在使用的场地');
+                return;
+            }
+
             // 显示结算弹窗
             this.settlementDialogVisible = true;
         },
         // 查看使用详情
         viewUsageDetail(usage) {
-            // 模拟获取详情
-            this.selectedUsage = {
-                ...usage,
-                actualStartTime: '14:05',
-                actualEndTime: '15:55',
-                duration: '1小时50分钟',
-                actualCost: 147.5,
-                paymentMethod: 'wechat',
-                paymentTime: '2025-03-31 15:56:23'
-            };
-
-            this.usageDetailDialogVisible = true;
+            // 获取使用详情
+            axios.get(`/api/reservations/${usage.id}/usage`)
+                .then(response => {
+                    if (response.data && response.data.code === 200) {
+                        this.selectedUsage = {
+                            ...usage,
+                            ...response.data.data
+                        };
+                        this.usageDetailDialogVisible = true;
+                    } else {
+                        this.$message.error(response.data.msg || '获取使用详情失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('获取使用详情失败:', error);
+                    this.$message.error('获取使用详情失败: ' + error.message);
+                });
         },
         // 确认结算
         confirmSettlement() {
@@ -373,134 +459,155 @@ const UserUsageComponent = {
             // 清除计时器
             this.clearTimer();
 
-            // 更新状态
-            const index = this.todayReservations.findIndex(item => item.id === this.currentUsage.id);
-            if (index !== -1) {
-                this.todayReservations[index].usageStatus = 'COMPLETED';
+            // 格式化时间
+            const formatTime = (date) => {
+                const d = new Date(date);
+                return d.toLocaleTimeString('zh-CN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+            };
 
-                // 创建完整的使用记录（实际项目中应该提交到后端）
-                const usageRecord = {
-                    ...this.currentUsage,
-                    actualStartTime: this.usageStartTime,
-                    actualEndTime: new Date().toLocaleString(),
-                    duration: this.formatDuration(this.elapsedTime),
-                    actualCost: this.calculateCurrentCost(),
-                    paymentMethod: this.paymentMethod,
-                    paymentTime: new Date().toLocaleString()
-                };
+            // 准备结算数据
+            const now = new Date();
+            const settlementData = {
+                reservationId: this.currentUsage.id,
+                actualStartTime: formatTime(this.usageStartTime),
+                actualEndTime: formatTime(now),
+                duration: this.formatDuration(this.elapsedTime),
+                actualCost: this.calculateCurrentCost().toFixed(2),
+                paymentMethod: this.paymentMethod
+            };
 
-                console.log('使用记录:', usageRecord);
+            console.log('提交结算数据:', settlementData);
 
-                // 清除本地存储
-                localStorage.removeItem('ongoingUsage');
-                localStorage.removeItem('usageStartTime');
+            // 提交结算
+            axios.post('/api/reservations/settle', settlementData)
+                .then(response => {
+                    console.log('结算响应:', response.data);
+                    if (response.data && response.data.code === 200) {
+                        // 更新状态
+                        const index = this.todayReservations.findIndex(item => item.id === this.currentUsage.id);
+                        if (index !== -1) {
+                            this.todayReservations[index].usageStatus = 'COMPLETED';
+                            this.todayReservations[index].actualStartTime = settlementData.actualStartTime;
+                            this.todayReservations[index].actualEndTime = settlementData.actualEndTime;
+                            this.todayReservations[index].duration = settlementData.duration;
+                            this.todayReservations[index].actualCost = settlementData.actualCost;
+                            this.todayReservations[index].paymentMethod = settlementData.paymentMethod;
+                        }
 
-                // 重置状态
-                this.currentUsage = null;
-                this.elapsedTime = 0;
-                this.usageStartTime = '';
+                        // 清除本地存储
+                        localStorage.removeItem('ongoingUsage');
+                        localStorage.removeItem('usageStartTime');
 
-                // 关闭弹窗
-                this.settlementDialogVisible = false;
+                        // 重置状态
+                        this.currentUsage = null;
+                        this.elapsedTime = 0;
+                        this.usageStartTime = '';
 
-                // 提示
-                this.$message.success('结算成功！');
-            }
+                        // 关闭弹窗
+                        this.settlementDialogVisible = false;
+
+                        // 提示
+                        this.$message.success('结算成功！');
+                    } else {
+                        this.$message.error(response.data.msg || '结算失败');
+                    }
+                })
+                .catch(error => {
+                    console.error('结算失败:', error);
+                    if (error.response && error.response.data) {
+                        console.error('错误详情:', error.response.data);
+                        this.$message.error('结算失败: ' + (error.response.data.msg || error.message));
+                    } else {
+                        this.$message.error('结算失败: ' + error.message);
+                    }
+                });
         },
         // 格式化时长
         formatDuration(seconds) {
             const hours = Math.floor(seconds / 3600);
             const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-
-            let result = '';
-            if (hours > 0) {
-                result += `${hours}小时`;
-            }
-            if (minutes > 0 || hours > 0) {
-                result += `${minutes}分钟`;
-            }
-            result += `${secs}秒`;
-
-            return result;
+            const remainingSeconds = seconds % 60;
+            
+            const parts = [];
+            if (hours > 0) parts.push(`${hours}小时`);
+            if (minutes > 0) parts.push(`${minutes}分钟`);
+            if (remainingSeconds > 0) parts.push(`${remainingSeconds}秒`);
+            
+            return parts.join(' ') || '0秒';
         },
         // 计算当前费用
         calculateCurrentCost() {
             if (!this.currentUsage) return 0;
-
-            // 预约的时长（小时）
-            const [startHours, startMinutes] = this.currentUsage.startTime.split(':').map(Number);
-            const [endHours, endMinutes] = this.currentUsage.endTime.split(':').map(Number);
-
-            const startTimeMinutes = startHours * 60 + startMinutes;
-            const endTimeMinutes = endHours * 60 + endMinutes;
-            const bookingDurationHours = (endTimeMinutes - startTimeMinutes) / 60;
-
-            // 已使用时长（小时）
-            const usedHours = this.elapsedTime / 3600;
-
-            // 如果未超时，按照预约费用计算
-            if (!this.isOvertime) {
-                return Math.min(usedHours, bookingDurationHours) * this.currentUsage.venueInfo.pricePerHour;
+            
+            const pricePerHour = this.currentUsage.venueInfo.pricePerHour;
+            const hours = this.elapsedTime / 3600; // 转换为小时
+            
+            // 如果超时，加收超时费用
+            if (this.isOvertime) {
+                const normalHours = this.getNormalHours();
+                const overtimeHours = hours - normalHours;
+                return pricePerHour * normalHours + this.calculateOvertimeCost();
             }
-
-            // 如果超时，需要额外计算超时费用
-            const normalCost = bookingDurationHours * this.currentUsage.venueInfo.pricePerHour;
-            const overtimeCost = this.calculateOvertimeCost();
-
-            return normalCost + overtimeCost;
+            
+            return pricePerHour * hours;
         },
         // 计算超时费用
         calculateOvertimeCost() {
             if (!this.currentUsage || !this.isOvertime) return 0;
-
-            // 解析结束时间
+            
+            const pricePerHour = this.currentUsage.venueInfo.pricePerHour;
+            const normalHours = this.getNormalHours();
+            const totalHours = this.elapsedTime / 3600;
+            const overtimeHours = totalHours - normalHours;
+            
+            // 超时费用按1.5倍计算
+            return pricePerHour * overtimeHours * 1.5;
+        },
+        // 获取正常使用时长（小时）
+        getNormalHours() {
+            if (!this.currentUsage) return 0;
+            
+            const [startHours, startMinutes] = this.currentUsage.startTime.split(':').map(Number);
             const [endHours, endMinutes] = this.currentUsage.endTime.split(':').map(Number);
-            const endTimeInSeconds = (endHours * 60 + endMinutes) * 60;
-
-            // 计算超时秒数
-            const overtimeSeconds = this.elapsedTime - endTimeInSeconds;
-
-            // 转换为小时
-            const overtimeHours = overtimeSeconds / 3600;
-
-            // 超时费用（按小时收费，超时部分按1.5倍计算）
-            return overtimeHours * this.currentUsage.venueInfo.pricePerHour * 1.5;
+            
+            return (endHours - startHours) + (endMinutes - startMinutes) / 60;
         },
         // 获取当前时间
         getCurrentTime() {
             const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-
-            return `${hours}:${minutes}`;
+            return now.toLocaleString();
         },
-        // 获取状态对应的样式类型
-        getStatusType(status) {
-            const types = {
-                'NOT_STARTED': 'info',
-                'IN_PROGRESS': 'primary',
-                'COMPLETED': 'success'
-            };
-            return types[status] || 'info';
-        },
-        // 获取状态显示文本
+        // 获取状态文本
         getStatusText(status) {
-            const texts = {
-                'NOT_STARTED': '待使用',
+            const statusMap = {
+                'NOT_STARTED': '未开始',
                 'IN_PROGRESS': '使用中',
                 'COMPLETED': '已完成'
             };
-            return texts[status] || '未知';
+            return statusMap[status] || '未知';
         },
-        // 获取支付方式显示文本
+        // 获取状态对应的样式类型
+        getStatusType(status) {
+            const typeMap = {
+                'NOT_STARTED': 'info',
+                'IN_PROGRESS': 'success',
+                'COMPLETED': 'warning'
+            };
+            return typeMap[status] || 'info';
+        },
+        // 获取支付方式文本
         getPaymentMethodText(method) {
-            const texts = {
+            const methodMap = {
                 'balance': '余额支付',
                 'wechat': '微信支付',
                 'alipay': '支付宝'
             };
-            return texts[method] || '未知';
+            return methodMap[method] || '未知';
         }
     }
 };

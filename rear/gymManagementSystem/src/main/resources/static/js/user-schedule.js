@@ -153,19 +153,7 @@ const UserScheduleComponent = {
             if (!this.searchForm.venueType) {
                 return this.venues;
             }
-
-            // 将英文类型值转换为中文类型名
-            const typeMap = {
-                'basketball': '篮球场',
-                'football': '足球场',
-                'badminton': '羽毛球场',
-                'tennis': '网球场',
-                'swimming': '游泳池',
-                'table_tennis': '乒乓球室'
-            };
-
-            const selectedType = typeMap[this.searchForm.venueType];
-            return this.venues.filter(venue => venue.type === selectedType);
+            return this.venues.filter(venue => venue.type === this.searchForm.venueType);
         },
         // 本周的日期列表
         weekDays() {

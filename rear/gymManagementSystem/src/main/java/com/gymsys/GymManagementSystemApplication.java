@@ -7,8 +7,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "com.gymsys.repository.venue")
-@EntityScan(basePackages = "com.gymsys.entity.venue")
+@EnableJpaRepositories(basePackages = {"com.gymsys.repository.venue", "com.gymsys.repository.competition"})
+@EntityScan(basePackages = {"com.gymsys.entity.venue", "com.gymsys.entity.competition"})
 public class GymManagementSystemApplication {
 
     /**

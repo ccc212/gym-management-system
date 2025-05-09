@@ -5,7 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class AddTeamDTO extends BaseDTO {
@@ -33,4 +33,9 @@ public class AddTeamDTO extends BaseDTO {
      */
     @NotNull(message = "部门id不能为空")
     private Integer departId;
+    
+    /**
+     * 团队成员id列表
+     */
+    private List<Long> memberIds;
 }

@@ -22,12 +22,33 @@ import java.util.List;
  */
 public interface ICompetitionService extends IService<Competition> {
 
+    /**
+     * 添加赛事
+     *
+     * @param addCompetitionDTO 添加赛事DTO
+     */
     void addCompetition(AddCompetitionDTO addCompetitionDTO);
 
+    /**
+     * 删除赛事
+     *
+     * @param id 赛事ID
+     */
     void deleteCompetition(Long id);
 
+    /**
+     * 更新赛事
+     *
+     * @param updateCompetitionDTO 更新赛事DTO
+     */
     void updateCompetition(UpdateCompetitionDTO updateCompetitionDTO);
 
+    /**
+     * 查询赛事列表
+     *
+     * @param listCompetitionDTO 查询条件
+     * @return 赛事列表
+     */
     IPage<Competition> listCompetition(ListCompetitionDTO listCompetitionDTO);
 
     CompetitionDetailVO getDetail(Long id);

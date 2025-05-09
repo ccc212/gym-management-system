@@ -29,6 +29,7 @@ public enum StatusCodeEnum {
     // 用户管理相关
 
     // 场地管理相关
+    VENUE_ALREADY_OCCUPIED(-10301, "场地已被占用"),
 
     // 赛事管理相关
     COMPETITION_NOT_EXIST(-10401, "赛事不存在"),
@@ -38,11 +39,21 @@ public enum StatusCodeEnum {
     COMPETITION_SIGN_UP_TEAM_NOT_EXIST(-10405, "团队报名不存在"),
     TEAM_NOT_EXIST(-10406, "团队不存在"),
     TEAM_MEMBER_RELATION_NOT_EXIST(-10407, "团队成员关联不存在"),
-
+    TEAM_IS_USED(-10408, "团队已存在"),
+    TEAM_NAME_ALREADY_EXISTS(-10409, "团队名称已存在"),
+    TEAM_MEMBER_ALREADY_EXISTS(-10410, "团队成员已存在"),
+    TEAM_MEMBER_NOT_EXIST(-10411, "团队成员不存在"),
+    COMPETITION_ITEM_NAME_ALREADY_EXISTS(-10412, "赛事项目名称已存在"),
+    COMPETITION_ITEM_NOT_EXIST(-10413, "赛事项目不存在"),
+    COMPETITION_ITEM_IS_USED(-10414, "赛事项目已使用"),
+    COMPETITION_NAME_ALREADY_EXISTS(-10415, "赛事名称已存在"),
+    COMPETITION_SIGN_UP_DEADLINE(-10416, "赛事报名截止时间已过"),
+    COMPETITION_SIGN_UP_FULL(-10417, "赛事报名人数已满"),
+    COMPETITION_SIGN_UP_ALREADY_EXISTS(-10418, "赛事报名已存在"),
+    COMPETITION_SIGN_UP_STATUS_ERROR(-10419, "赛事报名状态异常"),
 
     // 器材管理相关
-
-    ;
+    EQUIPMENT_NOT_EXIST(-10501, "器材不存在");
 
     private final Integer code;
 

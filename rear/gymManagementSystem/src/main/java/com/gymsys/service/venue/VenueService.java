@@ -25,7 +25,7 @@ public class VenueService {
         venue.setCreatedAt(LocalDateTime.now());
         venue.setUpdatedAt(LocalDateTime.now());
         venue.setIsAvailable(true);
-        venue.setStatus("ACTIVE");
+        venue.setStatus("NORMAL");
         
         venueRepository.insert(venue);
         return venue;

@@ -89,8 +89,8 @@ public class VenueScheduleService {
     
     private String determineTimeSlotStatus(VenueEntity venue, LocalDate date, LocalTime time,
                                          List<ReservationEntity> venueReservations) {
-        // 检查场地是否可用
-        if (!venue.getIsAvailable()) {
+        // 检查场地状态
+        if ("MAINTENANCE".equals(venue.getStatus())) {
             return "MAINTENANCE";
         }
         

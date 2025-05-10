@@ -1,141 +1,141 @@
-// 预约管理组件
-const AdminReservationsComponent = {
-    template: `
-        <div class="admin-reservations-container">
-            <el-card>
-                <div slot="header" class="card-header">
-                    <h2>预约管理</h2>
-                </div>
-                
-                <!-- 搜索筛选区域 -->
-                <el-form :inline="true" class="search-form" size="small">
-                    <el-form-item label="场地类型">
-                        <el-select v-model="searchForm.venueType" placeholder="选择场地类型" clearable @change="searchReservations">
-                            <el-option v-for="item in venueTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="预约状态">
-                        <el-select v-model="searchForm.status" placeholder="选择预约状态" clearable @change="searchReservations">
-                            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="日期范围">
-                        <el-date-picker
-                            v-model="searchForm.dateRange"
-                            type="daterange"
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            value-format="yyyy-MM-dd"
-                            @change="searchReservations">
-                        </el-date-picker>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="searchReservations">查询</el-button>
-                        <el-button @click="resetSearch">重置</el-button>
-                    </el-form-item>
-                </el-form>
-                
-                <!-- 预约列表 -->
-                <el-table 
-                    v-loading="loading" 
-                    :data="reservationList" 
-                    style="width: 100%"
-                    :header-cell-style="{background:'#f5f7fa', color:'#606266'}"
-                    border>
-                    <el-table-column prop="id" label="ID" width="80"></el-table-column>
-                    <el-table-column prop="venueName" label="场地名称" width="120"></el-table-column>
-                    <el-table-column prop="venueType" label="场地类型" width="100"></el-table-column>
-                    <el-table-column prop="userName" label="预约用户" width="100"></el-table-column>
-                    <el-table-column prop="date" label="预约日期" width="120"></el-table-column>
-                    <el-table-column prop="timeRange" label="时间段" width="160"></el-table-column>
-                    <el-table-column prop="numberOfPeople" label="人数" width="80" align="center"></el-table-column>
-                    <el-table-column prop="status" label="状态" width="100">
-                        <template slot-scope="scope">
-                            <el-tag :type="getStatusType(scope.row.status)">{{ getStatusText(scope.row.status) }}</el-tag>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
-                    <el-table-column label="操作" width="240">
-                        <template slot-scope="scope">
-                            <el-button type="primary" size="mini" @click="showReservationDetail(scope.row)">详情</el-button>
-                            <el-button v-if="scope.row.status === 'PENDING'" type="success" size="mini" @click="approveReservation(scope.row)">批准</el-button>
-                            <el-button v-if="scope.row.status === 'PENDING'" type="danger" size="mini" @click="rejectReservation(scope.row)">拒绝</el-button>
-                            <el-button v-if="scope.row.status === 'APPROVED' && !isReservationStarted(scope.row)" type="warning" size="mini" @click="cancelReservation(scope.row)">取消</el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-                
-                <!-- 分页组件 -->
-                <div class="pagination-container">
-                    <el-pagination
-                        @size-change="handleSizeChange"
-                        @current-change="handleCurrentChange"
-                        :current-page="pagination.currentPage"
-                        :page-sizes="[10, 20, 50, 100]"
-                        :page-size="pagination.pageSize"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        :total="pagination.total">
-                    </el-pagination>
-                </div>
-            </el-card>
-            
-            <!-- 预约详情弹窗 -->
-            <el-dialog title="预约详情" :visible.sync="detailDialogVisible" width="600px">
-                <div v-if="selectedReservation" class="reservation-detail">
-                    <el-descriptions :column="2" border>
-                        <el-descriptions-item label="预约ID">{{ selectedReservation.id }}</el-descriptions-item>
-                        <el-descriptions-item label="预约状态">
-                            <el-tag :type="getStatusType(selectedReservation.status)">{{ getStatusText(selectedReservation.status) }}</el-tag>
-                        </el-descriptions-item>
-                        <el-descriptions-item label="场地名称">{{ selectedReservation.venueName }}</el-descriptions-item>
-                        <el-descriptions-item label="场地类型">{{ selectedReservation.venueType }}</el-descriptions-item>
-                        <el-descriptions-item label="预约用户">{{ selectedReservation.userName }}</el-descriptions-item>
-                        <el-descriptions-item label="用户手机">{{ selectedReservation.userPhone || '无' }}</el-descriptions-item>
-                        <el-descriptions-item label="预约日期">{{ selectedReservation.date }}</el-descriptions-item>
-                        <el-descriptions-item label="时间段">{{ selectedReservation.timeRange }}</el-descriptions-item>
-                        <el-descriptions-item label="预约人数">{{ selectedReservation.numberOfPeople }} 人</el-descriptions-item>
-                        <el-descriptions-item label="费用">{{ selectedReservation.cost }} 元</el-descriptions-item>
-                        <el-descriptions-item label="创建时间" :span="2">{{ selectedReservation.createTime }}</el-descriptions-item>
-                        <el-descriptions-item label="修改时间" :span="2">{{ selectedReservation.updateTime || '无' }}</el-descriptions-item>
-                        <el-descriptions-item label="备注" :span="2">{{ selectedReservation.remarks || '无' }}</el-descriptions-item>
-                    </el-descriptions>
-                    
-                    <!-- 操作记录 -->
-                    <div class="operation-history" v-if="selectedReservation.operationHistory && selectedReservation.operationHistory.length > 0">
-                        <h3>操作记录</h3>
-                        <el-timeline>
-                            <el-timeline-item
-                                v-for="(activity, index) in selectedReservation.operationHistory"
-                                :key="index"
-                                :timestamp="activity.time"
-                                :type="getOperationHistoryType(activity.type)">
-                                {{ activity.content }}
-                                <div class="history-operator">操作人: {{ activity.operator }}</div>
-                            </el-timeline-item>
-                        </el-timeline>
+    // 预约管理组件
+    const AdminReservationsComponent = {
+        template: `
+            <div class="admin-reservations-container">
+                <el-card>
+                    <div slot="header" class="card-header">
+                        <h2>预约管理</h2>
                     </div>
                     
-                    <!-- 审核操作 -->
-                    <div class="approval-section" v-if="selectedReservation.status === 'PENDING'">
-                        <h3>预约审核</h3>
-                        <el-form :model="approvalForm" ref="approvalForm" label-width="80px">
-                            <el-form-item label="审核意见" prop="comment">
-                                <el-input type="textarea" v-model="approvalForm.comment" placeholder="请输入审核意见"></el-input>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button type="success" @click="doApprove">批准预约</el-button>
-                                <el-button type="danger" @click="doReject">拒绝预约</el-button>
-                            </el-form-item>
-                        </el-form>
+                    <!-- 搜索筛选区域 -->
+                    <el-form :inline="true" class="search-form" size="small">
+                        <el-form-item label="场地类型">
+                            <el-select v-model="searchForm.venueType" placeholder="选择场地类型" clearable @change="searchReservations">
+                                <el-option v-for="item in venueTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="预约状态">
+                            <el-select v-model="searchForm.status" placeholder="选择预约状态" clearable @change="searchReservations">
+                                <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="日期范围">
+                            <el-date-picker
+                                v-model="searchForm.dateRange"
+                                type="daterange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期"
+                                value-format="yyyy-MM-dd"
+                                @change="searchReservations">
+                            </el-date-picker>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="searchReservations">查询</el-button>
+                            <el-button @click="resetSearch">重置</el-button>
+                        </el-form-item>
+                    </el-form>
+                    
+                    <!-- 预约列表 -->
+                    <el-table 
+                        v-loading="loading" 
+                        :data="reservationList" 
+                        style="width: 100%"
+                        :header-cell-style="{background:'#f5f7fa', color:'#606266'}"
+                        border>
+                        <el-table-column prop="id" label="ID" width="80"></el-table-column>
+                        <el-table-column prop="venueName" label="场地名称" width="120"></el-table-column>
+                        <el-table-column prop="venueType" label="场地类型" width="100"></el-table-column>
+                        <el-table-column prop="userName" label="预约用户" width="100"></el-table-column>
+                        <el-table-column prop="date" label="预约日期" width="120"></el-table-column>
+                        <el-table-column prop="timeRange" label="时间段" width="160"></el-table-column>
+                        <el-table-column prop="numberOfPeople" label="人数" width="80" align="center"></el-table-column>
+                        <el-table-column prop="status" label="状态" width="100">
+                            <template slot-scope="scope">
+                                <el-tag :type="getStatusType(scope.row.status)">{{ getStatusText(scope.row.status) }}</el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
+                        <el-table-column label="操作" width="240">
+                            <template slot-scope="scope">
+                                <el-button type="primary" size="mini" @click="showReservationDetail(scope.row)">详情</el-button>
+                                <el-button v-if="scope.row.status === 'PENDING'" type="success" size="mini" @click="approveReservation(scope.row)">批准</el-button>
+                                <el-button v-if="scope.row.status === 'PENDING'" type="danger" size="mini" @click="rejectReservation(scope.row)">拒绝</el-button>
+                                <el-button v-if="scope.row.status === 'APPROVED' && !isReservationStarted(scope.row)" type="warning" size="mini" @click="cancelReservation(scope.row)">取消</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    
+                    <!-- 分页组件 -->
+                    <div class="pagination-container">
+                        <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="pagination.currentPage"
+                            :page-sizes="[10, 20, 50, 100]"
+                            :page-size="pagination.pageSize"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="pagination.total">
+                        </el-pagination>
                     </div>
-                </div>
-                <span slot="footer" class="dialog-footer">
-                    <el-button @click="detailDialogVisible = false">关闭</el-button>
-                </span>
-            </el-dialog>
-        </div>
-    `,
+                </el-card>
+                
+                <!-- 预约详情弹窗 -->
+                <el-dialog title="预约详情" :visible.sync="detailDialogVisible" width="600px">
+                    <div v-if="selectedReservation" class="reservation-detail">
+                        <el-descriptions :column="2" border>
+                            <el-descriptions-item label="预约ID">{{ selectedReservation.id }}</el-descriptions-item>
+                            <el-descriptions-item label="预约状态">
+                                <el-tag :type="getStatusType(selectedReservation.status)">{{ getStatusText(selectedReservation.status) }}</el-tag>
+                            </el-descriptions-item>
+                            <el-descriptions-item label="场地名称">{{ selectedReservation.venueName }}</el-descriptions-item>
+                            <el-descriptions-item label="场地类型">{{ selectedReservation.venueType }}</el-descriptions-item>
+                            <el-descriptions-item label="预约用户">{{ selectedReservation.userName }}</el-descriptions-item>
+                            <el-descriptions-item label="用户手机">{{ selectedReservation.userPhone || '无' }}</el-descriptions-item>
+                            <el-descriptions-item label="预约日期">{{ selectedReservation.date }}</el-descriptions-item>
+                            <el-descriptions-item label="时间段">{{ selectedReservation.timeRange }}</el-descriptions-item>
+                            <el-descriptions-item label="预约人数">{{ selectedReservation.numberOfPeople }} 人</el-descriptions-item>
+                            <el-descriptions-item label="费用">{{ selectedReservation.cost }} 元</el-descriptions-item>
+                            <el-descriptions-item label="创建时间" :span="2">{{ selectedReservation.createTime }}</el-descriptions-item>
+                            <el-descriptions-item label="修改时间" :span="2">{{ selectedReservation.updateTime || '无' }}</el-descriptions-item>
+                            <el-descriptions-item label="备注" :span="2">{{ selectedReservation.remarks || '无' }}</el-descriptions-item>
+                        </el-descriptions>
+                        
+                        <!-- 操作记录 -->
+                        <div class="operation-history" v-if="selectedReservation.operationHistory && selectedReservation.operationHistory.length > 0">
+                            <h3>操作记录</h3>
+                            <el-timeline>
+                                <el-timeline-item
+                                    v-for="(activity, index) in selectedReservation.operationHistory"
+                                    :key="index"
+                                    :timestamp="activity.time"
+                                    :type="getOperationHistoryType(activity.type)">
+                                    {{ activity.content }}
+                                    <div class="history-operator">操作人: {{ activity.operator }}</div>
+                                </el-timeline-item>
+                            </el-timeline>
+                        </div>
+                        
+                        <!-- 审核操作 -->
+                        <div class="approval-section" v-if="selectedReservation.status === 'PENDING'">
+                            <h3>预约审核</h3>
+                            <el-form :model="approvalForm" ref="approvalForm" label-width="80px">
+                                <el-form-item label="审核意见" prop="comment">
+                                    <el-input type="textarea" v-model="approvalForm.comment" placeholder="请输入审核意见"></el-input>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="success" @click="doApprove">批准预约</el-button>
+                                    <el-button type="danger" @click="doReject">拒绝预约</el-button>
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                    </div>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="detailDialogVisible = false">关闭</el-button>
+                    </span>
+                </el-dialog>
+            </div>
+        `,
     data() {
         return {
             // 搜索表单
@@ -188,65 +188,53 @@ const AdminReservationsComponent = {
     },
     methods: {
         // 加载预约数据
-        loadReservationData() {
+        async loadReservationData() {
             this.loading = true;
+            try {
+                const response = await axios.get('/api/reservations', {
+                    params: {
+                        page: this.pagination.currentPage,
+                        size: this.pagination.pageSize,
+                        type: this.searchForm.venueType,
+                        status: this.searchForm.status,
+                        startDate: this.searchForm.dateRange ? this.searchForm.dateRange[0] : null,
+                        endDate: this.searchForm.dateRange ? this.searchForm.dateRange[1] : null
+                    }
+                });
 
-            // 模拟后端API请求
-            setTimeout(() => {
-                // 模拟数据，实际项目中应通过API获取
-                const now = new Date();
-                const createTime = now.toLocaleString();
-                const yesterday = new Date(now);
-                yesterday.setDate(now.getDate() - 1);
-                const tomorrow = new Date(now);
-                tomorrow.setDate(now.getDate() + 1);
+                if (response.data && response.data.records) {
+                    // 场地类型映射
+                    const typeMap = {
+                        'basketball': '篮球场',
+                        'football': '足球场',
+                        'badminton': '羽毛球场',
+                        'tennis': '网球场',
+                        'swimming': '游泳池',
+                        'table_tennis': '乒乓球室'
+                    };
 
-                this.reservationList = [
-                    { id: 10001, venueName: '篮球场A', venueType: '篮球场', userName: '张三', userPhone: '13800138001', date: this.formatDate(tomorrow), timeRange: '10:00 - 12:00', numberOfPeople: 5, cost: 160, status: 'PENDING', createTime: createTime, remarks: '团队训练', operationHistory: [
-                            { type: 'CREATE', content: '创建预约', operator: '张三', time: createTime }
-                        ] },
-                    { id: 10002, venueName: '足球场A', venueType: '足球场', userName: '李四', userPhone: '13800138002', date: this.formatDate(tomorrow), timeRange: '14:00 - 16:00', numberOfPeople: 14, cost: 400, status: 'APPROVED', createTime: this.formatDateTime(yesterday), updateTime: createTime, remarks: '球队比赛', operationHistory: [
-                            { type: 'CREATE', content: '创建预约', operator: '李四', time: this.formatDateTime(yesterday) },
-                            { type: 'APPROVE', content: '审核通过: 符合预约条件', operator: '管理员', time: createTime }
-                        ] },
-                    { id: 10003, venueName: '羽毛球场B', venueType: '羽毛球场', userName: '王五', userPhone: '13800138003', date: this.formatDate(yesterday), timeRange: '18:00 - 19:00', numberOfPeople: 2, cost: 60, status: 'COMPLETED', createTime: this.formatDateTime(new Date(yesterday.getTime() - 86400000)), updateTime: this.formatDateTime(yesterday), remarks: '', operationHistory: [
-                            { type: 'CREATE', content: '创建预约', operator: '王五', time: this.formatDateTime(new Date(yesterday.getTime() - 86400000)) },
-                            { type: 'APPROVE', content: '审核通过', operator: '管理员', time: this.formatDateTime(new Date(yesterday.getTime() - 86400000 + 3600000)) },
-                            { type: 'COMPLETE', content: '预约完成，正常使用', operator: '管理员', time: this.formatDateTime(yesterday) }
-                        ] },
-                    { id: 10004, venueName: '游泳池', venueType: '游泳池', userName: '赵六', userPhone: '13800138004', date: this.formatDate(yesterday), timeRange: '09:00 - 10:00', numberOfPeople: 1, cost: 30, status: 'NO_SHOW', createTime: this.formatDateTime(new Date(yesterday.getTime() - 86400000)), updateTime: this.formatDateTime(yesterday), remarks: '', operationHistory: [
-                            { type: 'CREATE', content: '创建预约', operator: '赵六', time: this.formatDateTime(new Date(yesterday.getTime() - 86400000)) },
-                            { type: 'APPROVE', content: '审核通过', operator: '管理员', time: this.formatDateTime(new Date(yesterday.getTime() - 86400000 + 3600000)) },
-                            { type: 'NO_SHOW', content: '用户未签到，系统自动标记为未签到', operator: '系统', time: this.formatDateTime(yesterday) }
-                        ] },
-                    { id: 10005, venueName: '网球场A', venueType: '网球场', userName: '钱七', userPhone: '13800138005', date: this.formatDate(now), timeRange: '16:00 - 18:00', numberOfPeople: 2, cost: 120, status: 'REJECTED', createTime: this.formatDateTime(yesterday), updateTime: createTime, remarks: '临时预约', operationHistory: [
-                            { type: 'CREATE', content: '创建预约', operator: '钱七', time: this.formatDateTime(yesterday) },
-                            { type: 'REJECT', content: '拒绝预约: 场地已被其他活动占用', operator: '管理员', time: createTime }
-                        ] },
-                    { id: 10006, venueName: '乒乓球室A', venueType: '乒乓球室', userName: '孙八', userPhone: '13800138006', date: this.formatDate(now), timeRange: '20:00 - 21:00', numberOfPeople: 4, cost: 20, status: 'CANCELLED', createTime: this.formatDateTime(yesterday), updateTime: createTime, remarks: '', operationHistory: [
-                            { type: 'CREATE', content: '创建预约', operator: '孙八', time: this.formatDateTime(yesterday) },
-                            { type: 'APPROVE', content: '审核通过', operator: '管理员', time: this.formatDateTime(new Date(yesterday.getTime() + 3600000)) },
-                            { type: 'CANCEL', content: '取消预约: 用户临时有事', operator: '孙八', time: createTime }
-                        ] }
-                ];
-
-                // 根据筛选条件过滤
-                this.filterReservations();
-
-                this.pagination.total = this.reservationList.length;
+                    // 处理预约数据，确保所有字段都正确显示
+                    this.reservationList = response.data.records.map(reservation => ({
+                        ...reservation,
+                        venueName: reservation.venueInfo ? reservation.venueInfo.name : '未知',
+                        venueType: reservation.venueInfo ? typeMap[reservation.venueInfo.type] || '未知' : '未知',
+                        userName: reservation.userInfo ? reservation.userInfo.name : '未知',
+                        timeRange: `${reservation.startTime} - ${reservation.endTime}`,
+                        createTime: reservation.createdTime ? new Date(reservation.createdTime).toLocaleString() : '未知'
+                    }));
+                    this.pagination.total = response.data.total;
+                } else {
+                    this.reservationList = [];
+                    this.pagination.total = 0;
+                }
+            } catch (error) {
+                console.error('加载预约数据失败:', error);
+                this.$message.error('加载预约数据失败');
+                this.reservationList = [];
+                this.pagination.total = 0;
+            } finally {
                 this.loading = false;
-            }, 500);
-        },
-        // 格式化日期
-        formatDate(date) {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        },
-        // 格式化日期时间
-        formatDateTime(date) {
-            return new Date(date).toLocaleString();
+            }
         },
         // 搜索预约
         searchReservations() {
@@ -388,37 +376,26 @@ const AdminReservationsComponent = {
             });
         },
         // 执行批准操作
-        doApprove() {
+        async doApprove() {
+            if (!this.selectedReservation) return;
+
             this.loading = true;
-
-            // 模拟批准请求
-            setTimeout(() => {
-                // 更新选中的预约状态
-                this.selectedReservation.status = 'APPROVED';
-                this.selectedReservation.updateTime = new Date().toLocaleString();
-
-                // 添加操作记录
-                if (!this.selectedReservation.operationHistory) {
-                    this.selectedReservation.operationHistory = [];
-                }
-
-                this.selectedReservation.operationHistory.push({
-                    type: 'APPROVE',
-                    content: '审核通过' + (this.approvalForm.comment ? `: ${this.approvalForm.comment}` : ''),
-                    operator: '管理员',
-                    time: new Date().toLocaleString()
+            try {
+                const response = await axios.put(`/api/reservations/${this.selectedReservation.id}/approve`, {
+                    comment: this.approvalForm.comment
                 });
 
-                // 更新列表中的数据
-                const index = this.reservationList.findIndex(r => r.id === this.selectedReservation.id);
-                if (index !== -1) {
-                    this.reservationList.splice(index, 1, this.selectedReservation);
+                if (response.data) {
+                    this.$message.success('预约审核通过');
+                    this.detailDialogVisible = false;
+                    this.loadReservationData(); // 重新加载数据
                 }
-
-                this.$message.success('预约审核通过');
-                this.detailDialogVisible = false;
+            } catch (error) {
+                console.error('批准预约失败:', error);
+                this.$message.error('批准预约失败');
+            } finally {
                 this.loading = false;
-            }, 500);
+            }
         },
         // 拒绝预约
         rejectReservation(reservation) {
@@ -435,81 +412,60 @@ const AdminReservationsComponent = {
             });
         },
         // 执行拒绝操作
-        doReject() {
+        async doReject() {
+            if (!this.selectedReservation) return;
+
             if (!this.approvalForm.comment) {
                 this.$message.warning('请输入拒绝原因');
                 return;
             }
 
             this.loading = true;
-
-            // 模拟拒绝请求
-            setTimeout(() => {
-                // 更新选中的预约状态
-                this.selectedReservation.status = 'REJECTED';
-                this.selectedReservation.updateTime = new Date().toLocaleString();
-
-                // 添加操作记录
-                if (!this.selectedReservation.operationHistory) {
-                    this.selectedReservation.operationHistory = [];
-                }
-
-                this.selectedReservation.operationHistory.push({
-                    type: 'REJECT',
-                    content: `拒绝预约: ${this.approvalForm.comment}`,
-                    operator: '管理员',
-                    time: new Date().toLocaleString()
+            try {
+                const response = await axios.put(`/api/reservations/${this.selectedReservation.id}/reject`, {
+                    comment: this.approvalForm.comment
                 });
 
-                // 更新列表中的数据
-                const index = this.reservationList.findIndex(r => r.id === this.selectedReservation.id);
-                if (index !== -1) {
-                    this.reservationList.splice(index, 1, this.selectedReservation);
+                if (response.data) {
+                    this.$message.success('预约已拒绝');
+                    this.detailDialogVisible = false;
+                    this.loadReservationData(); // 重新加载数据
                 }
-
-                this.$message.success('预约已拒绝');
-                this.detailDialogVisible = false;
+            } catch (error) {
+                console.error('拒绝预约失败:', error);
+                this.$message.error('拒绝预约失败');
+            } finally {
                 this.loading = false;
-            }, 500);
+            }
         },
         // 取消预约
-        cancelReservation(reservation) {
-            this.$prompt('请输入取消原因', '取消预约', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                inputType: 'textarea',
-                inputPattern: /\S+/,
-                inputErrorMessage: '取消原因不能为空'
-            }).then(({ value }) => {
+        async cancelReservation(reservation) {
+            try {
+                const { value } = await this.$prompt('请输入取消原因', '取消预约', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputType: 'textarea',
+                    inputPattern: /\S+/,
+                    inputErrorMessage: '取消原因不能为空'
+                });
+
                 this.loading = true;
+                const response = await axios.put(`/api/reservations/${reservation.id}/cancel`, {
+                    comment: value
+                });
 
-                // 模拟取消请求
-                setTimeout(() => {
-                    // 更新预约状态
-                    const index = this.reservationList.findIndex(r => r.id === reservation.id);
-                    if (index !== -1) {
-                        this.reservationList[index].status = 'CANCELLED';
-                        this.reservationList[index].updateTime = new Date().toLocaleString();
-
-                        // 添加操作记录
-                        if (!this.reservationList[index].operationHistory) {
-                            this.reservationList[index].operationHistory = [];
-                        }
-
-                        this.reservationList[index].operationHistory.push({
-                            type: 'CANCEL',
-                            content: `取消预约: ${value}`,
-                            operator: '管理员',
-                            time: new Date().toLocaleString()
-                        });
-                    }
-
+                if (response.data) {
                     this.$message.success('预约已取消');
-                    this.loading = false;
-                }, 500);
-            }).catch(() => {
-                // 用户取消输入
-            });
+                    this.loadReservationData(); // 重新加载数据
+                }
+            } catch (error) {
+                if (error !== 'cancel') { // 用户取消输入的情况
+                    console.error('取消预约失败:', error);
+                    this.$message.error('取消预约失败');
+                }
+            } finally {
+                this.loading = false;
+            }
         }
     }
 };

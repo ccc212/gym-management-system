@@ -39,6 +39,24 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
         VenueEntity venue = venueRepository.selectById(venueId);
         
         if (venue != null) {
+            // 检查场地状态
+            if ("MAINTENANCE".equals(venue.getStatus())) {
+                // 如果场地处于维护状态，返回所有时间段都标记为维护中
+                LocalTime startTime = LocalTime.parse("08:00", TIME_FORMATTER);
+                LocalTime endTime = LocalTime.parse("22:00", TIME_FORMATTER);
+
+                while (startTime.isBefore(endTime)) {
+                    TimeSlot timeSlot = new TimeSlot();
+                    timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
+                    timeSlot.setEndTime(startTime.plusMinutes(30).format(TIME_FORMATTER));
+                    timeSlot.setStatus("MAINTENANCE");
+                    timeSlot.setPrice(venue.getPricePerHour().divide(BigDecimal.valueOf(2)));
+                    timeSlots.add(timeSlot);
+                    startTime = startTime.plusMinutes(30);
+                }
+                return timeSlots;
+            }
+
             // 设置营业时间
             LocalTime startTime = LocalTime.parse("08:00", TIME_FORMATTER);
             LocalTime endTime = LocalTime.parse("22:00", TIME_FORMATTER);
@@ -69,6 +87,12 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
                 
                 // 检查是否是过期时间段（只有当天的过去时间才标记为已过期）
                 if (localDate.equals(today) && slotEndTime.isBefore(nowTime)) {
+                    TimeSlot timeSlot = new TimeSlot();
+                    timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
+                    timeSlot.setEndTime(startTime.plusMinutes(30).format(TIME_FORMATTER));
+                    timeSlot.setStatus("EXPIRED");
+                    timeSlot.setPrice(venue.getPricePerHour().divide(BigDecimal.valueOf(2)));
+                    timeSlots.add(timeSlot);
                     startTime = startTime.plusMinutes(30);
                     continue;
                 }
@@ -130,6 +154,15 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
     @Transactional
     public ReservationEntity createReservation(Long venueId, Long userId,
                                              String startTime, String endTime, Integer numberOfPeople, String remarks) {
+        // 检查场地状态
+        VenueEntity venue = venueRepository.selectById(venueId);
+        if (venue == null) {
+            throw new RuntimeException("场地不存在");
+        }
+        if ("MAINTENANCE".equals(venue.getStatus())) {
+            throw new RuntimeException("该场地正在维护中，无法预约");
+        }
+
         System.out.println("准备写入预约: " + venueId + "," + userId + "," + startTime + "," + endTime);
         ReservationEntity reservation = new ReservationEntity();
         reservation.setVenueId(venueId);
@@ -147,7 +180,6 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
         reservation.setDate(reservationDate);
 
         // 获取场馆信息计算费用
-        VenueEntity venue = venueRepository.selectById(venueId);
         if (venue != null) {
             LocalTime start = LocalTime.parse(startTime, TIME_FORMATTER);
             LocalTime end = LocalTime.parse(endTime, TIME_FORMATTER);

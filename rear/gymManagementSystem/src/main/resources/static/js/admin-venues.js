@@ -46,6 +46,7 @@ const AdminVenuesComponent = {
                     <el-table-column prop="status" label="状态" width="100">
                         <template slot-scope="scope">
                             <el-tag :type="getStatusType(scope.row.status)">{{ getStatusText(scope.row.status) }}</el-tag>
+                            <span style="display: none;">{{ console.log('场地状态:', scope.row.status) }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="220">
@@ -54,6 +55,7 @@ const AdminVenuesComponent = {
                             <el-button type="danger" size="mini" @click="confirmDeleteVenue(scope.row)">删除</el-button>
                             <el-button v-if="scope.row.status === 'NORMAL'" type="warning" size="mini" @click="setVenueStatus(scope.row, 'MAINTENANCE')">维护</el-button>
                             <el-button v-if="scope.row.status === 'MAINTENANCE'" type="success" size="mini" @click="setVenueStatus(scope.row, 'NORMAL')">恢复</el-button>
+                            <span style="display: none;">{{ console.log('按钮状态判断:', scope.row.status === 'NORMAL') }}</span>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -126,12 +128,12 @@ const AdminVenuesComponent = {
             },
             // 场馆类型选项
             venueTypes: [
-                { value: 'basketball', label: '篮球场' },
-                { value: 'football', label: '足球场' },
-                { value: 'badminton', label: '羽毛球场' },
-                { value: 'tennis', label: '网球场' },
-                { value: 'swimming', label: '游泳池' },
-                { value: 'table_tennis', label: '乒乓球室' }
+                { value: '篮球场', label: '篮球场' },
+                { value: '足球场', label: '足球场' },
+                { value: '羽毛球场', label: '羽毛球场' },
+                { value: '网球场', label: '网球场' },
+                { value: '游泳池', label: '游泳池' },
+                { value: '乒乓球室', label: '乒乓球室' }
             ],
             // 场地状态选项
             statusOptions: [
@@ -203,31 +205,33 @@ const AdminVenuesComponent = {
     },
     methods: {
         // 加载场馆数据
-        loadVenueData() {
+        async loadVenueData() {
             this.loading = true;
+            try {
+                const response = await axios.get('/api/venues', {
+                    params: {
+                        page: this.pagination.currentPage,
+                        size: this.pagination.pageSize,
+                        type: this.searchForm.venueType,
+                        status: this.searchForm.status
+                    }
+                });
 
-            // 模拟后端API请求
-            setTimeout(() => {
-                // 模拟数据，实际项目中应通过API获取
-                this.venueList = [
-                    { id: 1, name: '篮球场A', type: '篮球场', location: '体育馆一楼', capacity: 20, pricePerHour: 80, peakHourPrice: 120, facilities: '照明设备、更衣室', description: '标准篮球场，适合5v5比赛', imageUrl: '', status: 'NORMAL' },
-                    { id: 2, name: '篮球场B', type: '篮球场', location: '体育馆一楼', capacity: 20, pricePerHour: 80, peakHourPrice: 120, facilities: '照明设备、更衣室', description: '标准篮球场，适合5v5比赛', imageUrl: '', status: 'MAINTENANCE' },
-                    { id: 3, name: '足球场A', type: '足球场', location: '户外运动区', capacity: 30, pricePerHour: 200, peakHourPrice: 300, facilities: '照明设备、更衣室、淋浴', description: '7人制足球场，人造草皮', imageUrl: '', status: 'NORMAL' },
-                    { id: 4, name: '羽毛球场A', type: '羽毛球场', location: '体育馆二楼', capacity: 4, pricePerHour: 40, peakHourPrice: 60, facilities: '空调、照明', description: '标准羽毛球场地', imageUrl: '', status: 'NORMAL' },
-                    { id: 5, name: '羽毛球场B', type: '羽毛球场', location: '体育馆二楼', capacity: 4, pricePerHour: 40, peakHourPrice: 60, facilities: '空调、照明', description: '标准羽毛球场地', imageUrl: '', status: 'NORMAL' },
-                    { id: 6, name: '羽毛球场C', type: '羽毛球场', location: '体育馆二楼', capacity: 4, pricePerHour: 40, peakHourPrice: 60, facilities: '空调、照明', description: '标准羽毛球场地', imageUrl: '', status: 'NORMAL' },
-                    { id: 7, name: '网球场A', type: '网球场', location: '户外运动区', capacity: 4, pricePerHour: 60, peakHourPrice: 90, facilities: '照明设备', description: '硬地网球场', imageUrl: '', status: 'NORMAL' },
-                    { id: 8, name: '游泳池', type: '游泳池', location: '体育馆负一楼', capacity: 50, pricePerHour: 30, peakHourPrice: 40, facilities: '更衣室、淋浴、储物柜', description: '25米标准泳道，6条泳道', imageUrl: '', status: 'NORMAL' },
-                    { id: 9, name: '乒乓球室A', type: '乒乓球室', location: '体育馆三楼', capacity: 4, pricePerHour: 20, peakHourPrice: 30, facilities: '空调、照明', description: '配备2张标准乒乓球桌', imageUrl: '', status: 'NORMAL' },
-                    { id: 10, name: '乒乓球室B', type: '乒乓球室', location: '体育馆三楼', capacity: 4, pricePerHour: 20, peakHourPrice: 30, facilities: '空调、照明', description: '配备2张标准乒乓球桌', imageUrl: '', status: 'SPECIAL' }
-                ];
-
-                // 根据筛选条件过滤
-                this.filterVenues();
-
-                this.pagination.total = this.venueList.length;
+                if (response.data && response.data.records) {
+                    this.venueList = response.data.records;
+                    this.pagination.total = response.data.total;
+                } else {
+                    this.venueList = [];
+                    this.pagination.total = 0;
+                }
+            } catch (error) {
+                console.error('加载场馆数据失败:', error);
+                this.$message.error('加载场馆数据失败');
+                this.venueList = [];
+                this.pagination.total = 0;
+            } finally {
                 this.loading = false;
-            }, 500);
+            }
         },
         // 搜索场馆
         searchVenues() {
@@ -247,18 +251,8 @@ const AdminVenuesComponent = {
             let filteredList = [...this.venueList];
 
             if (this.searchForm.venueType) {
-                // 将英文类型转换为对应的中文类型名
-                const typeMap = {
-                    'basketball': '篮球场',
-                    'football': '足球场',
-                    'badminton': '羽毛球场',
-                    'tennis': '网球场',
-                    'swimming': '游泳池',
-                    'table_tennis': '乒乓球室'
-                };
-
                 filteredList = filteredList.filter(venue => {
-                    return venue.type === typeMap[this.searchForm.venueType];
+                    return venue.type === this.searchForm.venueType;
                 });
             }
 
@@ -334,31 +328,33 @@ const AdminVenuesComponent = {
             });
         },
         // 保存场地
-        saveVenue() {
-            this.$refs.venueForm.validate(valid => {
+        async saveVenue() {
+            this.$refs.venueForm.validate(async valid => {
                 if (valid) {
                     this.loading = true;
-
-                    // 模拟保存请求
-                    setTimeout(() => {
+                    try {
                         if (this.dialogType === 'add') {
-                            // 模拟新增操作
-                            const maxId = Math.max(...this.venueList.map(v => v.id), 0);
-                            this.venueForm.id = maxId + 1;
-                            this.venueList.unshift(this.venueForm);
-                            this.$message.success('添加场地成功');
+                            // 新增场地
+                            const response = await axios.post('/api/venues', this.venueForm);
+                            if (response.data) {
+                                this.$message.success('添加场地成功');
+                                this.loadVenueData(); // 重新加载数据
+                            }
                         } else {
-                            // 模拟编辑操作
-                            const index = this.venueList.findIndex(v => v.id === this.venueForm.id);
-                            if (index !== -1) {
-                                this.venueList.splice(index, 1, this.venueForm);
+                            // 编辑场地
+                            const response = await axios.put(`/api/venues/${this.venueForm.id}`, this.venueForm);
+                            if (response.data) {
                                 this.$message.success('更新场地成功');
+                                this.loadVenueData(); // 重新加载数据
                             }
                         }
-
                         this.venueDialogVisible = false;
+                    } catch (error) {
+                        console.error('保存场地失败:', error);
+                        this.$message.error('保存场地失败');
+                    } finally {
                         this.loading = false;
-                    }, 500);
+                    }
                 }
             });
         },
@@ -375,32 +371,38 @@ const AdminVenuesComponent = {
             });
         },
         // 删除场地
-        deleteVenue(venue) {
+        async deleteVenue(venue) {
             this.loading = true;
-
-            // 模拟删除请求
-            setTimeout(() => {
-                const index = this.venueList.findIndex(v => v.id === venue.id);
-                if (index !== -1) {
-                    this.venueList.splice(index, 1);
+            try {
+                const response = await axios.delete(`/api/venues/${venue.id}`);
+                if (response.status === 200) {
                     this.$message.success('删除场地成功');
+                    this.loadVenueData(); // 重新加载数据
                 }
+            } catch (error) {
+                console.error('删除场地失败:', error);
+                this.$message.error('删除场地失败');
+            } finally {
                 this.loading = false;
-            }, 500);
+            }
         },
         // 设置场地状态
-        setVenueStatus(venue, status) {
+        async setVenueStatus(venue, status) {
             this.loading = true;
-
-            // 模拟状态更新请求
-            setTimeout(() => {
-                const index = this.venueList.findIndex(v => v.id === venue.id);
-                if (index !== -1) {
-                    this.venueList[index].status = status;
+            try {
+                const response = await axios.put(`/api/venues/${venue.id}/status`, null, {
+                    params: { status }
+                });
+                if (response.data) {
                     this.$message.success(`更新场地状态为${this.getStatusText(status)}成功`);
+                    this.loadVenueData(); // 重新加载数据
                 }
+            } catch (error) {
+                console.error('更新场地状态失败:', error);
+                this.$message.error('更新场地状态失败');
+            } finally {
                 this.loading = false;
-            }, 500);
+            }
         }
     }
 };

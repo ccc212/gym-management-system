@@ -3,6 +3,7 @@ package com.gymsys.entity.venue;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -21,6 +22,8 @@ public class VenueEntity {
     private Integer capacity;
     private BigDecimal pricePerHour;
     private String status;
+    @TableField("created_at")
     private LocalDateTime createdAt;
+    @TableField("updated_at")
     private LocalDateTime updatedAt;
 }

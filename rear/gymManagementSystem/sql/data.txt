@@ -1,0 +1,95 @@
+alter table sys_menu
+    drop foreign key FK_menu_parent_id;
+
+INSERT INTO `sys_depart` VALUES (12, '广东海洋大学体育馆管理组', '2025-04-18 21:41:47', '2025-04-18 21:41:47', '所属于部分教职工的部门');
+INSERT INTO `sys_depart` VALUES (13, '广东海洋大学数学与计算机学院', '2025-04-19 08:00:00', '2025-04-19 09:10:35', '所属于该学院的学生与教职工');
+INSERT INTO `sys_depart` VALUES (14, '广东海洋大学机械工程学院', '2025-04-19 09:10:30', '2025-04-19 09:10:30', '所属于该学院的学生与教职工');
+INSERT INTO `sys_depart` VALUES (15, '广东海洋大学化学与环境学院', '2025-04-21 21:20:31', '2025-04-21 21:20:31', '无');
+
+INSERT INTO `sys_menu` VALUES (4, 0, '顶级菜单', '系统管理', 'sys:manage', 'system', '/system', '', '0', 'Setting', '2', '2025-04-19 19:17:26', '2025-04-19 19:17:26');
+INSERT INTO `sys_menu` VALUES (5, 4, '系统管理', '用户管理', 'sys:user:index', 'userList', '/userList', 'views/system/User/UserList.vue', '1', 'UserFilled', '5', '2025-04-19 19:21:24', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (6, 4, '顶级菜单', '角色管理', 'sys:role:index', 'roleList', '/roleList', 'views/system/Role/RoleList.vue', '1', 'Wallet', '6', '2025-04-19 19:26:43', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (7, 4, '系统管理', '菜单管理', 'sys:menu:index', 'menuList', '/menuList', 'views/system/Menu/MenuList.vue', '1', 'Menu', '7', '2025-04-19 19:29:39', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (8, 4, '系统管理', '部门管理', 'sys:department:index', 'departmentList', '/departmentList', 'views/system/Department/DepartmentList.vue', '1', 'UserFilled', '3', '2025-04-21 08:00:00', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (9, 4, '系统管理', '班级管理', 'sys:section:index', 'sectionList', '/sectionList', 'views/system/Section/SectionList.vue', '1', 'UserFilled', '4', '2025-04-21 21:35:34', '2025-04-22 15:26:37');
+INSERT INTO `sys_menu` VALUES (10, 7, '菜单管理', '新增', 'sys:menu:add', '', '', '', '2', '', '21', '2025-04-23 08:00:00', '2025-04-23 19:01:37');
+INSERT INTO `sys_menu` VALUES (11, 7, '菜单管理', '编辑', 'sys:menu:edit', '', '', '', '2', '', '22', '2025-04-23 08:00:00', '2025-04-23 18:25:14');
+INSERT INTO `sys_menu` VALUES (12, 7, '部门管理', '删除', 'sys:menu:delete', '', '', '', '2', '', '23', '2025-04-23 18:25:03', '2025-04-23 18:25:02');
+INSERT INTO `sys_menu` VALUES (13, 6, '角色管理', '新增', 'sys:role:add', '', '', '', '2', '', '31', '2025-04-23 18:27:06', '2025-04-23 18:27:06');
+INSERT INTO `sys_menu` VALUES (14, 6, '角色管理', '编辑', 'sys:role:edit', '', '', '', '2', '', '32', '2025-04-23 08:00:00', '2025-04-23 18:28:14');
+INSERT INTO `sys_menu` VALUES (15, 6, '角色管理', '删除', 'sys:role:delete', '', '', '', '2', '', '33', '2025-04-23 18:28:07', '2025-04-23 18:28:06');
+INSERT INTO `sys_menu` VALUES (16, 5, '用户管理', '新增', 'sys:user:add', '', '', '', '2', '', '41', '2025-04-23 18:28:50', '2025-04-23 18:28:49');
+INSERT INTO `sys_menu` VALUES (17, 5, '用户管理', '编辑', 'sys:user:edit', '', '', '', '2', '', '42', '2025-04-23 18:29:14', '2025-04-23 18:29:13');
+INSERT INTO `sys_menu` VALUES (18, 5, '用户管理', '删除', 'sys:user:delete', '', '', '', '2', '', '43', '2025-04-23 18:29:52', '2025-04-23 18:29:52');
+INSERT INTO `sys_menu` VALUES (19, 9, '班级管理', '新增', 'sys:section:add', '', '', '', '2', '', '51', '2025-04-23 18:30:43', '2025-04-23 18:30:42');
+INSERT INTO `sys_menu` VALUES (20, 9, '班级管理', '编辑', 'sys:section:edit', '', '', '', '2', '', '52', '2025-04-23 18:31:09', '2025-04-23 18:31:08');
+INSERT INTO `sys_menu` VALUES (21, 9, '班级管理', '删除', 'sys:section:delete', '', '', '', '2', '', '53', '2025-04-23 18:31:32', '2025-04-23 18:31:31');
+INSERT INTO `sys_menu` VALUES (22, 8, '部门管理', '新增', 'sys:department:add', '', '', '', '2', '', '61', '2025-04-23 18:32:01', '2025-04-23 18:32:00');
+INSERT INTO `sys_menu` VALUES (23, 8, '部门管理', '编辑', 'sys:department:edit', '', '', '', '2', '', '62', '2025-04-23 18:32:51', '2025-04-23 18:32:51');
+INSERT INTO `sys_menu` VALUES (24, 8, '部门管理', '删除', 'sys:department:delete', '', '', '', '2', '', '63', '2025-04-23 18:33:14', '2025-04-23 18:33:14');
+INSERT INTO `sys_menu` VALUES (25, 5, '用户管理', '重置密码', 'sys:user:reset', '', '', '', '2', '', '44', '2025-04-23 08:00:00', '2025-04-23 18:54:23');
+INSERT INTO `sys_menu` VALUES (26, 6, '用户管理', '分配菜单', 'sys:role:assign', '', '', '', '2', '', '34', '2025-04-23 19:02:07', '2025-04-23 19:02:07');
+
+INSERT INTO `sys_menu_role` VALUES (41, 11, 4);
+INSERT INTO `sys_menu_role` VALUES (42, 11, 5);
+INSERT INTO `sys_menu_role` VALUES (43, 11, 16);
+INSERT INTO `sys_menu_role` VALUES (44, 11, 17);
+INSERT INTO `sys_menu_role` VALUES (45, 11, 18);
+INSERT INTO `sys_menu_role` VALUES (46, 11, 25);
+INSERT INTO `sys_menu_role` VALUES (47, 11, 6);
+INSERT INTO `sys_menu_role` VALUES (48, 11, 13);
+INSERT INTO `sys_menu_role` VALUES (49, 11, 14);
+INSERT INTO `sys_menu_role` VALUES (50, 11, 15);
+INSERT INTO `sys_menu_role` VALUES (51, 11, 7);
+INSERT INTO `sys_menu_role` VALUES (52, 11, 10);
+INSERT INTO `sys_menu_role` VALUES (53, 11, 11);
+INSERT INTO `sys_menu_role` VALUES (54, 11, 12);
+INSERT INTO `sys_menu_role` VALUES (55, 11, 8);
+INSERT INTO `sys_menu_role` VALUES (56, 11, 22);
+INSERT INTO `sys_menu_role` VALUES (57, 11, 23);
+INSERT INTO `sys_menu_role` VALUES (58, 11, 24);
+INSERT INTO `sys_menu_role` VALUES (59, 11, 9);
+INSERT INTO `sys_menu_role` VALUES (60, 11, 19);
+INSERT INTO `sys_menu_role` VALUES (61, 11, 20);
+INSERT INTO `sys_menu_role` VALUES (62, 11, 21);
+
+INSERT INTO `sys_role` VALUES (5, '普通学生', '无', '2025-04-17 19:16:41', '2025-04-17 19:16:41', NULL);
+INSERT INTO `sys_role` VALUES (6, '普通教师', '无', '2025-04-17 19:16:47', '2025-04-17 19:16:47', NULL);
+INSERT INTO `sys_role` VALUES (7, '普通职工', '无', '2025-04-17 19:17:04', '2025-04-17 19:17:04', NULL);
+INSERT INTO `sys_role` VALUES (8, '器材管理员', '无', '2025-04-17 19:17:14', '2025-04-17 19:17:14', NULL);
+INSERT INTO `sys_role` VALUES (9, '场地管理员', '无', '2025-04-17 19:17:21', '2025-04-17 19:17:21', NULL);
+INSERT INTO `sys_role` VALUES (10, '赛事管理员', '无', '2025-04-17 19:17:28', '2025-04-17 19:17:28', NULL);
+INSERT INTO `sys_role` VALUES (11, '用户管理员', '无', '2025-04-17 19:32:50', '2025-04-17 19:32:50', NULL);
+
+
+INSERT INTO `sys_section` VALUES (1, '软件1221', '无', '2025-04-18 21:42:18', '2025-04-18 21:42:18');
+INSERT INTO `sys_section` VALUES (2, '软件1222', '无', '2025-04-18 21:42:27', '2025-04-18 21:42:27');
+INSERT INTO `sys_section` VALUES (3, '软件1223', '无', '2025-04-18 21:42:39', '2025-04-18 21:42:39');
+INSERT INTO `sys_section` VALUES (4, '软件1224', '无', '2025-04-18 21:42:52', '2025-04-18 21:42:52');
+
+INSERT INTO `sys_use_depart` VALUES (6, 5, 13);
+INSERT INTO `sys_use_depart` VALUES (10, 4, 13);
+INSERT INTO `sys_use_depart` VALUES (11, 6, 13);
+INSERT INTO `sys_use_depart` VALUES (12, 7, 13);
+INSERT INTO `sys_use_depart` VALUES (13, 8, 12);
+INSERT INTO `sys_use_depart` VALUES (14, 9, 13);
+
+INSERT INTO `sys_use_role` VALUES (6, 5, 5);
+INSERT INTO `sys_use_role` VALUES (10, 4, 5);
+INSERT INTO `sys_use_role` VALUES (11, 6, 5);
+INSERT INTO `sys_use_role` VALUES (12, 7, 5);
+INSERT INTO `sys_use_role` VALUES (13, 8, 7);
+INSERT INTO `sys_use_role` VALUES (14, 9, 11);
+
+INSERT INTO `sys_use_section` VALUES (4, 5, 2);
+INSERT INTO `sys_use_section` VALUES (8, 4, 1);
+INSERT INTO `sys_use_section` VALUES (9, 6, 3);
+INSERT INTO `sys_use_section` VALUES (10, 7, 4);
+
+INSERT INTO `sys_user` VALUES (1, 'admin', '123456', '', '', ' ', ' ', ' ', '2025-04-20 14:53:34', '2025-04-23 15:52:48', ' ');
+INSERT INTO `sys_user` VALUES (4, '202211701001', '123456', '张三', '男', '18', '12345678998', '12345678998@163.com', '2025-04-21 08:00:00', '2025-04-23 16:21:12', '学生');
+INSERT INTO `sys_user` VALUES (5, '202211701002', '123456', '李四', '男', '19', '12345678997', '12345678997@qq.com', '2025-04-21 21:39:37', '2025-04-21 21:39:37', '学生');
+INSERT INTO `sys_user` VALUES (6, '202211701003', '123456', '王五', '男', '20', '12345678996', '12345678996@163.com', '2025-04-23 16:23:19', '2025-04-23 16:23:18', '学生');
+INSERT INTO `sys_user` VALUES (7, '202211701004', '123456', '赵六', '女', '22', '12345678995', '12345678995@163.com', '2025-04-23 16:24:16', '2025-04-23 16:24:16', '学生');
+INSERT INTO `sys_user` VALUES (8, '20221001', '123456', '林国瑞', '男', '41', '12345678994', '12345678994@163.com', '2025-04-23 16:30:08', '2025-04-23 16:30:07', '职工');
+INSERT INTO `sys_user` VALUES (9, '20221002', '123456', '吴俊伯', '男', '46', '12345678993', '12345678993@qq.com', '2025-04-23 16:33:13', '2025-04-23 16:33:12', '职工');

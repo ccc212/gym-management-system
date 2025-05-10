@@ -138,4 +138,18 @@ public class VenueController {
         venueRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<VenueEntity> updateVenueStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+        VenueEntity venue = venueRepository.selectById(id);
+        if (venue == null) {
+            return ResponseEntity.notFound().build();
+        }
+        venue.setStatus(status);
+        venue.setUpdatedAt(LocalDateTime.now());
+        venueRepository.updateById(venue);
+        return ResponseEntity.ok(venue);
+    }
 }

@@ -36,6 +36,15 @@ public class ReservationController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Page<ReservationEntity> reservationPage = reservationService.page(new Page<>(page, size), new LambdaQueryWrapper<>());
+
+        // 填充场馆信息
+        for (ReservationEntity reservation : reservationPage.getRecords()) {
+            VenueEntity venue = venueRepository.selectById(reservation.getVenueId());
+            if (venue != null) {
+                reservation.setVenueInfo(venue);
+            }
+        }
+
         return ResponseEntity.ok(reservationPage);
     }
     

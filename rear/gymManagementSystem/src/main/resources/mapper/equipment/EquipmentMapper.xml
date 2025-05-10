@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gymsys.mapper.equipment.EquipmentMapper">
+
+    <!-- 根据ID查找器材 -->
+    <select id="findById" resultType="com.gymsys.entity.equip.Equipment">
+        SELECT * FROM equipment WHERE id = #{id}
+    </select>
+
+    <!-- 删除器材 -->
+    <delete id="deleteEquipment">
+        DELETE FROM equipment WHERE id = #{id}
+    </delete>
+
+    <!-- 添加器材 -->
+    <insert id="addEquipment" parameterType="com.gymsys.entity.equip.Equipment">
+        INSERT INTO equipment (name, type, quantity, status) VALUES (#{name}, #{type}, #{quantity}, #{status})
+    </insert>
+
+    <!-- 修改器材信息 -->
+    <update id="updateEquipment" parameterType="com.gymsys.entity.equip.Equipment">
+        UPDATE equipment
+        SET name = #{name}, type = #{type}, quantity = #{quantity}, status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 报修器材 -->
+    <update id="reportRepair">
+        UPDATE equipment
+        SET status = 'REPAIRING', repair_reason = #{reason}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 审核器材 -->
+    <update id="auditEquipment">
+        UPDATE equipment
+        SET status = CASE WHEN #{approved} THEN 'APPROVED' ELSE 'REJECTED' END
+        WHERE id = #{id}
+    </update>
+
+    <!-- 借入器材 -->
+    <update id="borrowEquipment">
+        UPDATE equipment
+        SET status = 'BORROWED', borrower = #{borrower}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 归还器材 -->
+    <update id="returnEquipment">
+        UPDATE equipment
+        SET status = 'AVAILABLE', borrower = NULL
+        WHERE id = #{id}
+    </update>
+
+    <!-- 分页查询器材 -->
+    <select id="findByPage" resultType="com.gymsys.entity.equip.Equipment">
+        SELECT * FROM equipment
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 条件查询器材 -->
+    <select id="findByCondition" resultType="com.gymsys.entity.equip.Equipment">
+        SELECT * FROM equipment
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 //import org.springframework.security.access.prepost.PreAuthorize;
 
 
-@RequestMapping("/api/system/equipment")
+@RequestMapping("/api/equip/equipment")
 @RestController
 public class EquipBasicsController {
     @Autowired

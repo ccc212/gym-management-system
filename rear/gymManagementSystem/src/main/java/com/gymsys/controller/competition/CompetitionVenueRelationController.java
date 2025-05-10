@@ -1,14 +1,18 @@
 package com.gymsys.controller.competition;
 
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gymsys.constant.MessageConstant;
 import com.gymsys.entity.Result;
+import com.gymsys.entity.competition.CompetitionVenueRelation;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.AddCompetitionVenueRelationDTO;
+import com.gymsys.entity.competition.dto.competitionVenueRelation.ListCompetitionVenueRelationDTO;
+import com.gymsys.entity.competition.dto.competitionVenueRelation.UpdateCompetitionVenueRelationDTO;
 import com.gymsys.service.competition.ICompetitionVenueRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -37,4 +41,24 @@ public class CompetitionVenueRelationController {
         return Result.success(MessageConstant.DELETE_SUCCESS);
     }
 
+    @PutMapping("/update")
+    public Result<?> updateCompetitionVenueRelation(@RequestBody @Valid UpdateCompetitionVenueRelationDTO updateCompetitionVenueRelationDTO) {
+        competitionVenueRelationService.updateCompetitionVenueRelation(updateCompetitionVenueRelationDTO);
+        return Result.success(MessageConstant.UPDATE_SUCCESS);
+    }
+
+    @GetMapping("/list")
+    public Result<IPage<CompetitionVenueRelation>> listCompetitionVenueRelation(@Valid ListCompetitionVenueRelationDTO listCompetitionVenueRelationDTO) {
+        return Result.success(competitionVenueRelationService.listCompetitionVenueRelation(listCompetitionVenueRelationDTO));
+    }
+
+    @GetMapping("/get/{id}")
+    public Result<CompetitionVenueRelation> getCompetitionVenueRelation(@PathVariable Long id) {
+        return Result.success(competitionVenueRelationService.getById(id));
+    }
+    
+    @GetMapping("/listByCompetitionId/{competitionId}")
+    public Result<List<CompetitionVenueRelation>> listByCompetitionId(@PathVariable Long competitionId) {
+        return Result.success(competitionVenueRelationService.listByCompetitionId(competitionId));
+    }
 }

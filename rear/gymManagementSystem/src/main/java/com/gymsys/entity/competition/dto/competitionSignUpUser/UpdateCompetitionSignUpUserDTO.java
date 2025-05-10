@@ -9,9 +9,9 @@ import javax.validation.constraints.NotNull;
 public class UpdateCompetitionSignUpUserDTO extends BaseDTO {
 
     /**
-     * 赛事个人报名表id
+     * ID
      */
-    @NotNull(message = "赛事个人报名表id不能为空")
+    @NotNull(message = "ID不能为空")
     private Long id;
 
     /**

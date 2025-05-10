@@ -1,16 +1,13 @@
 package com.gymsys.controller.competition;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gymsys.constant.MessageConstant;
 import com.gymsys.entity.Result;
 import com.gymsys.entity.competition.CompetitionSignUpUser;
-import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.AddCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.ListCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.UpdateCompetitionSignUpUserDTO;
 import com.gymsys.service.competition.ICompetitionSignUpUserService;
-import com.gymsys.service.competition.ICompetitionVenueRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +34,7 @@ public class CompetitionSignUpUserController {
         return Result.success(MessageConstant.ADD_SUCCESS);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public Result<?> deleteCompetitionSignUpUser(@PathVariable Long id) {
         competitionSignUpUserService.deleteCompetitionSignUpUser(id);
         return Result.success(MessageConstant.DELETE_SUCCESS);
@@ -50,8 +47,24 @@ public class CompetitionSignUpUserController {
     }
 
     @GetMapping("/list")
-    public Result<IPage<CompetitionSignUpUser>> listCompetition(@Valid ListCompetitionSignUpUserDTO listCompetitionSignUpUserDTO) {
-        return Result.success(competitionSignUpUserService.listCompetitionSignUpUserDTO(listCompetitionSignUpUserDTO));
+    public Result<IPage<CompetitionSignUpUser>> listCompetitionSignUpUser(@Valid ListCompetitionSignUpUserDTO listCompetitionSignUpUserDTO) {
+        return Result.success(competitionSignUpUserService.listCompetitionSignUpUser(listCompetitionSignUpUserDTO));
     }
 
+    @GetMapping("/get/{id}")
+    public Result<CompetitionSignUpUser> getCompetitionSignUpUser(@PathVariable Long id) {
+        return Result.success(competitionSignUpUserService.getById(id));
+    }
+    
+    @PostMapping("/approve/{id}")
+    public Result<?> approveSignUp(@PathVariable Long id) {
+        competitionSignUpUserService.approveSignUp(id);
+        return Result.success();
+    }
+    
+    @PostMapping("/reject")
+    public Result<?> rejectSignUp(@RequestParam Long id, @RequestParam String rejectReason) {
+        competitionSignUpUserService.rejectSignUp(id, rejectReason);
+        return Result.success();
+    }
 }

@@ -1,7 +1,5 @@
 package com.gymsys.entity.competition.dto.competitionEquipmentRelation;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.gymsys.entity.BaseDTO;
 import lombok.Data;
 

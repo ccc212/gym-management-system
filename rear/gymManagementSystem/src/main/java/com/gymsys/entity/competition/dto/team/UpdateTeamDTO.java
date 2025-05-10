@@ -4,14 +4,15 @@ import com.gymsys.entity.BaseDTO;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 public class UpdateTeamDTO extends BaseDTO {
 
     /**
-     * 团队id
+     * 团队ID
      */
-    @NotNull(message = "团队id不能为空")
+    @NotNull(message = "团队ID不能为空")
     private Long id;
 
     /**
@@ -33,4 +34,9 @@ public class UpdateTeamDTO extends BaseDTO {
      * 部门id
      */
     private Integer departId;
+    
+    /**
+     * 团队成员id列表，如果提供则替换现有成员
+     */
+    private List<Long> memberIds;
 }

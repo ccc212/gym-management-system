@@ -111,6 +111,12 @@
             <version>2.2.15</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
+            <version>4.4.0</version>
+        </dependency>
+
         <!-- 添加Thymeleaf依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

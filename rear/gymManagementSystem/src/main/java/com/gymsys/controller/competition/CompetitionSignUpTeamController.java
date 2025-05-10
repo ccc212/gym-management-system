@@ -35,7 +35,7 @@ public class CompetitionSignUpTeamController {
         return Result.success(MessageConstant.ADD_SUCCESS);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public Result<?> deleteCompetitionSignUpTeam(@PathVariable Long id) {
         competitionSignUpTeamService.deleteCompetitionSignUpTeam(id);
         return Result.success(MessageConstant.DELETE_SUCCESS);

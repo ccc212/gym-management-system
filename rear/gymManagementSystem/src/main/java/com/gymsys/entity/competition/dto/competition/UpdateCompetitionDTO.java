@@ -11,9 +11,9 @@ import java.util.List;
 public class UpdateCompetitionDTO extends BaseDTO {
 
     /**
-     *
+     * 赛事ID
      */
-    @NotNull(message = "赛事id不能为空")
+    @NotNull(message = "赛事ID不能为空")
     private Long id;
 
     /**
@@ -52,6 +52,11 @@ public class UpdateCompetitionDTO extends BaseDTO {
     private LocalDateTime signUpDeadline;
 
     /**
+     * 已报人数
+     */
+    private Integer signUpNum;
+
+    /**
      * 最大报名人数
      */
     private Integer maxSignUpNum;
@@ -77,11 +82,6 @@ public class UpdateCompetitionDTO extends BaseDTO {
     private Integer teamMinNum;
 
     /**
-     * 比赛项目
-     */
-    private List<Long> competitionItemIds;
-
-    /**
      * 参赛要求
      */
     private String requirement;
@@ -90,4 +90,9 @@ public class UpdateCompetitionDTO extends BaseDTO {
      * 赛事描述
      */
     private String description;
+    
+    /**
+     * 赛事项目id列表
+     */
+    private List<Long> competitionItemIds;
 }

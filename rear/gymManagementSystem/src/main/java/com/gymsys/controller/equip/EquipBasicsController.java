@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
-@RequestMapping("/api/system/equipment")
+@RequestMapping("/api/equip/equipment")
 @RestController
 public class EquipBasicsController {
     @Autowired

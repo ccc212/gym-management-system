@@ -79,7 +79,7 @@ public class CompetitionVenueRelationServiceImpl implements ICompetitionVenueRel
         if (optionalRelation.isEmpty()) {
             throw new BizException(StatusCodeEnum.COMPETITION_VENUE_RELATION_NOT_EXIST);
         }
-        
+
         CompetitionVenueRelation competitionVenueRelation = optionalRelation.get();
 
         // 如果更新了场地或时间，需要检查时间冲突

@@ -1,6 +1,5 @@
 package com.gymsys.controller.competition;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gymsys.constant.MessageConstant;
 import com.gymsys.entity.Result;
@@ -54,6 +53,11 @@ public class CompetitionController {
     @GetMapping("/list")
     public Result<IPage<Competition>> listCompetition(@Valid ListCompetitionDTO listCompetitionDTO) {
         return Result.success(competitionService.listCompetition(listCompetitionDTO));
+    }
+
+    @GetMapping("/get/{id}")
+    public Result<Competition> getCompetition(@PathVariable Long id) {
+        return Result.success(competitionService.getById(id));
     }
 
     @GetMapping("/getDetail/{id}")

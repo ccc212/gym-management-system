@@ -66,7 +66,7 @@ public class AddCompetitionSignUpUserDTO extends BaseDTO {
     /**
      * 区分学生或教职工 0 学生 1教师
      */
-    @NotBlank(message = "身份不能为空")
+    @NotBlank(message = "区分学生或教职工不能为空")
     private String userStuorfac;
 
     /**

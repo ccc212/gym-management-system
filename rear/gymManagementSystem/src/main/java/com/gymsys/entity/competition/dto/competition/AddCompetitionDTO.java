@@ -4,7 +4,6 @@ import com.gymsys.entity.BaseDTO;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,12 +75,6 @@ public class AddCompetitionDTO extends BaseDTO {
     private Integer teamMinNum;
 
     /**
-     * 比赛项目
-     */
-    @NotEmpty(message = "比赛项目不能为空")
-    private List<Long> competitionItemIds;
-
-    /**
      * 参赛要求
      */
     private String requirement;
@@ -90,4 +83,9 @@ public class AddCompetitionDTO extends BaseDTO {
      * 赛事描述
      */
     private String description;
+    
+    /**
+     * 赛事项目id列表
+     */
+    private List<Long> competitionItemIds;
 }

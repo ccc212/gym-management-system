@@ -13,11 +13,14 @@ import com.gymsys.entity.competition.vo.CompetitionDetailVO;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
 import com.gymsys.mapper.competition.*;
+import com.gymsys.repository.competition.CompetitionVenueRelationRepository;
 import com.gymsys.service.competition.ICompetitionService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,88 +37,115 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
 
     private final CompetitionItemRelationMapper competitionItemRelationMapper;
 
-    private final CompetitionVenueRelationMapper competitionVenueRelationMapper;
+    private final CompetitionVenueRelationRepository competitionVenueRelationRepository;
 
     private final CompetitionEquipmentRelationMapper competitionEquipmentRelationMapper;
 
     private final CompetitionItemMapper competitionItemMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addCompetition(AddCompetitionDTO addCompetitionDTO) {
-        // 添加赛事
+        // 检查赛事名称是否已存在
+        if (lambdaQuery().eq(Competition::getName, addCompetitionDTO.getName()).exists()) {
+            throw new BizException(StatusCodeEnum.COMPETITION_NAME_ALREADY_EXISTS);
+        }
+
+        // 保存赛事
         Competition competition = BeanUtil.copyProperties(addCompetitionDTO, Competition.class);
+        // 设置初始化状态: 未开始
+        competition.setStatus(0);
+        // 设置初始已报人数
+        competition.setSignUpNum(0);
+        
         save(competition);
 
-        // 添加赛事与项目的关联
-        List<Long> competitionItemIds = addCompetitionDTO.getCompetitionItemIds();
-        List<CompetitionItemRelation> competitionItemRelations = competitionItemIds.stream()
-                .map(competitionItemId -> new CompetitionItemRelation()
-                        .setCompetitionId(competition.getId())
-                        .setCompetitionItemId(competitionItemId))
-                .toList();
-        competitionItemRelationMapper.insert(competitionItemRelations);
+        // 保存赛事与项目的关联关系
+        if (addCompetitionDTO.getCompetitionItemIds() != null && !addCompetitionDTO.getCompetitionItemIds().isEmpty()) {
+            saveCompetitionItemRelations(competition.getId(), addCompetitionDTO.getCompetitionItemIds());
+        }
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteCompetition(Long id) {
-        if (lambdaQuery().eq(Competition::getId, id).one() == null) {
+        // 检查赛事是否存在
+        Competition competition = getById(id);
+        if (competition == null) {
             throw new BizException(StatusCodeEnum.COMPETITION_NOT_EXIST);
         }
 
+        // 删除赛事与项目的关联关系
+        LambdaQueryWrapper<CompetitionItemRelation> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CompetitionItemRelation::getCompetitionId, id);
+        competitionItemRelationMapper.delete(queryWrapper);
+
+        // 删除赛事
         removeById(id);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCompetition(UpdateCompetitionDTO updateCompetitionDTO) {
-        String competitionName = updateCompetitionDTO.getName();
+        // 检查赛事是否存在
+        if (!lambdaQuery().eq(Competition::getId, updateCompetitionDTO.getId()).exists()) {
+            throw new BizException(StatusCodeEnum.COMPETITION_NOT_EXIST);
+        }
 
-        // 更新赛事信息
-        lambdaUpdate().eq(Competition::getId, updateCompetitionDTO.getId())
-                .set(updateCompetitionDTO.getName() != null, Competition::getName, updateCompetitionDTO.getName())
-                .set(updateCompetitionDTO.getType() != null, Competition::getType, updateCompetitionDTO.getType())
-                .set(updateCompetitionDTO.getCategory() != null, Competition::getCategory, updateCompetitionDTO.getCategory())
-                .set(updateCompetitionDTO.getHoster() != null, Competition::getHoster, updateCompetitionDTO.getHoster())
-                .set(updateCompetitionDTO.getStartTime() != null, Competition::getStartTime, updateCompetitionDTO.getStartTime())
-                .set(updateCompetitionDTO.getEndTime() != null, Competition::getEndTime, updateCompetitionDTO.getEndTime())
-                .set(updateCompetitionDTO.getSignUpDeadline() != null, Competition::getSignUpDeadline, updateCompetitionDTO.getSignUpDeadline())
-                .set(updateCompetitionDTO.getMaxSignUpNum() != null, Competition::getMaxSignUpNum, updateCompetitionDTO.getMaxSignUpNum())
-                .set(updateCompetitionDTO.getStatus() != null, Competition::getStatus, updateCompetitionDTO.getStatus())
-                .set(updateCompetitionDTO.getIsTeamCompetition() != null, Competition::getIsTeamCompetition, updateCompetitionDTO.getIsTeamCompetition())
-                .set(updateCompetitionDTO.getTeamMinNum() != null, Competition::getTeamMinNum, updateCompetitionDTO.getTeamMinNum())
-                .set(updateCompetitionDTO.getTeamMaxNum() != null, Competition::getTeamMaxNum, updateCompetitionDTO.getTeamMaxNum())
-                .set(updateCompetitionDTO.getRequirement() != null, Competition::getRequirement, updateCompetitionDTO.getRequirement())
-                .set(updateCompetitionDTO.getDescription() != null, Competition::getDescription, updateCompetitionDTO.getDescription());
+        // 检查赛事名称是否已存在(不包括自己)
+        if (StringUtils.isNotBlank(updateCompetitionDTO.getName()) && 
+            lambdaQuery().eq(Competition::getName, updateCompetitionDTO.getName())
+                        .ne(Competition::getId, updateCompetitionDTO.getId())
+                        .exists()) {
+            throw new BizException(StatusCodeEnum.COMPETITION_NAME_ALREADY_EXISTS);
+        }
 
-        // 更新赛事与项目的关联
-        List<Long> competitionItemIds = updateCompetitionDTO.getCompetitionItemIds();
-        if (competitionItemIds != null) {
-            Competition competition = lambdaQuery().eq(Competition::getName, competitionName).one();
-            competitionItemRelationMapper.delete(new LambdaQueryWrapper<CompetitionItemRelation>()
-                    .eq(CompetitionItemRelation::getCompetitionId, competition.getId()));
-            competitionItemRelationMapper.insert(competitionItemIds.stream()
-                    .map(competitionItemId -> new CompetitionItemRelation()
-                            .setCompetitionId(competition.getId())
-                            .setCompetitionItemId(competitionItemId))
-                    .toList());
+        // 更新赛事
+        Competition competition = BeanUtil.copyProperties(updateCompetitionDTO, Competition.class);
+        updateById(competition);
+
+        // 更新赛事与项目的关联关系
+        if (updateCompetitionDTO.getCompetitionItemIds() != null) {
+            // 删除原有关联关系
+            LambdaQueryWrapper<CompetitionItemRelation> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(CompetitionItemRelation::getCompetitionId, updateCompetitionDTO.getId());
+            competitionItemRelationMapper.delete(queryWrapper);
+            
+            // 添加新的关联关系
+            if (!updateCompetitionDTO.getCompetitionItemIds().isEmpty()) {
+                saveCompetitionItemRelations(updateCompetitionDTO.getId(), updateCompetitionDTO.getCompetitionItemIds());
+            }
         }
     }
 
     @Override
     public IPage<Competition> listCompetition(ListCompetitionDTO listCompetitionDTO) {
-        return page(new Page<>(listCompetitionDTO.getPage(), listCompetitionDTO.getPageSize()),
-                new LambdaQueryWrapper<Competition>()
-                        .eq(listCompetitionDTO.getId() != null, Competition::getId, listCompetitionDTO.getId())
-                        .like(StringUtils.isNotBlank(listCompetitionDTO.getName()), Competition::getName, listCompetitionDTO.getName())
-                        .eq(listCompetitionDTO.getType() != null, Competition::getType, listCompetitionDTO.getType())
-                        .eq(listCompetitionDTO.getStatus() != null, Competition::getStatus, listCompetitionDTO.getStatus()));
+        LambdaQueryWrapper<Competition> queryWrapper = new LambdaQueryWrapper<>();
+        
+        // 添加查询条件
+        queryWrapper.like(StringUtils.isNotBlank(listCompetitionDTO.getName()), 
+                           Competition::getName, listCompetitionDTO.getName())
+                   .eq(listCompetitionDTO.getType() != null, 
+                        Competition::getType, listCompetitionDTO.getType())
+                   .eq(listCompetitionDTO.getCategory() != null, 
+                        Competition::getCategory, listCompetitionDTO.getCategory())
+                   .like(StringUtils.isNotBlank(listCompetitionDTO.getHoster()), 
+                          Competition::getHoster, listCompetitionDTO.getHoster())
+                   .eq(listCompetitionDTO.getStatus() != null, 
+                        Competition::getStatus, listCompetitionDTO.getStatus())
+                   .eq(listCompetitionDTO.getIsTeamCompetition() != null, 
+                        Competition::getIsTeamCompetition, listCompetitionDTO.getIsTeamCompetition())
+                   .orderByDesc(Competition::getCreateTime);
+        
+        // 分页查询
+        return page(new Page<>(listCompetitionDTO.getPage(), listCompetitionDTO.getPageSize()), queryWrapper);
     }
 
     @Override
     public CompetitionDetailVO getDetail(Long id) {
         Competition competition = lambdaQuery().eq(Competition::getId, id).one();
 
-        List<CompetitionVenueRelation> competitionVenueRelations = competitionVenueRelationMapper.selectList(new LambdaQueryWrapper<CompetitionVenueRelation>()
-                .eq(CompetitionVenueRelation::getCompetitionId, id));
+        List<CompetitionVenueRelation> competitionVenueRelations = competitionVenueRelationRepository.findByCompetitionId(id);
 
         List<CompetitionEquipmentRelation> competitionEquipmentRelations = competitionEquipmentRelationMapper.selectList(new LambdaQueryWrapper<CompetitionEquipmentRelation>()
                 .eq(CompetitionEquipmentRelation::getCompetitionId, id));
@@ -145,5 +175,24 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
     public List<CompetitionItemRelation> listItemByCompetitionId(Long competitionId) {
         return competitionItemRelationMapper.selectList(new LambdaQueryWrapper<CompetitionItemRelation>()
                 .eq(CompetitionItemRelation::getCompetitionId, competitionId));
+    }
+
+    /**
+     * 保存赛事与项目的关联关系
+     *
+     * @param competitionId 赛事ID
+     * @param itemIds 项目ID列表
+     */
+    private void saveCompetitionItemRelations(Long competitionId, List<Long> itemIds) {
+        List<CompetitionItemRelation> relations = new ArrayList<>();
+        for (Long itemId : itemIds) {
+            CompetitionItemRelation relation = new CompetitionItemRelation();
+            relation.setCompetitionId(competitionId);
+            relation.setCompetitionItemId(itemId);
+            relations.add(relation);
+        }
+        for (CompetitionItemRelation relation : relations) {
+            competitionItemRelationMapper.insert(relation);
+        }
     }
 }

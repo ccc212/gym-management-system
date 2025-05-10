@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-//import org.springframework.security.access.prepost.PreAuthorize;
 
 
 @RequestMapping("/api/equip/equipment")
@@ -31,7 +30,6 @@ public class EquipBasicsController {
     /**
      * 添加器材
      */
-//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public Result add(@RequestBody Equipment equipment) {
         equipment.setCreateTime(new Date());
@@ -57,7 +55,6 @@ public class EquipBasicsController {
     /**
      * 删除器材
      */
-//    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable("id") Integer id) {
         if (equipmentService.removeById(id)) {

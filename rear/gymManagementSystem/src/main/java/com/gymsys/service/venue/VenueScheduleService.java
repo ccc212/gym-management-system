@@ -72,14 +72,14 @@ public class VenueScheduleService {
                     schedule.setType(venue.getType());
                     schedule.setDate(date);
                     schedule.setTimeSlot(currentTime.format(TIME_FORMATTER) + " - " + 
-                                      currentTime.plusMinutes(30).format(TIME_FORMATTER));
+                                      currentTime.plusHours(1).format(TIME_FORMATTER));
                     
                     // 确定该时间段的状态
                     String status = determineTimeSlotStatus(venue, date, currentTime, venueReservations);
                     schedule.setStatus(status);
                     
                     schedules.add(schedule);
-                    currentTime = currentTime.plusMinutes(30);
+                    currentTime = currentTime.plusHours(1);
                 }
             }
         }
@@ -119,7 +119,7 @@ public class VenueScheduleService {
                 LocalTime reservedStart = LocalTime.parse(reservation.getStartTime(), TIME_FORMATTER);
                 LocalTime reservedEnd = LocalTime.parse(reservation.getEndTime(), TIME_FORMATTER);
                 
-                if (!(time.plusMinutes(30).isBefore(reservedStart) || time.isAfter(reservedEnd))) {
+                if (!(time.plusHours(1).isBefore(reservedStart) || time.isAfter(reservedEnd))) {
                     switch (reservation.getStatus()) {
                         case "IN_USE":
                             return "IN_USE";

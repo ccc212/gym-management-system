@@ -216,6 +216,7 @@ const UserScheduleComponent = {
                             value: type,
                             label: this.getVenueTypeLabel(type)
                         }));
+                        console.log('处理后的场地类型:', this.venueTypes);
                     } else {
                         console.error('场地类型数据格式错误');
                         this.$message.error('场地类型数据格式错误');
@@ -228,6 +229,7 @@ const UserScheduleComponent = {
                     console.log('获取到场馆列表:', response.data);
                     if (response.data && response.data.records) {
                         this.venues = response.data.records;
+                        console.log('处理后的场馆列表:', this.venues);
                     } else {
                         this.venues = [];
                     }
@@ -250,7 +252,7 @@ const UserScheduleComponent = {
             endTime.setHours(22, 0, 0, 0);  // 到晚上10点结束
             
             while (startTime < endTime) {
-                const endTimeSlot = new Date(startTime.getTime() + 30 * 60000);  // 加30分钟
+                const endTimeSlot = new Date(startTime.getTime() + 60 * 60000);  // 加1小时
                 timeSlots.push({
                     id: timeSlots.length + 1,
                     timeRange: `${this.formatTime(startTime)} - ${this.formatTime(endTimeSlot)}`
@@ -259,6 +261,7 @@ const UserScheduleComponent = {
             }
             
             this.timeSlots = timeSlots;
+            console.log('初始化时间段:', this.timeSlots);
         },
         // 格式化时间
         formatTime(date) {
@@ -292,6 +295,16 @@ const UserScheduleComponent = {
                     if (response.data && response.data.code === 200) {
                         console.log("获取到场地安排数据:", response.data.data);
                         this.scheduleData = response.data.data || [];
+                        
+                        // 打印每个时间段的数据
+                        this.timeSlots.forEach(timeSlot => {
+                            this.weekDays.forEach(day => {
+                                const schedule = this.getScheduleForTimeAndDay(timeSlot, day);
+                                if (schedule) {
+                                    console.log(`时间段 ${timeSlot.timeRange} 在 ${day.date} 的安排:`, schedule);
+                                }
+                            });
+                        });
                     } else {
                         this.$message.error(response.data.msg || '获取场地安排失败');
                     }
@@ -357,10 +370,31 @@ const UserScheduleComponent = {
         },
         // 获取指定时间和日期的场地安排
         getScheduleForTimeAndDay(timeSlot, day) {
-            return this.scheduleData.find(schedule => 
+            console.log('查找场地安排:', {
+                timeSlot: timeSlot.timeRange,
+                date: day.date,
+                scheduleData: this.scheduleData
+            });
+            
+            const schedule = this.scheduleData.find(schedule => 
                 schedule.date === day.date && 
                 schedule.timeSlot === timeSlot.timeRange
             );
+            
+            if (schedule) {
+                console.log('找到场地安排:', {
+                    date: day.date,
+                    timeSlot: timeSlot.timeRange,
+                    schedule: schedule
+                });
+            } else {
+                console.log('未找到场地安排:', {
+                    date: day.date,
+                    timeSlot: timeSlot.timeRange
+                });
+            }
+            
+            return schedule;
         },
         // 获取单元格的CSS类
         getCellClass(schedule) {

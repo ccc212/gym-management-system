@@ -70,16 +70,18 @@ public class VenueScheduleService {
                     schedule.setVenueId(venue.getId());
                     schedule.setVenueName(venue.getName());
                     schedule.setType(venue.getType());
-                    schedule.setDate(date);
-                    schedule.setTimeSlot(currentTime.format(TIME_FORMATTER) + " - " + 
-                                      currentTime.plusHours(1).format(TIME_FORMATTER));
+                    schedule.setDate(date.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                    
+                    // 生成一小时时间段
+                    LocalTime nextTime = currentTime.plusHours(1);
+                    schedule.setTimeSlot(currentTime.format(TIME_FORMATTER) + " - " + nextTime.format(TIME_FORMATTER));
                     
                     // 确定该时间段的状态
                     String status = determineTimeSlotStatus(venue, date, currentTime, venueReservations);
                     schedule.setStatus(status);
                     
                     schedules.add(schedule);
-                    currentTime = currentTime.plusHours(1);
+                    currentTime = nextTime;
                 }
             }
         }

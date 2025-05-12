@@ -93,9 +93,11 @@ const UserScheduleComponent = {
                 <div v-if="selectedSchedule" class="schedule-detail">
                     <h3>{{ selectedSchedule.venueName }}</h3>
                     <el-descriptions :column="1" border>
-                        <el-descriptions-item label="场地类型">{{ selectedSchedule.venueType }}</el-descriptions-item>
+                        <el-descriptions-item label="场地类型">
+                            {{ getVenueTypeLabel(selectedSchedule.type) }}
+                        </el-descriptions-item>
                         <el-descriptions-item label="日期">{{ selectedSchedule.date }}</el-descriptions-item>
-                        <el-descriptions-item label="时间段">{{ selectedSchedule.timeRange }}</el-descriptions-item>
+                        <el-descriptions-item label="时间段">{{ selectedSchedule.timeSlot }}</el-descriptions-item>
                         <el-descriptions-item label="状态">
                             <el-tag :type="getStatusType(selectedSchedule.status)">
                                 {{ getStatusText(selectedSchedule.status) }}
@@ -412,6 +414,11 @@ const UserScheduleComponent = {
         },
         // 显示安排详情
         showScheduleDetail(schedule) {
+            console.log('显示场地详情:', {
+                schedule,
+                type: schedule.type,
+                typeLabel: this.getVenueTypeLabel(schedule.type)
+            });
             this.selectedSchedule = schedule;
             this.scheduleDetailVisible = true;
         },
@@ -453,6 +460,7 @@ const UserScheduleComponent = {
                 'swimming': '游泳池',
                 'table_tennis': '乒乓球室'
             };
+            console.log('转换场地类型:', { type, result: typeMap[type] || type });
             return typeMap[type] || type;
         },
         // 获取状态文本

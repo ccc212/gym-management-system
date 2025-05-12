@@ -67,6 +67,7 @@ function submitForm() {
                 //存储用户信息，跳转首页
                 store.setId(res.data.id)
                 store.setUserNumber(res.data.userNumber)
+                store.setName(res.data.name)
                 store.setToken(res.data.token)
                 store.getInfo()
                 mstore.getMenuList(router, store.getId)

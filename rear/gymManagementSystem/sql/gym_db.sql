@@ -249,19 +249,31 @@ CREATE TABLE `competition_venue_relation`  (
 -- Table structure for reservations
 -- ----------------------------
 DROP TABLE IF EXISTS `reservations`;
-CREATE TABLE `reservations`  (
-  `id` bigint(0) NOT NULL AUTO_INCREMENT,
-  `card_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `end_time` datetime(6) NOT NULL,
-  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `reservation_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `start_time` datetime(6) NOT NULL,
-  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `venue_id` bigint(0) NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `FKfghu9w3k11q38ti8x2xiyp3gj`(`venue_id`) USING BTREE,
-  CONSTRAINT `FKfghu9w3k11q38ti8x2xiyp3gj` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 658 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+CREATE TABLE `reservations` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `venue_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  `date` date NOT NULL,
+  `start_time` varchar(10) NOT NULL,
+  `end_time` varchar(10) NOT NULL,
+  `number_of_people` int NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `reservation_type` varchar(20) DEFAULT 'NORMAL',
+  `remarks` varchar(255) DEFAULT NULL,
+  `cancel_reason` varchar(255) DEFAULT NULL,
+  `cost` decimal(10,2) DEFAULT NULL,
+  `created_time` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `actual_start_time` varchar(10) DEFAULT NULL,
+  `actual_end_time` varchar(10) DEFAULT NULL,
+  `duration` varchar(50) DEFAULT NULL,
+  `actual_cost` decimal(10,2) DEFAULT NULL,
+  `payment_method` varchar(20) DEFAULT NULL,
+  `payment_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_venue_id` (`venue_id`),
+  CONSTRAINT `FK_venue_id` FOREIGN KEY (`venue_id`) REFERENCES `venues` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of reservations
@@ -615,6 +627,9 @@ CREATE TABLE `venues`  (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `price_per_hour` decimal(19, 2) NOT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'ACTIVE',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 642 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 

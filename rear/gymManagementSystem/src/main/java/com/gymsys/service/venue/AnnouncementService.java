@@ -1,5 +1,6 @@
 package com.gymsys.service.venue;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gymsys.entity.venue.AnnouncementEntity;
 import com.gymsys.repository.venue.AnnouncementRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +22,9 @@ public class AnnouncementService {
     @Transactional
     public AnnouncementEntity createAnnouncement(AnnouncementEntity announcement) {
         announcement.setPublishTime(LocalDateTime.now());
-        return announcementRepository.save(announcement);
+        announcement.setActive(true);
+        announcementRepository.insert(announcement);
+        return announcement;
     }
     
     /**
@@ -30,7 +32,11 @@ public class AnnouncementService {
      */
     public List<AnnouncementEntity> getActiveAnnouncements() {
         LocalDateTime now = LocalDateTime.now();
-        return announcementRepository.findByActiveTrueAndPublishTimeBeforeAndExpireTimeAfter(now, now);
+        LambdaQueryWrapper<AnnouncementEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AnnouncementEntity::getActive, true)
+                .lt(AnnouncementEntity::getPublishTime, now)
+                .gt(AnnouncementEntity::getExpireTime, now);
+        return announcementRepository.selectList(wrapper);
     }
     
     /**
@@ -38,27 +44,21 @@ public class AnnouncementService {
      */
     @Transactional
     public void deactivateAnnouncement(Long id) {
-        Optional<AnnouncementEntity> announcementOpt = announcementRepository.findById(id);
-        announcementOpt.ifPresent(announcement -> {
+        AnnouncementEntity announcement = announcementRepository.selectById(id);
+        if (announcement != null) {
             announcement.setActive(false);
-            announcementRepository.save(announcement);
-        });
+            announcementRepository.updateById(announcement);
+        }
     }
     
     /**
      * 获取最新公告
      */
-    public String getLatestAnnouncementContent() {
-        List<AnnouncementEntity> activeAnnouncements = getActiveAnnouncements();
-        if (activeAnnouncements.isEmpty()) {
-            return "欢迎使用场馆，请遵守相关规定。";
-        }
-        
-        // 按发布时间排序，取最新的
-        return activeAnnouncements.stream()
-                .sorted((a1, a2) -> a2.getPublishTime().compareTo(a1.getPublishTime()))
-                .findFirst()
-                .map(AnnouncementEntity::getContent)
-                .orElse("欢迎使用场馆，请遵守相关规定。");
+    public List<AnnouncementEntity> getLatestAnnouncements() {
+        LambdaQueryWrapper<AnnouncementEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AnnouncementEntity::getActive, true)
+                .orderByDesc(AnnouncementEntity::getPublishTime)
+                .last("LIMIT 5");
+        return announcementRepository.selectList(wrapper);
     }
 }

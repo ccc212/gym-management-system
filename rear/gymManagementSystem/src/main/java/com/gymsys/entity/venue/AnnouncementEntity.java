@@ -1,36 +1,23 @@
 package com.gymsys.entity.venue;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
-@Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "announcements")
+@TableName("announcement")
 public class AnnouncementEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableId(type = IdType.AUTO)
     private Long id;
-    
-    @Column(nullable = false)
     private String title;
-    
-    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
-    
-    @Column(name = "publish_time", nullable = false)
+    private String status;
+    private Boolean active;
     private LocalDateTime publishTime;
-    
-    @Column(name = "expire_time")
     private LocalDateTime expireTime;
-    
-    @Column
-    private Boolean active = true;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

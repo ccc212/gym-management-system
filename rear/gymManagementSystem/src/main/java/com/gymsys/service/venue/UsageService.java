@@ -1,9 +1,9 @@
 package com.gymsys.service.venue;
 
-import com.gymsys.entity.venue.ReservationEntity;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.entity.venue.UsageEntity;
 import com.gymsys.entity.venue.VenueEntity;
-import com.gymsys.repository.venue.ReservationRepository;
 import com.gymsys.repository.venue.UsageRepository;
 import com.gymsys.repository.venue.VenueRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,134 +21,126 @@ public class UsageService {
     
     private final UsageRepository usageRepository;
     private final VenueRepository venueRepository;
-    private final ReservationRepository reservationRepository;
     
     /**
-     * 场地使用开始
+     * 开始使用场馆
      */
     @Transactional
-    public UsageEntity startVenueUsage(Long venueId, String cardNumber, Long reservationId) {
-        // 检查场地是否存在
-        Optional<VenueEntity> venueOpt = venueRepository.findById(venueId);
-        if (venueOpt.isEmpty()) {
-            throw new IllegalArgumentException("场地不存在");
+    public UsageEntity startUsage(UsageEntity usage) {
+        // 检查场馆是否存在且可用
+        VenueEntity venue = venueRepository.selectById(usage.getVenueId());
+        if (venue == null) {
+            throw new RuntimeException("场馆不存在");
         }
         
-        VenueEntity venue = venueOpt.get();
+        if (!venue.getIsAvailable()) {
+            throw new RuntimeException("场馆不可用");
+        }
         
-        // 创建使用记录
-        UsageEntity usage = new UsageEntity();
-        usage.setVenue(venue);
-        usage.setCardNumber(cardNumber);
+        // 设置使用记录
         usage.setStartTime(LocalDateTime.now());
+        usage.setPaid(false);
+        usage.setCreatedAt(LocalDateTime.now());
+        usage.setUpdatedAt(LocalDateTime.now());
         
-        // 如果有预约ID，关联预约
-        if (reservationId != null) {
-            Optional<ReservationEntity> reservationOpt = reservationRepository.findById(reservationId);
-            if (reservationOpt.isPresent()) {
-                ReservationEntity reservation = reservationOpt.get();
-                
-                // 验证一卡通号码
-                if (!reservation.getCardNumber().equals(cardNumber) && 
-                    !reservation.getCardNumber().equals("TEAM") && 
-                    !reservation.getCardNumber().equals("CLASS")) {
-                    throw new IllegalArgumentException("无权使用此预约");
-                }
-                
-                usage.setReservation(reservation);
-                
-                // 更新预约状态
-                reservation.setStatus("COMPLETED");
-                reservationRepository.save(reservation);
-            }
-        }
-        
-        return usageRepository.save(usage);
+        // 保存使用记录
+        usageRepository.insert(usage);
+        return usage;
     }
     
     /**
-     * 场地使用结束，并计算费用
+     * 结束使用场馆
      */
     @Transactional
-    public UsageEntity endVenueUsage(Long usageId) {
-        // 检查使用记录是否存在
-        Optional<UsageEntity> usageOpt = usageRepository.findById(usageId);
-        if (usageOpt.isEmpty()) {
-            throw new IllegalArgumentException("使用记录不存在");
+    public UsageEntity endUsage(Long id) {
+        UsageEntity usage = usageRepository.selectById(id);
+        if (usage == null) {
+            throw new RuntimeException("使用记录不存在");
         }
         
-        UsageEntity usage = usageOpt.get();
-        
-        // 检查是否已经结束
         if (usage.getEndTime() != null) {
-            throw new IllegalArgumentException("场地使用已经结束");
+            throw new RuntimeException("该使用记录已结束");
         }
         
         // 设置结束时间
-        LocalDateTime endTime = LocalDateTime.now();
-        usage.setEndTime(endTime);
-        
-        // 计算使用时长（小时）
-        double hours = Duration.between(usage.getStartTime(), endTime).toMinutes() / 60.0;
+        usage.setEndTime(LocalDateTime.now());
+        usage.setUpdatedAt(LocalDateTime.now());
         
         // 计算费用
-        BigDecimal pricePerHour = usage.getVenue().getPricePerHour();
-        BigDecimal cost = pricePerHour.multiply(BigDecimal.valueOf(hours));
+        VenueEntity venue = venueRepository.selectById(usage.getVenueId());
+        long hours = ChronoUnit.HOURS.between(usage.getStartTime(), usage.getEndTime());
+        usage.setCost(venue.getPricePerHour().multiply(BigDecimal.valueOf(hours)));
         
-        usage.setCost(cost);
-        
-        return usageRepository.save(usage);
+        // 更新使用记录
+        usageRepository.updateById(usage);
+        return usage;
     }
     
     /**
-     * 一卡通付费
+     * 支付使用费用
      */
     @Transactional
-    public UsageEntity payUsage(Long usageId) {
-        // 检查使用记录是否存在
-        Optional<UsageEntity> usageOpt = usageRepository.findById(usageId);
-        if (usageOpt.isEmpty()) {
-            throw new IllegalArgumentException("使用记录不存在");
+    public UsageEntity payUsage(Long id) {
+        UsageEntity usage = usageRepository.selectById(id);
+        if (usage == null) {
+            throw new RuntimeException("使用记录不存在");
         }
         
-        UsageEntity usage = usageOpt.get();
-        
-        // 检查是否已经付费
         if (usage.getPaid()) {
-            throw new IllegalArgumentException("已经付费");
+            throw new RuntimeException("该使用记录已支付");
         }
         
-        // 检查是否已经结束
         if (usage.getEndTime() == null) {
-            throw new IllegalArgumentException("场地使用尚未结束，无法付费");
+            throw new RuntimeException("使用尚未结束，无法支付");
         }
         
-        // 更新付费状态
+        // 设置支付状态
         usage.setPaid(true);
+        usage.setUpdatedAt(LocalDateTime.now());
         
-        return usageRepository.save(usage);
+        // 更新使用记录
+        usageRepository.updateById(usage);
+        return usage;
     }
     
     /**
-     * 场地收费标准查询
+     * 获取场馆的使用记录
      */
-    public BigDecimal getVenuePrice(Long venueId) {
-        Optional<VenueEntity> venueOpt = venueRepository.findById(venueId);
-        return venueOpt.map(VenueEntity::getPricePerHour)
-                .orElseThrow(() -> new IllegalArgumentException("场地不存在"));
+    public Page<UsageEntity> getVenueUsages(Long venueId, int page, int size) {
+        return usageRepository.findByVenueId(venueId, new Page<>(page, size));
     }
     
     /**
-     * 查询正在使用的场地
+     * 获取用户的使用记录
      */
-    public List<UsageEntity> getActiveUsages() {
-        return usageRepository.findByEndTimeIsNull();
+    public Page<UsageEntity> getUserUsages(Long userId, int page, int size) {
+        return usageRepository.findByUserId(userId, new Page<>(page, size));
     }
     
     /**
-     * 查询用户未付费的记录
+     * 获取指定时间范围内的使用记录
      */
-    public List<UsageEntity> getUnpaidUsages(String cardNumber) {
-        return usageRepository.findByCardNumberAndPaid(cardNumber, false);
+    public Page<UsageEntity> getUsagesByTimeRange(LocalDateTime startTime, LocalDateTime endTime, int page, int size) {
+        LambdaQueryWrapper<UsageEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.between(UsageEntity::getStartTime, startTime, endTime);
+        return usageRepository.selectPage(new Page<>(page, size), wrapper);
+    }
+    
+    /**
+     * 获取进行中的使用记录
+     */
+    public Page<UsageEntity> getActiveUsages(int page, int size) {
+        LambdaQueryWrapper<UsageEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.isNull(UsageEntity::getEndTime);
+        return usageRepository.selectPage(new Page<>(page, size), wrapper);
+    }
+    
+    /**
+     * 获取指定卡号的使用记录
+     */
+    public Page<UsageEntity> getUsagesByCardNumber(String cardNumber, int page, int size) {
+        LambdaQueryWrapper<UsageEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UsageEntity::getCardNumber, cardNumber);
+        return usageRepository.selectPage(new Page<>(page, size), wrapper);
     }
 }

@@ -1,42 +1,29 @@
 package com.gymsys.entity.venue;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
-@Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "venues")
+@TableName("venues")
 public class VenueEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @TableId(type = IdType.AUTO)
     private Long id;
-
-    @Column(nullable = false)
     private String name;
-    
-    @Column(nullable = false)
     private String type;
-    
-    @Column(name = "price_per_hour", nullable = false)
-    private BigDecimal pricePerHour;
-    
-    @Column(name = "is_available", nullable = false)
-    private boolean isAvailable = true;
-    
-    @Column
-    private String location;
-    
-    @Column
-    private Integer capacity;
-    
-    @Column
     private String description;
+    private Boolean isAvailable;
+    private String location;
+    private Integer capacity;
+    private BigDecimal pricePerHour;
+    private String status;
+    @TableField("created_at")
+    private LocalDateTime createdAt;
+    @TableField("updated_at")
+    private LocalDateTime updatedAt;
 }

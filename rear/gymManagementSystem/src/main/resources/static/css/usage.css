@@ -1,0 +1,57 @@
+
+/* 场地使用页面样式 */
+.venue-usage-container {
+    padding: 10px;
+}
+.usage-timer-card {
+    height: 100%;
+}
+.timer-container {
+    text-align: center;
+    padding: 20px 0;
+}
+.timer-label {
+    font-size: 16px;
+    color: #606266;
+    margin-bottom: 10px;
+}
+.timer-display {
+    font-size: 36px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #409EFF;
+}
+.cost-container {
+    margin: 20px 0;
+}
+.cost-label {
+    font-size: 16px;
+    color: #606266;
+}
+.cost-display {
+    font-size: 24px;
+    color: #F56C6C;
+    font-weight: bold;
+    margin: 10px 0;
+}
+.timer-actions {
+    margin-top: 30px;
+}
+.empty-usage {
+    padding: 40px 0;
+}
+.no-usage-card {
+    height: 100%;
+}
+.highlight-cost {
+    color: #F56C6C;
+    font-weight: bold;
+}
+.overtime-tag {
+    font-size: 12px;
+    color: #E6A23C;
+    margin-left: 5px;
+}
+.payment-options {
+    margin-top: 20px;
+}

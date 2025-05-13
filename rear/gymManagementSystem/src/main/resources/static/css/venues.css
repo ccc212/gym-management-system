@@ -1,0 +1,61 @@
+
+/* 场地预约页面样式 */
+.venue-booking-container {
+    padding: 10px;
+}
+.time-slots-container {
+    margin: 15px 0;
+}
+.time-slot {
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #dcdfe6;
+}
+.time-slot.available {
+    background-color: #f0f9eb;
+    color: #67c23a;
+}
+.time-slot.booked {
+    background-color: #f56c6c;
+    color: white;
+    cursor: not-allowed;
+}
+.time-slot.special {
+    background-color: #e6a23c;
+    color: white;
+    cursor: not-allowed;
+}
+.time-slot.selected {
+    border: 2px solid #409eff;
+    box-shadow: 0 0 5px rgba(64, 158, 255, 0.5);
+}
+.venue-detail {
+    display: flex;
+    flex-wrap: wrap;
+}
+.venue-image {
+    flex: 0 0 100%;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.venue-image img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 4px;
+}
+.venue-info {
+    flex: 1;
+}
+.booking-summary {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f5f7fa;
+    border-radius: 4px;
+}
+.pagination-container {
+    margin-top: 20px;
+    text-align: right;
+}

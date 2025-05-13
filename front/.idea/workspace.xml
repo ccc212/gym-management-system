@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8a6d4dc5-691a-45b0-8f79-45a2f672f66f" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/front.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/.vscode/extensions.json" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/.vscode/extensions.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/components/HelloWorld.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/components/HelloWorld.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/header/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/header/Header.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuBar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuItem.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuItem.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuLogo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuLogo.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/dashboard/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/dashboard/Index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/system/Menu/MenuList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/system/Menu/MenuList.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/system/Role/RoleList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/system/Role/RoleList.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/system/Staff/StaffList.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/system/Student/StudentList.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/tsconfig.app.json" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/tsconfig.app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/tsconfig.node.json" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/tsconfig.node.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/vite.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vue.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/application.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;TomOVOTom&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ccc212/gym-management-system.git&quot;,
+    &quot;accountId&quot;: &quot;9c75f68b-e6d6-4e51-9ad8-343594b616be&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2wtnNXlDX2ZQLVRKLcB7L1Ermhc" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Code/作业/软综作业/gym-management-system/rear/gymManagementSystem&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.build.executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.preview.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\Code\\作业\\软综作业\\gym-management-system\\front\\gym-management-system\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager" selected="npm.dev">
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/gym-management-system/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/gym-management-system/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="preview" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/gym-management-system/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="preview" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.build" />
+        <item itemvalue="npm.preview" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="8a6d4dc5-691a-45b0-8f79-45a2f672f66f" name="更改" comment="" />
+      <created>1746869697725</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1746869697725</updated>
+      <workItem from="1746869698816" duration="2800000" />
+      <workItem from="1747041691921" duration="609000" />
+      <workItem from="1747043043162" duration="3892000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

@@ -4,102 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>体育场馆管理系统</title>
-    <!-- 引入Element UI样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入Element UI样式 - 使用国内CDN -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/theme-chalk/index.css">
     <!-- 引入自定义样式 -->
+    <!--    <link rel="stylesheet" href="/css/main.css">-->
+
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/venues.css">
+    <link rel="stylesheet" href="/css/usage.css">
+    <link rel="stylesheet" href="/css/schedule.css">
+    <link rel="stylesheet" href="/css/prices.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- 在CSS链接后添加v-cloak样式 -->
+    <style>
+        [v-cloak] { display: none; }
+    </style>
+
+
+
+
+
 </head>
 <body>
 <div id="app">
-    <el-container>
-        <el-header>
-            <div class="logo">体育场馆管理系统</div>
-            <div class="user-info" v-if="currentUser">
-                <span>{{ currentUser.name }}</span>
-                <el-dropdown trigger="click" @command="handleCommand">
-                        <span class="el-dropdown-link">
-                            {{ currentUser.role === 'ADMIN' ? '场地管理员' : '普通用户' }}<i class="el-icon-arrow-down el-icon--right"></i>
-                        </span>
-                    <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item command="logout">退出登录</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-            </div>
-        </el-header>
-
+    <div v-cloak>
         <el-container>
-            <el-aside width="200px">
-                <el-menu default-active="1" class="el-menu-vertical" :router="true">
-                    <!-- 场地管理员菜单 -->
-                    <template v-if="currentUser && currentUser.role === 'ADMIN'">
-                        <el-menu-item index="/admin/venues">
-                            <i class="el-icon-location"></i>
-                            <span slot="title">场地管理</span>
-                        </el-menu-item>
-                        <el-menu-item index="/admin/reservations">
-                            <i class="el-icon-document"></i>
-                            <span slot="title">预约管理</span>
-                        </el-menu-item>
-                        <el-menu-item index="/admin/special">
-                            <i class="el-icon-star-on"></i>
-                            <span slot="title">特殊场地管理</span>
-                        </el-menu-item>
-                        <el-menu-item index="/admin/noshows">
-                            <i class="el-icon-warning"></i>
-                            <span slot="title">失约处理</span>
-                        </el-menu-item>
-                        <el-menu-item index="/admin/announcements">
-                            <i class="el-icon-bell"></i>
-                            <span slot="title">场馆公告</span>
-                        </el-menu-item>
-                    </template>
+            <el-header>
+                <div class="logo">体育场馆管理系统</div>
+                <div class="user-info" v-if="currentUser">
+                    <span>{{ currentUser.name }}</span>
+                    <el-dropdown trigger="click" @command="handleCommand">
+                            <span class="el-dropdown-link">
+                                {{ currentUser.role === 'ADMIN' ? '场地管理员' : '普通用户' }}<i class="el-icon-arrow-down el-icon--right"></i>
+                            </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </div>
+            </el-header>
 
-                    <!-- 普通用户菜单 -->
-                    <template v-else>
-                        <el-menu-item index="/user/venues">
-                            <i class="el-icon-location"></i>
-                            <span slot="title">场地预约</span>
-                        </el-menu-item>
-                        <el-menu-item index="/user/myreservations">
-                            <i class="el-icon-document"></i>
-                            <span slot="title">我的预约</span>
-                        </el-menu-item>
-                        <el-menu-item index="/user/usage">
-                            <i class="el-icon-time"></i>
-                            <span slot="title">场地使用</span>
-                        </el-menu-item>
-                        <el-menu-item index="/user/schedule">
-                            <i class="el-icon-date"></i>
-                            <span slot="title">场地安排</span>
-                        </el-menu-item>
-                        <el-menu-item index="/user/prices">
-                            <i class="el-icon-money"></i>
-                            <span slot="title">收费标准</span>
-                        </el-menu-item>
-                    </template>
-                </el-menu>
-            </el-aside>
+            <el-container>
+                <el-aside width="200px" v-if="currentUser">
+                    <el-menu default-active="1" class="el-menu-vertical" :router="true">
+                        <!-- 场地管理员菜单 -->
+                        <template v-if="currentUser.role === 'ADMIN'">
+                            <el-menu-item index="/admin/venues">
+                                <i class="el-icon-location"></i>
+                                <span slot="title">场地管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="/admin/reservations">
+                                <i class="el-icon-document"></i>
+                                <span slot="title">预约管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="/admin/special">
+                                <i class="el-icon-star-on"></i>
+                                <span slot="title">特殊场地管理</span>
+                            </el-menu-item>
+                            <el-menu-item index="/admin/noshows">
+                                <i class="el-icon-warning"></i>
+                                <span slot="title">失约处理</span>
+                            </el-menu-item>
+                            <el-menu-item index="/admin/announcements">
+                                <i class="el-icon-bell"></i>
+                                <span slot="title">场馆公告</span>
+                            </el-menu-item>
+                        </template>
 
-            <el-main>
-                <router-view></router-view>
-            </el-main>
+                        <!-- 普通用户菜单 -->
+                        <template v-else>
+                            <el-menu-item index="/user/venues">
+                                <i class="el-icon-location"></i>
+                                <span slot="title">场地预约</span>
+                            </el-menu-item>
+                            <el-menu-item index="/user/myreservations">
+                                <i class="el-icon-document"></i>
+                                <span slot="title">我的预约</span>
+                            </el-menu-item>
+                            <el-menu-item index="/user/usage">
+                                <i class="el-icon-time"></i>
+                                <span slot="title">场地使用</span>
+                            </el-menu-item>
+                            <el-menu-item index="/user/schedule">
+                                <i class="el-icon-date"></i>
+                                <span slot="title">场地安排</span>
+                            </el-menu-item>
+                            <el-menu-item index="/user/prices">
+                                <i class="el-icon-money"></i>
+                                <span slot="title">收费标准</span>
+                            </el-menu-item>
+                        </template>
+                    </el-menu>
+                </el-aside>
+
+                <el-main>
+                    <router-view></router-view>
+                </el-main>
+            </el-container>
         </el-container>
-    </el-container>
+    </div>
 </div>
-
 <!-- 引入Vue.js -->
-<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.min.js"></script>
 <!-- 引入Vue Router -->
-<script src="https://cdn.jsdelivr.net/npm/vue-router@3.5.3/dist/vue-router.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/vue-router/3.5.3/vue-router.min.js"></script>
 <!-- 引入Element UI组件库 -->
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.13/index.js"></script>
 <!-- 引入Axios -->
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<!-- 引入主应用JS -->
-<script src="/js/main.js"></script>
-<!-- 引入路由JS -->
-<script src="/js/router.js"></script>
-<!-- 引入组件JS -->
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+<!-- 引入各种组件 -->
+<script src="/js/user-venues.js"></script>
+<script src="/js/user-reservations.js"></script>
+<script src="/js/user-usage.js"></script>
+<script src="/js/user-schedule.js"></script>
+<script src="/js/user-prices.js"></script>
+<script src="/js/admin-venues.js"></script>
+<script src="/js/admin-reservations.js"></script>
+<script src="/js/admin-special.js"></script>
+<script src="/js/admin-noshows.js"></script>
+<script src="/js/admin-announcements.js"></script>
+<!-- 引入自定义JS（顺序很重要） -->
 <script src="/js/components.js"></script>
+<script src="/js/router.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
 </body>
+
 </html>

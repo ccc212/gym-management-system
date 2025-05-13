@@ -1,350 +1,613 @@
-// 场地使用组件 - 用户
+// 场地使用组件
 const UserUsageComponent = {
     template: `
-        <div>
-            <el-card class="box-card" shadow="never">
-                <div slot="header" class="card-header">
-                    <span>场地使用</span>
-                </div>
-                <div v-if="!activeUsage">
-                    <el-table :data="reservations" border style="width: 100%">
-                        <el-table-column prop="id" label="ID" width="80"></el-table-column>
-                        <el-table-column prop="venue.name" label="场地名称"></el-table-column>
-                        <el-table-column prop="startTime" label="预约时间">
-                            <template slot-scope="scope">
-                                {{ new Date(scope.row.startTime).toLocaleString() }} - {{ new Date(scope.row.endTime).toLocaleString() }}
-                            </template>
-                        </el-table-column>
-                        <el-table-column label="操作" width="150">
-                            <template slot-scope="scope">
-                                <el-button 
-                                    size="mini" 
-                                    type="primary" 
-                                    @click="startUsage(scope.row)"
-                                    :disabled="!isReservationActive(scope.row)">
-                                    开始使用
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </div>
-                <div v-else class="timer-container">
-                    <h2>当前使用场地: {{ activeUsage.venue.name }}</h2>
-                    <div class="timer-display">
-                        {{ formatTime(elapsedTime) }}
-                    </div>
-                    <div class="progress-info">
-                        <el-progress :percentage="progressPercentage" :color="progressColor"></el-progress>
-                        <div class="time-info">
-                            <span>已使用时间: {{ formatTime(elapsedTime) }}</span>
-                            <span>剩余时间: {{ formatTime(remainingTime) }}</span>
+        <div class="venue-usage-container">
+            <el-row :gutter="20">
+                <el-col :span="12">
+                    <el-card>
+                        <div slot="header" class="card-header">
+                            <h2>今日可用预约</h2>
                         </div>
-                    </div>
-                    <div class="cost-display">
-                        当前产生费用: {{ currentCost }} 元
-                    </div>
-                    <div class="timer-actions">
-                        <el-button type="danger" @click="endUsage" :loading="submitting">结束使用</el-button>
-                    </div>
-                    <div v-if="usageEnded" class="payment-section">
-                        <h3>使用结算</h3>
-                        <p>使用时长: {{ formatTime(finalTime) }}</p>
-                        <p>应付金额: {{ finalCost }} 元</p>
-                        <el-button type="primary" @click="payUsage" :loading="paying">一卡通付费</el-button>
+                        
+                        <div v-if="todayReservations.length === 0" class="empty-data">
+                            <el-empty description="没有今日可用的预约"></el-empty>
+                        </div>
+                        
+                        <div v-else>
+                            <el-table 
+                                :data="todayReservations" 
+                                style="width: 100%"
+                                :header-cell-style="{background:'#f5f7fa', color:'#606266'}"
+                                border>
+                                <el-table-column prop="venueInfo.name" label="场地名称" width="120"></el-table-column>
+                                <el-table-column label="预约时间" width="180">
+                                    <template slot-scope="scope">
+                                        {{ scope.row.startTime }} - {{ scope.row.endTime }}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="status" label="状态" width="100">
+                                    <template slot-scope="scope">
+                                        <el-tag :type="getStatusType(scope.row.usageStatus)">{{ getStatusText(scope.row.usageStatus) }}</el-tag>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="操作" width="160">
+                                    <template slot-scope="scope">
+                                        <el-button 
+                                            v-if="scope.row.usageStatus === 'NOT_STARTED'" 
+                                            type="primary" 
+                                            size="mini" 
+                                            @click="startUsage(scope.row)">开始使用</el-button>
+                                        <el-button 
+                                            v-if="scope.row.usageStatus === 'IN_PROGRESS'" 
+                                            type="danger" 
+                                            size="mini" 
+                                            @click="endUsage(scope.row)">结束使用</el-button>
+                                        <el-button 
+                                            v-if="scope.row.usageStatus === 'COMPLETED'" 
+                                            type="info" 
+                                            size="mini" 
+                                            @click="viewUsageDetail(scope.row)">查看详情</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </el-card>
+                </el-col>
+                
+                <el-col :span="12">
+                    <el-card v-if="currentUsage" class="usage-timer-card">
+                        <div slot="header" class="card-header">
+                            <h2>正在使用</h2>
+                        </div>
+                        
+                        <div class="usage-info">
+                            <h3>{{ currentUsage.venueInfo.name }}</h3>
+                            <p>预约时间: {{ currentUsage.startTime }} - {{ currentUsage.endTime }}</p>
+                            
+                            <div class="timer-container">
+                                <div class="timer-label">已使用时间</div>
+                                <div class="timer-display">{{ formatDuration(elapsedTime) }}</div>
+                                
+                                <div class="cost-container">
+                                    <div class="cost-label">当前费用</div>
+                                    <div class="cost-display">¥ {{ calculateCurrentCost().toFixed(2) }}</div>
+                                </div>
+                                
+                                <el-alert
+                                    v-if="isOvertime"
+                                    title="您已超出预约时间"
+                                    type="warning"
+                                    :closable="false"
+                                    show-icon>
+                                    <span slot="description">
+                                        超时使用将按正常价格收费，请尽快结束使用。
+                                    </span>
+                                </el-alert>
+                                
+                                <div class="timer-actions">
+                                    <el-button type="danger" @click="endUsage(currentUsage)">结束使用</el-button>
+                                </div>
+                            </div>
+                        </div>
+                    </el-card>
+                    
+                    <el-card v-else class="no-usage-card">
+                        <div slot="header" class="card-header">
+                            <h2>场地使用</h2>
+                        </div>
+                        
+                        <div class="empty-usage">
+                            <el-empty description="您当前没有正在使用的场地">
+                                <el-button type="primary" @click="$router.push('/user/venues')">去预约场地</el-button>
+                            </el-empty>
+                        </div>
+                    </el-card>
+                </el-col>
+            </el-row>
+            
+            <!-- 使用结算弹窗 -->
+            <el-dialog title="场地使用结算" :visible.sync="settlementDialogVisible" width="500px">
+                <div v-if="currentUsage" class="settlement-info">
+                    <h3>{{ currentUsage.venueInfo.name }}</h3>
+                    <el-descriptions :column="1" border>
+                        <el-descriptions-item label="场地类型">{{ currentUsage.venueInfo.type }}</el-descriptions-item>
+                        <el-descriptions-item label="预约时间">{{ currentUsage.startTime }} - {{ currentUsage.endTime }}</el-descriptions-item>
+                        <el-descriptions-item label="实际使用时间">{{ usageStartTime }} - {{ getCurrentTime() }}</el-descriptions-item>
+                        <el-descriptions-item label="使用时长">{{ formatDuration(elapsedTime) }}</el-descriptions-item>
+                        <el-descriptions-item label="标准费用">{{ currentUsage.cost }} 元</el-descriptions-item>
+                        <el-descriptions-item label="实际费用" class="highlight-cost">
+                            {{ calculateCurrentCost().toFixed(2) }} 元
+                            <span v-if="isOvertime" class="overtime-tag">
+                                (含超时费用 {{ calculateOvertimeCost().toFixed(2) }} 元)
+                            </span>
+                        </el-descriptions-item>
+                    </el-descriptions>
+                    
+                    <div class="payment-options">
+                        <h4>支付方式</h4>
+                        <el-radio-group v-model="paymentMethod">
+                            <el-radio label="balance">余额支付</el-radio>
+                            <el-radio label="wechat">微信支付</el-radio>
+                            <el-radio label="alipay">支付宝</el-radio>
+                        </el-radio-group>
                     </div>
                 </div>
-            </el-card>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="settlementDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="confirmSettlement">确认支付</el-button>
+                </span>
+            </el-dialog>
+            
+            <!-- 使用详情弹窗 -->
+            <el-dialog title="使用详情" :visible.sync="usageDetailDialogVisible" width="500px">
+                <div v-if="selectedUsage" class="usage-detail">
+                    <h3>{{ selectedUsage.venueInfo.name }}</h3>
+                    <el-descriptions :column="1" border>
+                        <el-descriptions-item label="场地类型">{{ selectedUsage.venueInfo.type }}</el-descriptions-item>
+                        <el-descriptions-item label="预约时间">{{ selectedUsage.startTime }} - {{ selectedUsage.endTime }}</el-descriptions-item>
+                        <el-descriptions-item label="实际使用时间">{{ selectedUsage.actualStartTime }} - {{ selectedUsage.actualEndTime }}</el-descriptions-item>
+                        <el-descriptions-item label="使用时长">{{ selectedUsage.duration }}</el-descriptions-item>
+                        <el-descriptions-item label="应付费用">{{ selectedUsage.cost }} 元</el-descriptions-item>
+                        <el-descriptions-item label="实付费用">{{ selectedUsage.actualCost }} 元</el-descriptions-item>
+                        <el-descriptions-item label="支付方式">{{ getPaymentMethodText(selectedUsage.paymentMethod) }}</el-descriptions-item>
+                        <el-descriptions-item label="支付时间">{{ selectedUsage.paymentTime }}</el-descriptions-item>
+                    </el-descriptions>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="usageDetailDialogVisible = false">关闭</el-button>
+                </span>
+            </el-dialog>
         </div>
     `,
     data() {
         return {
-            reservations: [],
-            activeUsage: null,
-            elapsedTime: 0, // 秒
-            remainingTime: 0, // 秒
-            timerInterval: null,
-            currentCost: 0,
-            submitting: false,
-            usageEnded: false,
-            finalTime: 0,
-            finalCost: 0,
-            paying: false,
-            startTime: null
+            // 今日可用预约
+            todayReservations: [],
+            // 当前使用的场地
+            currentUsage: null,
+            // 使用开始时间
+            usageStartTime: '',
+            // 计时器
+            timer: null,
+            // 已经过时间（秒）
+            elapsedTime: 0,
+            // 结算弹窗
+            settlementDialogVisible: false,
+            // 支付方式
+            paymentMethod: 'balance',
+            // 使用详情弹窗
+            usageDetailDialogVisible: false,
+            // 选中的使用记录
+            selectedUsage: null
         };
     },
     computed: {
-        progressPercentage() {
-            if (!this.activeUsage) return 0;
-            const totalTime = this.elapsedTime + this.remainingTime;
-            return totalTime === 0 ? 0 : Math.min(100, Math.round((this.elapsedTime / totalTime) * 100));
-        },
-        progressColor() {
-            if (this.progressPercentage < 70) return '#67c23a';
-            if (this.progressPercentage < 90) return '#e6a23c';
-            return '#f56c6c';
+        // 是否超时
+        isOvertime() {
+            if (!this.currentUsage) return false;
+
+            // 解析结束时间
+            const [hours, minutes] = this.currentUsage.endTime.split(':').map(Number);
+            const endTimeInMinutes = hours * 60 + minutes;
+
+            // 获取当前时间
+            const now = new Date();
+            const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+
+            return currentTimeInMinutes > endTimeInMinutes;
         }
     },
     created() {
-        this.fetchReservations();
+        // 加载今日预约
+        this.loadTodayReservations();
 
-        // 检查是否有正在进行的使用
-        this.fetchActiveUsage();
+        // 检查是否有进行中的使用
+        this.checkOngoingUsage();
     },
     beforeDestroy() {
-        if (this.timerInterval) {
-            clearInterval(this.timerInterval);
-        }
+        // 清除计时器
+        this.clearTimer();
     },
     methods: {
-        fetchReservations() {
-            // 获取当前用户的一卡通号
-            const userStr = localStorage.getItem('currentUser');
-            let cardNumber = '';
-            if (userStr) {
-                try {
-                    const user = JSON.parse(userStr);
-                    cardNumber = user.cardNumber || '2021001001';
-                } catch (e) {
-                    console.error('解析用户信息失败:', e);
-                    cardNumber = '2021001001';
-                }
-            } else {
-                cardNumber = '2021001001';
+        // 加载今日预约
+        loadTodayReservations() {
+            console.log('开始加载今日预约...');
+            
+            // 获取当前用户ID
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const userId = currentUser && currentUser.id ? currentUser.id : null;
+            if (!userId) {
+                this.$message.error('请先登录');
+                return;
             }
-
-            // 实际应该调用API
-            axios.get(`/reservations/active?cardNumber=${cardNumber}`)
-                .then(response => {
-                    this.reservations = response.data;
-                })
-                .catch(error => {
-                    console.error('获取活跃预约失败:', error);
-
-                    // 模拟数据
-                    this.reservations = [
-                        {
-                            id: 8,
-                            venue: {
-                                id: 1,
-                                name: '篮球场1号',
-                                pricePerHour: 60
-                            },
-                            cardNumber: cardNumber,
-                            startTime: new Date(new Date().getTime() - 30 * 60 * 1000).toISOString(), // 30分钟前
-                            endTime: new Date(new Date().getTime() + 90 * 60 * 1000).toISOString(), // 90分钟后
-                            status: 'BOOKED'
+            
+            // 获取今日预约
+            axios.get(`/api/reservations/user/${userId}`, {
+                params: {
+                    page: 1,
+                    size: 100,
+                    status: 'PENDING,CONFIRMED,IN_USE'  // 获取所有可用状态的预约
+                }
+            })
+            .then(response => {
+                console.log('获取到预约数据:', response.data);
+                
+                if (response.data && response.data.records) {
+                    // 处理预约数据
+                    this.todayReservations = response.data.records
+                        .filter(reservation => {
+                            // 确保日期是Date对象
+                            if (typeof reservation.date === 'string') {
+                                reservation.date = new Date(reservation.date);
+                            }
+                            
+                            // 只显示今天的预约
+                            const today = new Date();
+                            const reservationDate = new Date(reservation.date);
+                            return reservationDate.toDateString() === today.toDateString();
+                        })
+                        .map(reservation => {
+                            // 添加使用状态
+                            const usageStatus = this.getUsageStatus(reservation);
+                            console.log(`预约 ${reservation.id} 的使用状态: ${usageStatus}`);
+                            
+                            return {
+                                ...reservation,
+                                usageStatus
+                            };
+                        });
+                    
+                    console.log('处理后的预约数据:', this.todayReservations);
+                    
+                    // 检查本地存储是否有使用中的记录
+                    const ongoingUsageStr = localStorage.getItem('ongoingUsage');
+                    if (ongoingUsageStr) {
+                        try {
+                            const ongoingUsage = JSON.parse(ongoingUsageStr);
+                            const index = this.todayReservations.findIndex(item => item.id === ongoingUsage.id);
+                            if (index !== -1) {
+                                console.log(`找到进行中的预约: ${ongoingUsage.id}`);
+                                this.todayReservations[index].usageStatus = 'IN_PROGRESS';
+                            }
+                        } catch (e) {
+                            console.error('解析进行中的使用记录失败:', e);
+                            localStorage.removeItem('ongoingUsage');
                         }
-                    ];
-                });
-        },
-        fetchActiveUsage() {
-            // 获取当前用户的一卡通号
-            const userStr = localStorage.getItem('currentUser');
-            let cardNumber = '';
-            if (userStr) {
-                try {
-                    const user = JSON.parse(userStr);
-                    cardNumber = user.cardNumber || '2021001001';
-                } catch (e) {
-                    console.error('解析用户信息失败:', e);
-                    cardNumber = '2021001001';
-                }
-            } else {
-                cardNumber = '2021001001';
-            }
-
-            // 实际应该调用API
-            axios.get(`/usages/active?cardNumber=${cardNumber}`)
-                .then(response => {
-                    if (response.data) {
-                        this.activeUsage = response.data;
-                        this.startTime = new Date(this.activeUsage.startTime);
-                        this.startTimer();
                     }
-                })
-                .catch(error => {
-                    console.error('获取活跃使用记录失败:', error);
-                    // 默认不设置活跃使用
-                });
+                } else {
+                    console.error('预约数据格式不正确:', response.data);
+                    this.$message.error('获取预约列表失败：数据格式不正确');
+                }
+            })
+            .catch(error => {
+                console.error('加载今日预约失败:', error);
+                if (error.response) {
+                    console.error('错误响应:', error.response.data);
+                    this.$message.error('加载今日预约失败: ' + (error.response.data.msg || error.message));
+                } else {
+                    this.$message.error('加载今日预约失败: ' + error.message);
+                }
+            });
         },
-        isReservationActive(reservation) {
+        
+        // 获取使用状态
+        getUsageStatus(reservation) {
             const now = new Date();
-            const start = new Date(reservation.startTime);
-            const end = new Date(reservation.endTime);
-
-            return start <= now && now <= end && reservation.status === 'BOOKED';
+            
+            // 解析日期和时间
+            const [hours, minutes] = reservation.startTime.split(':').map(Number);
+            const [endHours, endMinutes] = reservation.endTime.split(':').map(Number);
+            
+            // 将日期字符串转换为Date对象
+            const reservationDate = new Date(reservation.date);
+            
+            // 设置开始时间和结束时间
+            const startTime = new Date(reservationDate);
+            startTime.setHours(hours, minutes, 0, 0);
+            
+            const endTime = new Date(reservationDate);
+            endTime.setHours(endHours, endMinutes, 0, 0);
+            
+            // 检查是否有进行中的使用记录
+            const ongoingUsageStr = localStorage.getItem('ongoingUsage');
+            if (ongoingUsageStr) {
+                try {
+                    const ongoingUsage = JSON.parse(ongoingUsageStr);
+                    if (ongoingUsage.id === reservation.id) {
+                        return 'IN_PROGRESS';
+                    }
+                } catch (e) {
+                    localStorage.removeItem('ongoingUsage');
+                }
+            }
+            
+            // 检查预约状态
+            if (reservation.status === 'COMPLETED') {
+                return 'COMPLETED';
+            }
+            
+            // 根据时间判断状态
+            if (now < startTime) {
+                return 'NOT_STARTED';
+            } else if (now >= endTime) {
+                return 'COMPLETED';
+            } else {
+                return 'NOT_STARTED';
+            }
         },
+        // 检查是否有进行中的使用
+        checkOngoingUsage() {
+            const ongoingUsageStr = localStorage.getItem('ongoingUsage');
+            const usageStartTime = localStorage.getItem('usageStartTime');
+            
+            if (ongoingUsageStr && usageStartTime) {
+                try {
+                    const ongoingUsage = JSON.parse(ongoingUsageStr);
+                    const startTime = new Date(usageStartTime);
+                    const now = new Date();
+                    
+                    // 计算已经过的时间（秒）
+                    this.elapsedTime = Math.floor((now - startTime) / 1000);
+                    
+                    // 设置当前使用
+                    this.currentUsage = ongoingUsage;
+                    this.usageStartTime = usageStartTime;
+                    
+                    // 启动计时器
+                    this.startTimer();
+                } catch (e) {
+                    console.error('解析进行中的使用记录失败:', e);
+                    localStorage.removeItem('ongoingUsage');
+                    localStorage.removeItem('usageStartTime');
+                }
+            }
+        },
+        // 开始使用场地
         startUsage(reservation) {
-            if (this.activeUsage) {
-                this.$message.warning('您已有正在使用的场地，请先结束当前使用');
+            // 检查是否已有使用中的场地
+            if (this.currentUsage) {
+                this.$confirm('您已有正在使用的场地，需要先结束当前使用才能开始新的使用。', '提示', {
+                    confirmButtonText: '去结束使用',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    // 滚动到当前使用的卡片
+                    const timerCard = document.querySelector('.usage-timer-card');
+                    if (timerCard) {
+                        timerCard.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }).catch(() => {});
                 return;
             }
 
-            // 获取当前用户的一卡通号
-            const userStr = localStorage.getItem('currentUser');
-            let cardNumber = reservation.cardNumber;
-            if (userStr) {
-                try {
-                    const user = JSON.parse(userStr);
-                    if (user.cardNumber) {
-                        cardNumber = user.cardNumber;
-                    }
-                } catch (e) {
-                    console.error('解析用户信息失败:', e);
-                }
+            // 更新状态
+            const index = this.todayReservations.findIndex(item => item.id === reservation.id);
+            if (index !== -1) {
+                this.todayReservations[index].usageStatus = 'IN_PROGRESS';
+                this.currentUsage = this.todayReservations[index];
+
+                // 记录开始时间
+                const now = new Date();
+                this.usageStartTime = now.toLocaleString();
+                this.elapsedTime = 0;
+
+                // 保存到本地存储
+                localStorage.setItem('ongoingUsage', JSON.stringify({
+                    ...this.currentUsage,
+                    startTime: this.usageStartTime
+                }));
+                localStorage.setItem('usageStartTime', this.usageStartTime);
+
+                // 启动计时器
+                this.startTimer();
+
+                // 提示
+                this.$message.success('已开始使用场地');
             }
-
-            // 实际应该调用API
-            const data = {
-                venueId: reservation.venue.id,
-                cardNumber: cardNumber,
-                reservationId: reservation.id
-            };
-
-            axios.post('/usages/start', data)
-                .then(response => {
-                    this.$message.success('开始使用场地');
-                    this.activeUsage = response.data;
-                    this.startTime = new Date();
-                    this.startTimer();
-                })
-                .catch(error => {
-                    console.error('开始场地使用失败:', error);
-                    this.$message.error('开始场地使用失败');
-
-                    // 模拟操作成功
-                    this.activeUsage = {
-                        id: 1,
-                        venue: reservation.venue,
-                        reservation: reservation,
-                        cardNumber: cardNumber,
-                        startTime: new Date().toISOString(),
-                        endTime: null,
-                        cost: null,
-                        paid: false
-                    };
-                    this.startTime = new Date();
-                    this.startTimer();
-                    this.$message.success('开始使用场地');
-                });
         },
+        // 启动计时器
         startTimer() {
-            // 计算已经过去的时间（如果从数据库恢复状态）
-            if (this.startTime) {
-                const now = new Date();
-                this.elapsedTime = Math.floor((now - this.startTime) / 1000);
+            if (this.timer) {
+                clearInterval(this.timer);
             }
-
-            // 计算剩余时间
-            if (this.activeUsage.reservation) {
-                const endTime = new Date(this.activeUsage.reservation.endTime);
-                const now = new Date();
-                this.remainingTime = Math.max(0, Math.floor((endTime - now) / 1000));
-            } else {
-                // 默认2小时
-                this.remainingTime = 2 * 60 * 60;
-            }
-
-            // 启动计时器
-            this.timerInterval = setInterval(() => {
+            this.timer = setInterval(() => {
                 this.elapsedTime++;
-                if (this.remainingTime > 0) {
-                    this.remainingTime--;
-                }
-                this.calculateCost();
             }, 1000);
         },
-        calculateCost() {
-            if (!this.activeUsage || !this.activeUsage.venue.pricePerHour) return;
-
-            const hours = this.elapsedTime / 3600;
-            const hourlyRate = parseFloat(this.activeUsage.venue.pricePerHour);
-            this.currentCost = (hours * hourlyRate).toFixed(2);
+        // 清除计时器
+        clearTimer() {
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
         },
-        formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-
-            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        },
-        endUsage() {
-            if (!this.activeUsage) return;
-
-            this.submitting = true;
-
-            // 停止计时器
-            if (this.timerInterval) {
-                clearInterval(this.timerInterval);
-                this.timerInterval = null;
+        // 结束使用
+        endUsage(reservation) {
+            // 检查是否是当前使用中的场地
+            if (!this.currentUsage || this.currentUsage.id !== reservation.id) {
+                this.$message.error('只能结束当前正在使用的场地');
+                return;
             }
 
-            // 实际应该调用API
-            axios.post(`/usages/${this.activeUsage.id}/end`)
+            // 显示结算弹窗
+            this.settlementDialogVisible = true;
+        },
+        // 查看使用详情
+        viewUsageDetail(usage) {
+            // 获取使用详情
+            axios.get(`/api/reservations/${usage.id}/usage`)
                 .then(response => {
-                    this.submitting = false;
-                    this.usageEnded = true;
-                    this.finalTime = this.elapsedTime;
-                    this.finalCost = this.currentCost;
-
-                    // 更新activeUsage
-                    this.activeUsage = response.data;
+                    if (response.data && response.data.code === 200) {
+                        this.selectedUsage = {
+                            ...usage,
+                            ...response.data.data
+                        };
+                        this.usageDetailDialogVisible = true;
+                    } else {
+                        this.$message.error(response.data.msg || '获取使用详情失败');
+                    }
                 })
                 .catch(error => {
-                    console.error('结束场地使用失败:', error);
-                    this.$message.error('结束场地使用失败');
-
-                    // 模拟操作成功
-                    this.submitting = false;
-                    this.usageEnded = true;
-                    this.finalTime = this.elapsedTime;
-                    this.finalCost = this.currentCost;
-                    this.$message.success('结束使用场地');
+                    console.error('获取使用详情失败:', error);
+                    this.$message.error('获取使用详情失败: ' + error.message);
                 });
         },
-        payUsage() {
-            if (!this.usageEnded || !this.activeUsage) return;
+        // 确认结算
+        confirmSettlement() {
+            if (!this.currentUsage) return;
 
-            this.paying = true;
+            // 清除计时器
+            this.clearTimer();
 
-            // 实际应该调用API
-            axios.post(`/usages/${this.activeUsage.id}/pay`)
+            // 格式化时间
+            const formatTime = (date) => {
+                const d = new Date(date);
+                return d.toLocaleTimeString('zh-CN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+            };
+
+            // 准备结算数据
+            const now = new Date();
+            const settlementData = {
+                reservationId: this.currentUsage.id,
+                actualStartTime: formatTime(this.usageStartTime),
+                actualEndTime: formatTime(now),
+                duration: this.formatDuration(this.elapsedTime),
+                actualCost: this.calculateCurrentCost().toFixed(2),
+                paymentMethod: this.paymentMethod
+            };
+
+            console.log('提交结算数据:', settlementData);
+
+            // 提交结算
+            axios.post('/api/reservations/settle', settlementData)
                 .then(response => {
-                    this.paying = false;
-                    this.$message.success('付费成功');
+                    console.log('结算响应:', response.data);
+                    if (response.data && response.data.code === 200) {
+                        // 更新状态
+                        const index = this.todayReservations.findIndex(item => item.id === this.currentUsage.id);
+                        if (index !== -1) {
+                            this.todayReservations[index].usageStatus = 'COMPLETED';
+                            this.todayReservations[index].actualStartTime = settlementData.actualStartTime;
+                            this.todayReservations[index].actualEndTime = settlementData.actualEndTime;
+                            this.todayReservations[index].duration = settlementData.duration;
+                            this.todayReservations[index].actualCost = settlementData.actualCost;
+                            this.todayReservations[index].paymentMethod = settlementData.paymentMethod;
+                        }
 
-                    // 重置状态
-                    setTimeout(() => {
-                        this.activeUsage = null;
+                        // 清除本地存储
+                        localStorage.removeItem('ongoingUsage');
+                        localStorage.removeItem('usageStartTime');
+
+                        // 重置状态
+                        this.currentUsage = null;
                         this.elapsedTime = 0;
-                        this.remainingTime = 0;
-                        this.currentCost = 0;
-                        this.usageEnded = false;
-                        this.finalTime = 0;
-                        this.finalCost = 0;
-                        this.fetchReservations();
-                    }, 1500);
+                        this.usageStartTime = '';
+
+                        // 关闭弹窗
+                        this.settlementDialogVisible = false;
+
+                        // 提示
+                        this.$message.success('结算成功！');
+                    } else {
+                        this.$message.error(response.data.msg || '结算失败');
+                    }
                 })
                 .catch(error => {
-                    console.error('场地使用付费失败:', error);
-                    this.$message.error('场地使用付费失败');
-
-                    // 模拟操作成功
-                    this.paying = false;
-                    this.$message.success('付费成功');
-
-                    // 重置状态
-                    setTimeout(() => {
-                        this.activeUsage = null;
-                        this.elapsedTime = 0;
-                        this.remainingTime = 0;
-                        this.currentCost = 0;
-                        this.usageEnded = false;
-                        this.finalTime = 0;
-                        this.finalCost = 0;
-                        this.fetchReservations();
-                    }, 1500);
+                    console.error('结算失败:', error);
+                    if (error.response && error.response.data) {
+                        console.error('错误详情:', error.response.data);
+                        this.$message.error('结算失败: ' + (error.response.data.msg || error.message));
+                    } else {
+                        this.$message.error('结算失败: ' + error.message);
+                    }
                 });
+        },
+        // 格式化时长
+        formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const remainingSeconds = seconds % 60;
+            
+            const parts = [];
+            if (hours > 0) parts.push(`${hours}小时`);
+            if (minutes > 0) parts.push(`${minutes}分钟`);
+            if (remainingSeconds > 0) parts.push(`${remainingSeconds}秒`);
+            
+            return parts.join(' ') || '0秒';
+        },
+        // 计算当前费用
+        calculateCurrentCost() {
+            if (!this.currentUsage) return 0;
+            
+            const pricePerHour = this.currentUsage.venueInfo.pricePerHour;
+            const hours = this.elapsedTime / 3600; // 转换为小时
+            
+            // 如果超时，加收超时费用
+            if (this.isOvertime) {
+                const normalHours = this.getNormalHours();
+                const overtimeHours = hours - normalHours;
+                return pricePerHour * normalHours + this.calculateOvertimeCost();
+            }
+            
+            return pricePerHour * hours;
+        },
+        // 计算超时费用
+        calculateOvertimeCost() {
+            if (!this.currentUsage || !this.isOvertime) return 0;
+            
+            const pricePerHour = this.currentUsage.venueInfo.pricePerHour;
+            const normalHours = this.getNormalHours();
+            const totalHours = this.elapsedTime / 3600;
+            const overtimeHours = totalHours - normalHours;
+            
+            // 超时费用按1.5倍计算
+            return pricePerHour * overtimeHours * 1.5;
+        },
+        // 获取正常使用时长（小时）
+        getNormalHours() {
+            if (!this.currentUsage) return 0;
+            
+            const [startHours, startMinutes] = this.currentUsage.startTime.split(':').map(Number);
+            const [endHours, endMinutes] = this.currentUsage.endTime.split(':').map(Number);
+            
+            return (endHours - startHours) + (endMinutes - startMinutes) / 60;
+        },
+        // 获取当前时间
+        getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleString();
+        },
+        // 获取状态文本
+        getStatusText(status) {
+            const statusMap = {
+                'NOT_STARTED': '未开始',
+                'IN_PROGRESS': '使用中',
+                'COMPLETED': '已完成'
+            };
+            return statusMap[status] || '未知';
+        },
+        // 获取状态对应的样式类型
+        getStatusType(status) {
+            const typeMap = {
+                'NOT_STARTED': 'info',
+                'IN_PROGRESS': 'success',
+                'COMPLETED': 'warning'
+            };
+            return typeMap[status] || 'info';
+        },
+        // 获取支付方式文本
+        getPaymentMethodText(method) {
+            const methodMap = {
+                'balance': '余额支付',
+                'wechat': '微信支付',
+                'alipay': '支付宝'
+            };
+            return methodMap[method] || '未知';
         }
     }
 };

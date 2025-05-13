@@ -6,7 +6,7 @@ const routes = [
     },
     {
         path: '/login',
-        component: LoginComponent
+        component: LoginComponent  // 使用components.js中定义的组件
     },
     // 场地管理员路由
     {

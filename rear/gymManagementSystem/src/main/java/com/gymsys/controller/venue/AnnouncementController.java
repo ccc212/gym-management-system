@@ -1,55 +1,64 @@
 package com.gymsys.controller.venue;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.entity.venue.AnnouncementEntity;
-import com.gymsys.service.venue.AnnouncementService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import com.gymsys.repository.venue.AnnouncementRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/announcements")
-public class AnnouncementController {// 代码行数：30
+public class AnnouncementController {
     
-    private final AnnouncementService announcementService;
+    @Autowired
+    private AnnouncementRepository announcementRepository;
     
-    /**
-     * 创建公告
-     */
-    @PostMapping
-    public ResponseEntity<AnnouncementEntity> createAnnouncement(@RequestBody AnnouncementEntity announcement) {
-        AnnouncementEntity savedAnnouncement = announcementService.createAnnouncement(announcement);
-        return new ResponseEntity<>(savedAnnouncement, HttpStatus.CREATED);
+    @GetMapping
+    public ResponseEntity<Page<AnnouncementEntity>> getAllAnnouncements(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        Page<AnnouncementEntity> announcementPage = announcementRepository.selectPage(
+                new Page<>(page, size),
+                new LambdaQueryWrapper<AnnouncementEntity>()
+        );
+        return ResponseEntity.ok(announcementPage);
     }
     
-    /**
-     * 获取所有有效公告
-     */
-    @GetMapping
+    @GetMapping("/active")
     public ResponseEntity<List<AnnouncementEntity>> getActiveAnnouncements() {
-        List<AnnouncementEntity> announcements = announcementService.getActiveAnnouncements();
+        List<AnnouncementEntity> announcements = announcementRepository.findByStatus("ACTIVE");
         return ResponseEntity.ok(announcements);
     }
     
-    /**
-     * 停用公告
-     */
-    @PostMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateAnnouncement(@PathVariable Long id) {
-        announcementService.deactivateAnnouncement(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/time-range")
+    public ResponseEntity<List<AnnouncementEntity>> getAnnouncementsByTimeRange(
+            @RequestParam LocalDateTime startTime,
+            @RequestParam LocalDateTime endTime) {
+        List<AnnouncementEntity> announcements = announcementRepository.findByPublishTimeBetween(startTime, endTime);
+        return ResponseEntity.ok(announcements);
     }
     
-    /**
-     * 获取最新公告内容
-     */
-    @GetMapping("/latest")
-    public ResponseEntity<Map<String, String>> getLatestAnnouncement() {
-        String content = announcementService.getLatestAnnouncementContent();
-        return ResponseEntity.ok(Map.of("content", content));
+    @PostMapping
+    public ResponseEntity<AnnouncementEntity> createAnnouncement(@RequestBody AnnouncementEntity announcement) {
+        announcementRepository.insert(announcement);
+        return ResponseEntity.ok(announcement);
+    }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<AnnouncementEntity> updateAnnouncement(@PathVariable Long id, @RequestBody AnnouncementEntity announcement) {
+        announcement.setId(id);
+        announcementRepository.updateById(announcement);
+        return ResponseEntity.ok(announcement);
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAnnouncement(@PathVariable Long id) {
+        announcementRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

@@ -2,9 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type AddTeamMemberRelationDTO = {
+export type TeamMemberRelation = {
+    createTime?: string;
+    id?: number;
     status?: number;
     teamId?: number;
+    updateTime?: string;
     userId?: number;
 };
 

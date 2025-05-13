@@ -160,6 +160,7 @@ create table `team_member_relation`
     id          bigint not null auto_increment primary key,
     team_id     bigint not null comment '团队id',
     user_id     bigint not null comment '用户id',
+    status      tinyint   default 0 not null comment '状态：0-待审核，1-已通过，2-已拒绝',
     create_time datetime default current_timestamp comment '创建时间',
     update_time datetime default current_timestamp on update current_timestamp comment '更新时间'
 ) engine = innodb

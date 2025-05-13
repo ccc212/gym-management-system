@@ -31,12 +31,15 @@
       <el-table-column prop="teamName" label="团队名称" width="150px"></el-table-column>
       <el-table-column prop="leaderName" label="领队姓名" width="120px"></el-table-column>
       <el-table-column prop="leaderPhone" label="联系电话" width="120px"></el-table-column>
-      <el-table-column prop="departName" label="所属部门" width="120px"></el-table-column>
+      <el-table-column prop="departName" label="所属部门" width="120px">
+        <template #default="scope">
+          {{ getDepartmentName(scope.row.departId) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="createTime" label="创建时间" width="160px"></el-table-column>
-      <el-table-column label="操作" width="320px">
+      <el-table-column label="操作" width="420px">
         <template #default="scope">
           <el-button type="primary" icon="View" size="small" @click="viewBtn(scope.row)">查看成员</el-button>
-          <el-button type="success" icon="Plus" size="small" @click="addMemberBtn(scope.row)">添加成员</el-button>
           <el-button type="warning" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
           <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
         </template>
@@ -110,28 +113,6 @@
           </template>
         </el-table-column>
       </el-table>
-    </el-dialog>
-
-    <!-- 添加成员对话框 -->
-    <el-dialog title="添加成员" v-model="openAddMemberDialog" width="500px" append-to-body>
-      <el-form ref="addMemberFormRef" :model="addMemberForm" label-width="80px">
-        <el-form-item label="选择成员" prop="userId">
-          <el-select v-model="addMemberForm.userId" placeholder="请选择成员" filterable>
-            <el-option
-                v-for="item in userOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="submitAddMember">确 定</el-button>
-          <el-button @click="cancelAddMemberDialog">取 消</el-button>
-        </div>
-      </template>
     </el-dialog>
   </el-main>
 </template>
@@ -221,14 +202,6 @@ const formData = reactive({
 const openMemberDialog = ref(false);
 const currentTeamId = ref('');
 
-// 添加成员对话框
-const openAddMemberDialog = ref(false);
-const addMemberFormRef = ref(null);
-const addMemberForm = reactive({
-  teamId: '',
-  userId: ''
-});
-
 // 表单校验规则
 const rules = {
   teamName: [
@@ -245,9 +218,20 @@ const rules = {
   ]
 };
 
+// 获取部门名称
+const getDepartmentName = (departId: number) => {
+  const department = departmentOptions.value.find(item => item.value === departId);
+  return department ? department.label : '-';
+};
+
 // 获取列表数据
 const loadData = async () => {
   try {
+    // 确保部门选项已加载
+    if (departmentOptions.value.length === 0) {
+      await getDepartmentOptions();
+    }
+
     const res = await TeamControllerService.listTeamUsingGet(
         searchParm.departId ? Number(searchParm.departId) : undefined,
         searchParm.leaderName,
@@ -338,48 +322,6 @@ const viewBtn = async (row: any) => {
     openMemberDialog.value = true;
   }
   return res;
-};
-
-// 添加成员按钮
-const addMemberBtn = (row: any) => {
-  addMemberForm.teamId = row.id;
-  addMemberForm.userId = '';
-  openAddMemberDialog.value = true;
-};
-
-// 提交添加成员
-const submitAddMember = async () => {
-  if (!addMemberForm.userId) {
-    ElMessage.warning('请选择成员');
-    return;
-  }
-
-  try {
-    const res = await TeamControllerService.addTeamMemberUsingPost(
-        Number(addMemberForm.teamId),
-        Number(addMemberForm.userId)
-    );
-    if (res && res.code === 0) {
-      ElMessage.success('添加成员成功');
-      // 先关闭对话框
-      openAddMemberDialog.value = false;
-
-      // 如果成员详情对话框是打开的，需要刷新成员列表
-      if (openMemberDialog.value && currentTeamId.value === addMemberForm.teamId) {
-        await viewBtn({ id: currentTeamId.value });
-      }
-    } else {
-      ElMessage.error(res?.msg || '添加成员失败');
-    }
-  } catch (error) {
-    console.error('添加成员错误:', error);
-    ElMessage.error('添加成员失败，请检查网络或联系管理员');
-  }
-};
-
-// 取消添加成员对话框
-const cancelAddMemberDialog = () => {
-  openAddMemberDialog.value = false;
 };
 
 // 移除成员按钮

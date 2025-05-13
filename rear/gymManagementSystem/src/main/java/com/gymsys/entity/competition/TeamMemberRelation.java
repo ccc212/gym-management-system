@@ -38,6 +38,11 @@ public class TeamMemberRelation implements Serializable {
     private Long userId;
 
     /**
+     * 状态：0-待审核，1-已通过，2-已拒绝
+     */
+    private Integer status;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

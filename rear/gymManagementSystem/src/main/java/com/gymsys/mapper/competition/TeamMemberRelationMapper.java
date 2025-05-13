@@ -2,6 +2,9 @@ package com.gymsys.mapper.competition;
 
 import com.gymsys.entity.competition.TeamMemberRelation;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gymsys.entity.competition.vo.TeamMemberRelationVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface TeamMemberRelationMapper extends BaseMapper<TeamMemberRelation> {
 
+    List<TeamMemberRelationVO> getTeamApplications(Long teamId, Integer status);
+
+    List<TeamMemberRelationVO> getUserApplications(Long userId, Integer status);
 }

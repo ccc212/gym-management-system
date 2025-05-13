@@ -2,4 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gymsys.mapper.competition.TeamMemberRelationMapper">
 
+    <select id="getUserApplications" resultType="com.gymsys.entity.competition.vo.TeamMemberRelationVO">
+        select tmr.id,
+               tmr.team_id,
+               tmr.user_id,
+               tmr.status,
+               tmr.create_time,
+               u.name as name,
+               u.user_number as userNumber
+        from team_member_relation tmr
+                 left join sys_user u on tmr.user_id = u.id
+        <where>
+            <if test="userId != null">
+                and tmr.user_id = #{userId}
+            </if>
+            <if test="status != null">
+                and tmr.status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="getTeamApplications" resultType="com.gymsys.entity.competition.vo.TeamMemberRelationVO">
+        select tmr.id,
+        tmr.team_id,
+        tmr.user_id,
+        tmr.status,
+        tmr.create_time,
+        u.name as name,
+        u.user_number as userNumber
+        from team_member_relation tmr
+        left join sys_user u on tmr.user_id = u.id
+        <where>
+            <if test="teamId != null">
+                and tmr.team_id = #{teamId}
+            </if>
+            <if test="status != null">
+                and tmr.status = #{status}
+            </if>
+        </where>
+    </select>
 </mapper>

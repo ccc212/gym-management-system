@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type AddTeamMemberRelationDTO = {
-    status?: number;
-    teamId?: number;
-    userId?: number;
+export type Result_boolean_ = {
+    code?: number;
+    data?: boolean;
+    msg?: string;
 };
 

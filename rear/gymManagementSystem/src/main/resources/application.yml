@@ -5,9 +5,11 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/gym_db?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+#      url: jdbc:mysql://localhost:3306/gym_db?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+      url: jdbc:mysql://mysql.ccc212.cn:57996/gym_db?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
       username: root
-      password: 12345678
+#      password: 12345678
+      password: test
   jpa:
     hibernate:
       ddl-auto: update
@@ -33,4 +35,6 @@ jwt:
   secret: com.gymsys
   expiration: 999999999
 
+knife4j:
+  enable: true
 

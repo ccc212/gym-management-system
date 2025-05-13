@@ -1,26 +1,25 @@
 <template>
     <el-main>
-       <el-form :model="searchParm" :inline="true" size="default">
+       <el-form :model="searchParm" :inline="true" size="default" >
         <el-form-item>
-            <el-input v-model="searchParm.roleName" placeholder="请输入角色名称"></el-input>
+            <el-input v-model="searchParm.departName" placeholder="请输入部门名称"></el-input>
         </el-form-item>
         <el-form-item>
-            <el-button icon="Search" @click="searchBtn">搜索</el-button>
+            <el-button  icon="Search" @click="searchBtn">搜索</el-button>
             <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
-            <el-button v-permission="['sys:role:add']" icon="Plus" type="primary" @click="addBtn">新增</el-button>
+            <el-button v-permission="['sys:department:add']" icon="Plus" type="primary" @click="addBtn">新增</el-button>
         </el-form-item>
        </el-form>
 
        <!-- 表格 -->
        <el-table :height="tableHeight":data="tableList" border stripe>
         <el-table-column prop="id" label="序号"></el-table-column>
-        <el-table-column prop="roleName" label="角色名称"></el-table-column>
-        <el-table-column prop="remark" label="角色备注"></el-table-column>
-        <el-table-column label="操作" width="320px">
-            <template #default="scope" >
-                <el-button v-permission="['sys:role:edit']" type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
-                <el-button v-permission="['sys:role:assign']" type="success" icon="Edit" size="small" @click="assignBtn(scope.row)">分配菜单</el-button>
-                <el-button v-permission="['sys:role:delete']" type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
+        <el-table-column prop="departName" label="部门名称"></el-table-column>
+        <el-table-column prop="remark" label="备注"></el-table-column>
+        <el-table-column label="操作" width="200px">
+            <template #default="scope">
+                <el-button v-permission="['sys:department:edit']" type="primary" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
+                <el-button v-permission="['sys:department:delete']" type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
             </template>
         </el-table-column>
        </el-table>
@@ -38,14 +37,14 @@
 
         
 
-       <!-- 新增角色对话框 -->
-      <el-dialog title="新增角色" v-model="openAdd" width="500px" append-to-body>
+       <!-- 新增部门对话框 -->
+      <el-dialog title="新增部门" v-model="openAdd" width="500px" append-to-body>
       <el-form ref="addRef" :model="addModel" :rules="rules" label-width="80px">
-        <el-form-item label="角色名称" prop="roleName">
-            <el-input v-model="addModel.roleName" placeholder="请输入角色名称" />
+        <el-form-item label="部门名称" prop="departName">
+            <el-input v-model="addModel.departName" placeholder="请输入部门名称" />
         </el-form-item>
-        <el-form-item label="角色备注" prop="remark">
-          <el-input v-model="addModel.remark" placeholder="请输入角色备注" />
+        <el-form-item label="备注" prop="remark">
+            <el-input v-model="addModel.remark" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -56,14 +55,14 @@
       </template>
     </el-dialog>
 
-    <!-- 编辑角色对话框 -->
-    <el-dialog title="编辑角色" v-model="openEdit" width="500px" append-to-body>
+    <!-- 编辑部门对话框 -->
+    <el-dialog title="编辑部门" v-model="openEdit" width="500px" append-to-body>
       <el-form ref="addRef" :model="addModel" :rules="rules" label-width="80px">
-        <el-form-item label="角色名称" prop="roleName">
-            <el-input v-model="addModel.roleName" placeholder="请输入角色名称" />
+        <el-form-item label="部门名称" prop="departName">
+            <el-input v-model="addModel.departName" placeholder="请输入角色名称" />
         </el-form-item>
-        <el-form-item label="角色备注" prop="remark">
-          <el-input v-model="addModel.remark" placeholder="请输入角色备注" />
+        <el-form-item label="备注" prop="remark">
+            <el-input v-model="addModel.remark" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -74,8 +73,7 @@
       </template>
     </el-dialog>
 
-    <!-- 分配菜单 -->
-     <AssignTree ref="assignTree"></AssignTree>
+
     </el-main>
 </template>
 
@@ -83,14 +81,10 @@
 import {reactive,ref} from 'vue'
 import type {FormInstance} from 'element-plus'
 import {ElMessage} from 'element-plus'
-import {addRole,getRoleList,deleteRole,editRole} from '../../../api/system/role/index'
-import type {Role} from '../../../api/system/role/RoleModel'
-import { nextTick } from 'vue'
+import {addDepartment,getDepartmentList,deleteDepartment,editDepartment} from '../../../api/system/department/index'
+import type {Department} from '../../../api/system/department/DepartmentModel'
 import useInstance from '../../../hooks/useInstance'
-import AssignTree from './AssignTree.vue'
-
-//菜单树ref
-const assignTree = ref()
+import { nextTick } from 'vue'
 
 //获取全局
 const {global} = useInstance()
@@ -103,30 +97,31 @@ const searchParm = reactive({
     id:'',
     currentPage:1,
     pageSize:10,
-    roleName:'',
+    departName:'',
+    remark:'',
     total:0
 })
 
 //新增表单对象
 const addModel = reactive({
     id:'',
-    roleName:'',
-    remark:''
+    departName:'',
+    remark:'',
 })
 
 //表单验证规则
 const rules = reactive({
-    roleName:[
+    departName:[
         {
             required: true,
-            message: '请输入角色名称',
+            message: '请输入部门名称',
             trigger: 'blur'
         }
     ],
     remark:[
         {
             required: true,
-            message: '请输入角色备注',
+            message: '请输入部门备注',
             trigger: 'blur'
         }
     ],
@@ -140,7 +135,7 @@ const tableHeight = ref(0)
 
 //查询列表
 async function getList (){
-    let res = await getRoleList(searchParm)
+    let res = await getDepartmentList(searchParm)
     if(res && res.code == 0){
         tableList.value = res.data.records
         // 分页信息
@@ -148,27 +143,22 @@ async function getList (){
     }
 }
 
-//查询角色
+//查询部门
 function searchBtn(){
     getList()
 }
 
 //重置搜索框
 function resetBtn(){
-    searchParm.roleName = ''
+    searchParm.departName = ''
     searchParm.currentPage = 1;
     getList()
 }
 
-//新增角色对话框
+//新增部门对话框
 const openAdd = ref(false)
-//编辑角色对话框
+//编辑部门对话框
 const openEdit = ref(false)
-
-//分配菜单按钮
-function assignBtn(row:Role){
-    assignTree.value.show(row.id,row.roleName)
-}
 
 // 取消按钮
 function cancel() {
@@ -176,17 +166,15 @@ function cancel() {
   openAdd.value = false;
   addRef.value?.resetFields()
 }
-//新增角色
+//新增部门
 function addBtn(){
     addRef.value?.resetFields()
     openAdd.value = true
-    
 }
 
-//编辑角色
-function editBtn(row:Role){
+//编辑部门
+function editBtn(row:Department){
     addRef.value?.resetFields()
-
     openEdit.value = true;
     
     nextTick(()=>{
@@ -194,11 +182,11 @@ function editBtn(row:Role){
     })
 }
 
-//删除角色
+//删除部门
 async function deleteBtn(id:string){
-   const confirm = await global.$myconfirm("是否确认删除该角色")
+   const confirm = await global.$myconfirm("是否删除该部门")
    if(confirm){
-       const res = await deleteRole(id)
+       const res = await deleteDepartment(id)
        if(res && res.code === 0){
            ElMessage.success(res.msg)
            getList()
@@ -225,7 +213,7 @@ function submitFormAdd() {
     addRef.value?.validate(async(valid) => {
         if (valid) {
             //提交请求
-            let res = await addRole(addModel)
+            let res = await addDepartment(addModel)
             if(res && res.code == 0){
                 ElMessage.success(res.msg)
                 getList()
@@ -233,7 +221,6 @@ function submitFormAdd() {
             }
         }
     });
-    
 }
 
 //编辑提交按钮
@@ -241,7 +228,7 @@ function submitFormEdit() {
     addRef.value?.validate(async(valid) => {
         if (valid) {
             //提交请求
-            let res = await editRole(addModel)
+            let res = await editDepartment(addModel)
             if(res && res.code == 0){
                 ElMessage.success(res.msg)
                 getList()
@@ -256,10 +243,8 @@ nextTick(() => {
     getList()
 })
 getList()
-
 </script>
 
 <style scoped>
-
 
 </style>

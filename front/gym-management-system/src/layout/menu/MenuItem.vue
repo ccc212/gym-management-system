@@ -6,7 +6,7 @@
         <template #title>
             <el-icon>
                 <!-- 图标 -->
-                <component :is="menu.icon"></component>
+                <component :is="menu.meta.icon"></component>
             </el-icon>
             <!-- 标题 -->
             <span>{{ menu.meta.title }}</span>
@@ -18,7 +18,7 @@
       <el-menu-item style="color: #f4f4f5" v-else :index="menu.path">
         <el-icon>
                 <!-- 图标 -->
-                <component :is="menu.icon"></component>
+                <component :is="menu.meta.icon"></component>
             </el-icon>
             <!-- 标题 -->
       <template #title>{{ menu.meta.title }}</template>

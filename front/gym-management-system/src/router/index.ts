@@ -1,14 +1,41 @@
 import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import Layout from '../layout/index.vue'
-import component from "element-plus/es/components/tree-select/src/tree-select-option.mjs"
 
-const routes: Array<RouteRecordRaw> = [
-    /* {
-        path: '/home',
-        name: 'Home',
-        component: Layout
-    } */
+//动态生成
+export const constantRoutes:Array<RouteRecordRaw>=[
+    {
+        path:"/login",
+        component: () => import('../views/login/login.vue'),
+        name: 'login',
+    },
+    {
+        path: '/',
+        component: Layout,
+        redirect: '/dashboard',
+        children: [
+           {
+              path: '/dashboard',
+              component: () => import('../views/dashboard/Index.vue'),
+              name: 'dashboard',
+              meta: {
+                 title: '首页',
+                 icon: 'HomeFilled',
+              }
+           }
+        ]
+     },
+    
+]
+
+
+//静态路由
+/* const routes: Array<RouteRecordRaw> = [
+   {
+        path: '/login',
+        component: () => import('../views/login/login.vue'),
+        name: 'login',
+   },
    {
       path: '/',
       component: Layout,
@@ -36,23 +63,33 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
         {
-            path: "/studentList",
-            component: () => import('../views/system/Student/StudentList.vue'),
-            name:"studentList",
+            path: "/departmentList",
+            component: () => import('../views/system/Department/DepartmentList.vue'),
+            name:"departmentList",
             meta:{
-                title:"学生管理",
+                title:"部门管理",
                 icon:"UserFilled",
-                roles:["sys:student"]
+                roles:["sys:department"]
             },
         },
         {
-            path: '/staffList',
-            component: () => import('../views/system/Staff/StaffList.vue'),
-            name:"staffList",
+            path: "/sectionList",
+            component: () => import('../views/system/Section/SectionList.vue'),
+            name:"sectionList",
             meta:{
-                title:"教职管理",
+                title:"班级管理",
                 icon:"UserFilled",
-                roles:["sys:staff"]
+                roles:["sys:section"]
+            },
+        },
+        {
+            path: "/userList",
+            component: () => import('../views/system/User/UserList.vue'),
+            name:"userList",
+            meta:{
+                title:"用户管理",
+                icon:"UserFilled",
+                roles:["sys:user"]
             },
         },
         {
@@ -76,12 +113,43 @@ const routes: Array<RouteRecordRaw> = [
             },
         },
     ]
-   }
-]
+   },
+   {
+    path: '/venues',
+    component: Layout,
+    name:"venues",
+    meta:{
+        title:"场地管理",
+        icon:"Setting",
+        roles:["sys:venues"]
+    },
+},
+{
+    path: '/euqipment',
+    component: Layout,
+    name:"euqipment",
+    meta:{
+        title:"器材管理",
+        icon:"Setting",
+        roles:["sys:euqipment"]
+    },
+},
+{
+    path: '/competition',
+    component: Layout,
+    name:"competition",
+    meta:{
+        title:"赛事管理",
+        icon:"Setting",
+        roles:["sys:competition"]
+    },
+},
+] */
 
 const router = createRouter({
     history: createWebHistory(),
-    routes
+    routes: constantRoutes
+    /* routes */
 })
 
 export default router

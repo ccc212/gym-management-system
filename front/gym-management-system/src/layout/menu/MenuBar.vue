@@ -14,21 +14,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref,reactive } from 'vue';
+/* import { reactive } from 'vue'; */
 import {computed} from 'vue'
 import MenuItem from './MenuItem.vue';
 import {useRoute} from 'vue-router'
 import MenuLogo from './MenuLogo.vue';
+import { menuStore }  from '../../store/menu/index';
+
+
+//获取store
+const store = menuStore()
+
+//获取状态
+const isCollapse = computed(() => {
+    return store.getCollapse
+})
+
+
+
 const route = useRoute()
-const isCollapse = ref(false)
 //当前激活的菜单
 const defaultActive = computed(() => {
     const {path} = route
     return path
 })
 
+const menuList = computed(() => {
+    return store.getMenu
+})
+
+
+
 //菜单数据
-let menuList = reactive([
+/* let menuList = reactive([
+    {
+        path: '/dashboard',
+        component: '/dashboard/Index',
+        name:"dashboard",
+        meta:{
+            title:"首页",
+            icon:"House",
+            roles:["sys:dashboard"]
+        },
+    },
     {
         path: '/system',
         component: 'layout',
@@ -40,23 +68,33 @@ let menuList = reactive([
         },
         children: [
         {
-            path: '/studentList',
-            component: '/system/Student/StudentList',
-            name:"studentList",
+            path: "/departmentList",
+            component: '/system/Department/DepartmentList',
+            name:"departmentList",
             meta:{
-                title:"学生管理",
+                title:"部门管理",
                 icon:"UserFilled",
-                roles:["sys:student"]
+                roles:["sys:department"]
             },
         },
         {
-            path: '/staffList',
-            component: '/system/Staff/StaffList',
-            name:"staffList",
+            path: "/sectionList",
+            component: '/system/Section/SectionList',
+            name:"sectionList",
             meta:{
-                title:"教职管理",
+                title:"班级管理",
                 icon:"UserFilled",
-                roles:["sys:staff"]
+                roles:["sys:section"]
+            },
+        },
+        {
+            path: '/userList',
+            component: '/system/User/UserList',
+            name:"userList",
+            meta:{
+                title:"用户管理",
+                icon:"UserFilled",
+                roles:["sys:user"]
             },
         },
         {
@@ -82,7 +120,37 @@ let menuList = reactive([
         
     ],
     },
-])
+    {
+        path: '/venues',
+        component: 'layout',
+        name:"venues",
+        meta:{
+            title:"场地管理",
+            icon:"Setting",
+            roles:["sys:venues"]
+        },
+    },
+    {
+        path: '/euqipment',
+        component: 'layout',
+        name:"euqipment",
+        meta:{
+            title:"器材管理",
+            icon:"Setting",
+            roles:["sys:euqipment"]
+        },
+    },
+    {
+        path: '/competition',
+        component: 'layout',
+        name:"competition",
+        meta:{
+            title:"赛事管理",
+            icon:"Setting",
+            roles:["sys:competition"]
+        },
+    },
+]) */
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }

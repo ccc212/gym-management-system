@@ -32,8 +32,7 @@ public class TeamController {
 
     @PostMapping("/add")
     public Result<?> addTeam(@RequestBody @Valid AddTeamDTO addTeamDTO) {
-        teamService.addTeam(addTeamDTO);
-        return Result.success(MessageConstant.ADD_SUCCESS);
+        return Result.success(teamService.addTeam(addTeamDTO));
     }
 
     @DeleteMapping("/delete/{id}")

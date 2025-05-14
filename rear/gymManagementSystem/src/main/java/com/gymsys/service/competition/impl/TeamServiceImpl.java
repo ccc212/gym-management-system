@@ -52,7 +52,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements IT
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addTeam(AddTeamDTO addTeamDTO) {
+    public Long addTeam(AddTeamDTO addTeamDTO) {
         // 检查团队名称是否已存在
         if (lambdaQuery().eq(Team::getTeamName, addTeamDTO.getTeamName()).exists()) {
             throw new BizException(StatusCodeEnum.TEAM_NAME_ALREADY_EXISTS);
@@ -66,6 +66,8 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements IT
         if (addTeamDTO.getMemberIds() != null && !addTeamDTO.getMemberIds().isEmpty()) {
             saveTeamMemberRelations(team.getId(), addTeamDTO.getMemberIds());
         }
+
+        return team.getId();
     }
 
     @Override

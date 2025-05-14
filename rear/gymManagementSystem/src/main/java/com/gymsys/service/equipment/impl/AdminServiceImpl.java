@@ -18,7 +18,7 @@ public class AdminServiceImpl implements AdminService {
             // 处理审核通过逻辑，例如更新器材状态为维修中
             Equipment equipment = equipmentService.getById(equipmentId);
             if (equipment != null) {
-                equipment.setStatus(3); // 假设 3 为维修中状态
+                equipment.setStatus(3); // 3 为维修中状态
                 if (equipmentService.updateById(equipment)) {
                     return Result.success("报修审核通过");
                 }

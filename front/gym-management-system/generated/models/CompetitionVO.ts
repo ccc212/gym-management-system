@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type Competition = {
+export type CompetitionVO = {
     category?: number;
     createTime?: string;
     description?: string;

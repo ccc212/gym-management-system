@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Competition } from './Competition';
-export type IPage_Competition_ = {
+import type { CompetitionVO } from './CompetitionVO';
+export type IPage_CompetitionVO_ = {
     current?: number;
     pages?: number;
-    records?: Array<Competition>;
+    records?: Array<CompetitionVO>;
     size?: number;
     total?: number;
 };

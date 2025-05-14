@@ -8,9 +8,11 @@
             c.name as competitionName,
             c.type as competitionType,
             c.start_time as startTime,
-            c.status as competitionStatus,
+            c.sign_up_deadline as signUpDeadline,
+            c.end_time as endTime,
             csuu.status as signUpStatus,
-            csuu.reject_reason as rejectReason
+            csuu.reject_reason as rejectReason,
+            csuu.id as id
         from competition_sign_up_user csuu
                  left join competition c on c.id = csuu.competition_id
         where csuu.user_id = #{userId}

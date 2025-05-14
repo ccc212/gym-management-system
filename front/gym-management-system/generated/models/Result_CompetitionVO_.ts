@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Competition } from './Competition';
-export type Result_Competition_ = {
+import type { CompetitionVO } from './CompetitionVO';
+export type Result_CompetitionVO_ = {
     code?: number;
-    data?: Competition;
+    data?: CompetitionVO;
     msg?: string;
 };
 

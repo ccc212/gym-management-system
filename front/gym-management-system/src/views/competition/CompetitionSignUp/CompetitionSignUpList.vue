@@ -16,16 +16,6 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="searchParm.status" placeholder="请选择状态" style="width: 150px" clearable>
-          <el-option
-              v-for="item in statusOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
         <el-button icon="Search" @click="searchBtn">搜索</el-button>
         <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
         <el-button type="primary" @click="showMySignUpRecords = true">我的报名</el-button>
@@ -125,7 +115,7 @@
         @cancel="cancelTeamSelect"
         @team-created="handleTeamCreated"
     />
-    
+
     <!-- 我的报名记录对话框 -->
     <my-sign-up-records
         v-model="showMySignUpRecords"
@@ -137,8 +127,13 @@
 <script setup lang="ts">
 import {computed, onMounted, reactive, ref} from 'vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
-import {CompetitionControllerService, CompetitionSignUpUserControllerService, CompetitionSignUpTeamControllerService, TeamControllerService, TeamMemberRelationControllerService} from '../../../../generated';
-import type { Competition } from '../../../../generated';
+import {
+  CompetitionControllerService,
+  CompetitionSignUpTeamControllerService,
+  CompetitionSignUpUserControllerService, CompetitionVO,
+  TeamControllerService,
+  TeamMemberRelationControllerService
+} from '../../../../generated';
 import CompetitionDetails from '../../../components/competition/CompetitionDetails.vue';
 import IndividualSignUp from '../../../components/competition/IndividualSignUp.vue';
 import TeamSignUp from '../../../components/competition/TeamSignUp.vue';
@@ -146,19 +141,8 @@ import TeamSelect from '../../../components/competition/TeamSelect.vue';
 import MySignUpRecords from '../../../components/competition/MySignUpRecords.vue';
 import moment from 'moment';
 import {userStore} from '@/store/user';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
 
 const store = userStore();
-
-// 状态选项
-const statusOptions = [
-  {value: 0, label: '未开始'},
-  {value: 1, label: '正在进行'},
-  {value: 2, label: '已结束'},
-  {value: 3, label: '报名已截止'}
-];
 
 // 类型选项
 const typeOptions = [
@@ -172,17 +156,16 @@ const searchParm = reactive({
   pageSize: 10,
   name: '',
   type: null,
-  status: null
 });
 
 // 数据列表
-const tableList = ref<Competition[]>([]);
+const tableList = ref<CompetitionVO[]>([]);
 const total = ref(0);
 
 // 对话框控制
 const showDetails = ref(false);
 const showSignUp = ref(false);
-const selectedCompetition = ref<Competition | null>(null);
+const selectedCompetition = ref<CompetitionVO | null>(null);
 const showMySignUpRecords = ref(false);
 
 // 报名状态
@@ -194,8 +177,8 @@ const teamSignUpRecords = ref<Map<number, number>>(new Map());
 
 // 团队选择相关
 const showTeamSelect = ref(false);
-const teamOptions = ref<{value: string | number, label: string}[]>([]);
-const selectedTeamId = ref<number>(undefined);
+const teamOptions = ref<{ value: string | number, label: string }[]>([]);
+const selectedTeamId = ref<number | undefined>(undefined);
 const selectedTeam = ref<any>(null);
 
 // 添加loading状态
@@ -205,24 +188,25 @@ const loading = ref(false);
 const loadData = async () => {
   try {
     loading.value = true;
-    
+
     // 同时发起获取比赛列表和报名状态的请求
     const competitionPromise = CompetitionControllerService.listCompetitionUsingGet(
+        undefined,
         undefined,
         undefined,
         undefined,
         searchParm.name,
         searchParm.page,
         searchParm.pageSize,
-        searchParm.status || undefined,
+        undefined,
         searchParm.type || undefined
     );
-    
+
     const statusPromise = loadSignUpStatus();
-    
+
     // 等待所有请求完成
     const [res] = await Promise.all([competitionPromise, statusPromise]);
-    
+
     if (res?.data) {
       tableList.value = res.data.records ?? [];
       total.value = res.data.total ?? 0;
@@ -242,10 +226,10 @@ const loadSignUpStatus = async () => {
     signUpStatus.value = [];
     signUpRecords.value.clear();
     teamSignUpRecords.value.clear();
-    
+
     // 同时发起两个请求，不用等待第一个完成再发起第二个
     const userId = store.getId;
-    
+
     // 发起个人报名查询
     const userPromise = CompetitionSignUpUserControllerService.listCompetitionSignUpUserUsingGet(
         undefined,
@@ -257,14 +241,14 @@ const loadSignUpStatus = async () => {
         undefined,
         userId
     );
-    
+
     // 获取用户的团队ID列表
     const userTeamsPromise = getUserTeams();
-    
+
     // 等待用户团队列表加载完成
     const userTeams = await userTeamsPromise;
     const userTeamIds = userTeams.map(team => team.id);
-    
+
     // 如果用户有团队，发起团队报名查询
     let teamPromise = Promise.resolve({data: {records: []}});
     if (userTeamIds.length > 0) {
@@ -276,10 +260,10 @@ const loadSignUpStatus = async () => {
           undefined
       );
     }
-    
+
     // 等待所有请求完成
     const [userRes, teamRes] = await Promise.all([userPromise, teamPromise]);
-    
+
     // 处理个人报名记录
     if (userRes.data?.records) {
       userRes.data.records.forEach((item: any) => {
@@ -287,7 +271,7 @@ const loadSignUpStatus = async () => {
         signUpRecords.value.set(item.competitionId, item.id);
       });
     }
-    
+
     // 处理团队报名记录
     if (teamRes.data?.records && userTeamIds.length > 0) {
       teamRes.data.records.forEach((teamSignUp: any) => {
@@ -298,7 +282,7 @@ const loadSignUpStatus = async () => {
         }
       });
     }
-    
+
     console.log('报名状态已更新:', signUpStatus.value);
   } catch (error) {
     console.error('获取报名状态失败:', error);
@@ -316,54 +300,54 @@ const cancelSignUp = (row: any) => {
   // 根据赛事类型判断是个人报名还是团队报名
   const isTeamCompetition = row.isTeamCompetition === 1;
   let signUpId;
-  
+
   if (isTeamCompetition) {
     signUpId = teamSignUpRecords.value.get(row.id);
   } else {
     signUpId = signUpRecords.value.get(row.id);
   }
-  
+
   if (!signUpId) {
     ElMessage.error('未找到报名记录');
     return;
   }
 
   ElMessageBox.confirm(
-    '确定要取消报名吗？取消后需要重新报名。',
-    '取消报名',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  )
-    .then(async () => {
-      try {
-        let res;
-        if (isTeamCompetition) {
-          res = await CompetitionSignUpTeamControllerService.deleteCompetitionSignUpTeamUsingDelete(Number(signUpId));
-        } else {
-          res = await CompetitionSignUpUserControllerService.deleteCompetitionSignUpUserUsingDelete(Number(signUpId));
-        }
-        
-        if (res.code === 0) {
-          ElMessage.success('取消报名成功');
-          // 刷新数据
-          signUpStatus.value = [];
-          signUpRecords.value.clear();
-          teamSignUpRecords.value.clear();
-          loadData();
-        } else {
-          ElMessage.error(res.msg || '取消报名失败');
-        }
-      } catch (error) {
-        console.error('取消报名失败:', error);
-        ElMessage.error('取消报名失败');
+      '确定要取消报名吗？取消后需要重新报名。',
+      '取消报名',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }
-    })
-    .catch(() => {
-      // 用户取消操作，不做任何处理
-    });
+  )
+      .then(async () => {
+        try {
+          let res;
+          if (isTeamCompetition) {
+            res = await CompetitionSignUpTeamControllerService.deleteCompetitionSignUpTeamUsingDelete(Number(signUpId));
+          } else {
+            res = await CompetitionSignUpUserControllerService.deleteCompetitionSignUpUserUsingDelete(Number(signUpId));
+          }
+
+          if (res.code === 0) {
+            ElMessage.success('取消报名成功');
+            // 刷新数据
+            signUpStatus.value = [];
+            signUpRecords.value.clear();
+            teamSignUpRecords.value.clear();
+            loadData();
+          } else {
+            ElMessage.error(res.msg || '取消报名失败');
+          }
+        } catch (error) {
+          console.error('取消报名失败:', error);
+          ElMessage.error('取消报名失败');
+        }
+      })
+      .catch(() => {
+        // 用户取消操作，不做任何处理
+      });
 };
 
 // 查看详情
@@ -375,13 +359,13 @@ const viewDetails = (row: any) => {
 // 报名
 const signUp = async (row: any) => {
   selectedCompetition.value = row;
-  
+
   // 如果是团队赛事，先检查用户是否在团队中
   if (row.isTeamCompetition === 1) {
     try {
       // 查询用户参与的团队
       const userTeams = await getUserTeams();
-      
+
       if (userTeams.length === 0) {
         // 用户没有团队，打开团队选择对话框，显示创建团队选项
         teamOptions.value = [];
@@ -413,36 +397,36 @@ const getUserTeams = async () => {
   try {
     // 获取用户创建的团队（作为队长）
     const leadTeamsRes = await TeamControllerService.listTeamUsingGet(
-      undefined, // departId
-      store.getName, // leaderName - 查找用户是队长的团队
-      1, // page
-      100, // pageSize
-      undefined // teamName
+        undefined, // departId
+        store.getName, // leaderName - 查找用户是队长的团队
+        1, // page
+        100, // pageSize
+        undefined // teamName
     );
-    
+
     let userTeams = [];
     if (leadTeamsRes && leadTeamsRes.code === 0 && leadTeamsRes.data) {
       // 过滤出用户是队长的团队
-      userTeams = leadTeamsRes.data.records.filter((team: any) => 
-        team.leaderName === store.getName
+      userTeams = leadTeamsRes.data.records.filter((team: any) =>
+          team.leaderName === store.getName
       );
     }
-    
+
     // 获取用户加入的团队（作为成员）
     try {
       const userId = store.getId;
       const memberTeamsRes = await TeamMemberRelationControllerService.listTeamUsingGet1(
-        1, // page
-        100, // pageSize
-        undefined, // teamId 
-        undefined, // teamName
-        userId // userId
+          1, // page
+          100, // pageSize
+          undefined, // teamId
+          undefined, // teamName
+          userId // userId
       );
-      
+
       if (memberTeamsRes && memberTeamsRes.code === 0 && memberTeamsRes.data) {
         // 获取已通过的团队申请
         const approvedRelations = memberTeamsRes.data.records.filter((relation: any) => relation.status === 1);
-        
+
         // 为每个团队关系获取团队详情
         for (const relation of approvedRelations) {
           // 检查是否已经在队长的团队列表中
@@ -459,7 +443,7 @@ const getUserTeams = async () => {
     } catch (memberError) {
       console.error('获取用户加入的团队失败:', memberError);
     }
-    
+
     return userTeams;
   } catch (error) {
     console.error('获取用户团队列表失败:', error);
@@ -474,10 +458,10 @@ const confirmTeamSelect = async (teamId: number) => {
     ElMessage.warning('请选择一个团队');
     return;
   }
-  
+
   selectedTeamId.value = teamId;
   console.log('收到团队选择确认，ID:', teamId);
-  
+
   try {
     // 获取选择的团队详情，包括团队成员信息
     const res = await TeamControllerService.getTeamDetailUsingGet(teamId);
@@ -504,16 +488,16 @@ const cancelTeamSelect = () => {
 // 报名成功处理
 const handleSignUpSuccess = (result: any) => {
   showSignUp.value = false;  // 关闭报名对话框
-  
+
   // 如果是团队报名，直接更新状态
   if (selectedCompetition.value && selectedCompetition.value.isTeamCompetition === 1) {
     // 正在处理的比赛ID
     const competitionId = selectedCompetition.value.id;
-    
+
     // 更新报名状态
     if (!signUpStatus.value.includes(competitionId)) {
       signUpStatus.value.push(competitionId);
-      
+
       // 如果结果对象中包含ID信息，使用它，否则使用0
       if (result && result.competitionId) {
         teamSignUpRecords.value.set(competitionId, result.id || 0);
@@ -523,10 +507,10 @@ const handleSignUpSuccess = (result: any) => {
       }
     }
   }
-  
+
   // 重置选中的团队
   selectedTeam.value = null;
-  
+
   // 刷新数据
   loadData();
 };
@@ -541,7 +525,6 @@ const searchBtn = () => {
 const resetBtn = () => {
   searchParm.name = '';
   searchParm.type = null;
-  searchParm.status = null;
   searchParm.page = 1;
   loadData();
 };

@@ -10,12 +10,16 @@ import com.gymsys.entity.competition.dto.competition.AddCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
 import com.gymsys.entity.competition.vo.CompetitionDetailVO;
+import com.gymsys.entity.competition.vo.CompetitionVO;
+import com.gymsys.enums.CompetitionStatusEnum;
 import com.gymsys.service.competition.ICompetitionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -51,13 +55,25 @@ public class CompetitionController {
     }
 
     @GetMapping("/list")
-    public Result<IPage<Competition>> listCompetition(@Valid ListCompetitionDTO listCompetitionDTO) {
+    public Result<IPage<CompetitionVO>> listCompetition(@Valid ListCompetitionDTO listCompetitionDTO) {
         return Result.success(competitionService.listCompetition(listCompetitionDTO));
     }
 
     @GetMapping("/get/{id}")
-    public Result<Competition> getCompetition(@PathVariable Long id) {
-        return Result.success(competitionService.getById(id));
+    public Result<CompetitionVO> getCompetition(@PathVariable Long id) {
+        Competition competition = competitionService.getById(id);
+        CompetitionVO vo = new CompetitionVO();
+        BeanUtils.copyProperties(competition, vo);
+        
+        // 动态计算状态
+        Integer status = CompetitionStatusEnum.getStatusByTime(
+            competition.getSignUpDeadline(),
+            competition.getStartTime(),
+            competition.getEndTime()
+        );
+        vo.setStatus(status);
+        
+        return Result.success(vo);
     }
 
     @GetMapping("/getDetail/{id}")

@@ -8,6 +8,11 @@ import java.time.LocalDateTime;
 public class CompetitionSignUpUserVO {
 
     /**
+     * ID
+     */
+    private Long id;
+
+    /**
      * 赛事名称
      */
     private String competitionName;
@@ -23,9 +28,19 @@ public class CompetitionSignUpUserVO {
     private LocalDateTime startTime;
 
     /**
+     * 报名截止时间
+     */
+    private LocalDateTime signUpDeadline;
+
+    /**
+     * 赛事结束时间
+     */
+    private LocalDateTime endTime;
+
+    /**
      * 赛事状态
      */
-    private String competitionStatus;
+    private Integer competitionStatus;
 
     /**
      * 报名状态

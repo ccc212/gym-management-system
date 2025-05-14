@@ -63,6 +63,12 @@ public class CompetitionDetailVO implements Serializable {
     private Integer isTeamCompetition;
 
     /**
+     * 赛事状态(0为未开始，1为正在进行，2为已结束，3为报名已截止)
+     * 由CompetitionStatusEnum.getStatusByTime方法动态计算
+     */
+    private Integer status;
+
+    /**
      * 场地
      */
     private List<CompetitionVenueRelation> venueRelations;

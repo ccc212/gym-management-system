@@ -82,11 +82,6 @@ public class Competition implements Serializable {
     private Integer maxSignUpNum;
 
     /**
-     * 赛事状态(0为未开始，1为正在进行，2为已结束，3为报名已截止)
-     */
-    private Integer status;
-
-    /**
      * 是否为团体赛事
      */
     @NotNull(message = "是否为团体赛事不能为空")

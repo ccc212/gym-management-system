@@ -17,7 +17,6 @@ create table `competition`
     sign_up_deadline    datetime     default current_timestamp comment '报名截止时间',
     sign_up_num         int          default 0  not null comment '已报人数',
     max_sign_up_num     int          default 0  not null comment '最大报名人数',
-    status              tinyint      default 0  not null comment '赛事状态(0为未开始，1为正在进行，2为已结束，3为报名已截止)',
     is_team_competition tinyint      default 0  not null comment '是否为团体赛事',
     team_max_num        int          default 0  not null comment '每队人数上限',
     team_min_num        int          default 0  not null comment '每队人数下限',

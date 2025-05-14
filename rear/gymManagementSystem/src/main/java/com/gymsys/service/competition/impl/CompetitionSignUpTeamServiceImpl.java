@@ -10,6 +10,7 @@ import com.gymsys.entity.competition.dto.competitionSignUpTeam.AddCompetitionSig
 import com.gymsys.entity.competition.dto.competitionSignUpTeam.ListCompetitionSignUpTeamDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpTeam.UpdateCompetitionSignUpTeamDTO;
 import com.gymsys.entity.competition.vo.CompetitionSignUpTeamVO;
+import com.gymsys.enums.CompetitionStatusEnum;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
 import com.gymsys.mapper.competition.CompetitionSignUpTeamMapper;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -74,6 +76,17 @@ public class CompetitionSignUpTeamServiceImpl extends ServiceImpl<CompetitionSig
 
     @Override
     public List<CompetitionSignUpTeamVO> getCompetitionSignUpTeam(Long userId) {
-        return competitionSignUpTeamMapper.getCompetitionSignUpTeam(userId);
+        List<CompetitionSignUpTeamVO> teamVOList = competitionSignUpTeamMapper.getCompetitionSignUpTeam(userId);
+        
+        // 动态计算每个团队报名的比赛状态
+        for (CompetitionSignUpTeamVO vo : teamVOList) {
+            vo.setCompetitionStatus(CompetitionStatusEnum.getStatusByTime(
+                    vo.getSignUpDeadline(),
+                    vo.getStartTime(),
+                    vo.getEndTime()
+            ));
+        }
+        
+        return teamVOList;
     }
 }

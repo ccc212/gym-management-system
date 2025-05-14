@@ -16,6 +16,7 @@ export type CompetitionDetailVO = {
     requirement?: string;
     signUpDeadline?: string;
     startTime?: string;
+    status?: number;
     type?: number;
     venueRelations?: Array<CompetitionVenueRelation>;
 };

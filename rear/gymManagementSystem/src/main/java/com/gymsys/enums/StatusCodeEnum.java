@@ -54,6 +54,7 @@ public enum StatusCodeEnum {
     COMPETITION_SIGN_UP_ALREADY_EXISTS(-10420, "赛事报名已存在"),
     COMPETITION_SIGN_UP_STATUS_ERROR(-10421, "赛事报名状态异常"),
     COMPETITION_SIGN_UP_DEADLINE_AFTER_START_TIME(-10422, "赛事报名截止时间不能在赛事开始时间之后"),
+    COMPETITION_END_TIME_BEFORE_START_TIME(-10423, "赛事结束时间不能在赛事开始时间之前"),
 
     // 器材管理相关
     EQUIPMENT_NOT_EXIST(-10501, "器材不存在");

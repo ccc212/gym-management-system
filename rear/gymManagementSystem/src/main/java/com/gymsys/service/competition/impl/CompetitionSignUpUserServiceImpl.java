@@ -11,6 +11,7 @@ import com.gymsys.entity.competition.dto.competitionSignUpUser.AddCompetitionSig
 import com.gymsys.entity.competition.dto.competitionSignUpUser.ListCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.UpdateCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.vo.CompetitionSignUpUserVO;
+import com.gymsys.enums.CompetitionStatusEnum;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
 import com.gymsys.mapper.competition.CompetitionMapper;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -48,7 +50,8 @@ public class CompetitionSignUpUserServiceImpl extends ServiceImpl<CompetitionSig
         }
 
         // 检查赛事是否已截止报名
-        if (competition.getStatus() == 3) {
+        if (Objects.equals(CompetitionStatusEnum.getStatusByTime(competition.getSignUpDeadline(), competition.getStartTime(), competition.getEndTime()),
+                CompetitionStatusEnum.SIGN_UP_DEADLINE.getCode())) {
             throw new BizException(StatusCodeEnum.COMPETITION_SIGN_UP_DEADLINE);
         }
 
@@ -185,6 +188,18 @@ public class CompetitionSignUpUserServiceImpl extends ServiceImpl<CompetitionSig
 
     @Override
     public List<CompetitionSignUpUserVO> getCompetitionSignUpUser(Long userId) {
-        return competitionSignUpUserMapper.getCompetitionSignUpUser(userId);
+        List<CompetitionSignUpUserVO> userVOList = competitionSignUpUserMapper.getCompetitionSignUpUser(userId);
+        
+        // 动态计算每个个人报名的比赛状态
+        for (CompetitionSignUpUserVO vo : userVOList) {
+            Integer status = CompetitionStatusEnum.getStatusByTime(
+                vo.getSignUpDeadline(),
+                vo.getStartTime(),
+                vo.getEndTime()
+            );
+            vo.setCompetitionStatus(status);
+        }
+        
+        return userVOList;
     }
 }

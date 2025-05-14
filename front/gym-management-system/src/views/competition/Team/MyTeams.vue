@@ -32,6 +32,20 @@
                 @click="showAddMember(team)">
               添加成员
             </el-button>
+            <el-button
+                v-if="isTeamLeader(team)"
+                type="danger"
+                size="small"
+                @click="disbandTeam(team)">
+              解散团队
+            </el-button>
+            <el-button
+                v-if="!isTeamLeader(team)"
+                type="danger"
+                size="small"
+                @click="quitTeam(team)">
+              退出团队
+            </el-button>
           </div>
         </div>
       </template>
@@ -827,6 +841,72 @@ const loadJoinRequests = async () => {
     console.error('获取申请状态失败:', error);
     ElMessage.error('获取申请状态失败，请稍后再试');
   }
+};
+
+// 解散团队
+const disbandTeam = async (team: any) => {
+  ElMessageBox.confirm(
+      `确定要解散团队"${team.teamName}"吗？`,
+      '解散团队',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+  ).then(async () => {
+    try {
+      const res = await TeamControllerService.deleteTeamUsingDelete(Number(team.id));
+
+      if (res && res.code === 0) {
+        ElMessage.success('团队解散成功');
+
+        // 重新加载团队列表
+        await loadUserTeams();
+      } else {
+        ElMessage.error(res?.msg || '解散团队失败');
+      }
+    } catch (error) {
+      console.error('解散团队失败:', error);
+      ElMessage.error('解散团队失败，请稍后再试');
+    }
+  }).catch(() => {
+    // 用户取消操作
+  });
+};
+
+// 退出团队
+const quitTeam = async (team: any) => {
+  ElMessageBox.confirm(
+      `确定要退出团队"${team.teamName}"吗？`,
+      '退出团队',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+  ).then(async () => {
+    try {
+      const userId = store.getId;
+      const res = await TeamControllerService.removeTeamMemberUsingPost(
+          Number(team.id),
+          Number(userId)
+      );
+
+      if (res && res.code === 0) {
+        ElMessage.success('退出团队成功');
+
+        // 重新加载团队列表
+        await loadUserTeams();
+      } else {
+        ElMessage.error(res?.msg || '退出团队失败');
+      }
+    } catch (error) {
+      console.error('退出团队失败:', error);
+      ElMessage.error('退出团队失败，请稍后再试');
+    }
+  }).catch(() => {
+    // 用户取消操作
+  });
 };
 
 // 初始化

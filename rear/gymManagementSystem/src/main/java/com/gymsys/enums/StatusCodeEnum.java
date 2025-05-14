@@ -40,7 +40,7 @@ public enum StatusCodeEnum {
     TEAM_NOT_EXIST(-10406, "团队不存在"),
     TEAM_MEMBER_RELATION_NOT_EXIST(-10407, "团队成员关联不存在"),
     TEAM_MEMBER_RELATION_EXISTS(-10408, "已加入该团队"),
-    TEAM_IS_USED(-10409, "团队已存在"),
+    TEAM_IS_USED(-10409, "团队存在报名的赛事"),
     TEAM_NAME_ALREADY_EXISTS(-10410, "团队名称已存在"),
     TEAM_MEMBER_ALREADY_EXISTS(-10411, "团队成员已存在"),
     TEAM_MEMBER_NOT_EXIST(-10412, "团队成员不存在"),

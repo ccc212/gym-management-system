@@ -51,6 +51,11 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
             throw new BizException(StatusCodeEnum.COMPETITION_NAME_ALREADY_EXISTS);
         }
 
+        // 检查截止时间是否在比赛时间之前
+        if (addCompetitionDTO.getSignUpDeadline().isAfter(addCompetitionDTO.getStartTime())) {
+            throw new BizException(StatusCodeEnum.COMPETITION_SIGN_UP_DEADLINE_AFTER_START_TIME);
+        }
+
         // 保存赛事
         Competition competition = BeanUtil.copyProperties(addCompetitionDTO, Competition.class);
         // 设置初始化状态: 未开始
@@ -90,6 +95,14 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
         // 检查赛事是否存在
         if (!lambdaQuery().eq(Competition::getId, updateCompetitionDTO.getId()).exists()) {
             throw new BizException(StatusCodeEnum.COMPETITION_NOT_EXIST);
+        }
+
+        // 检查截止时间是否在比赛时间之前
+        if (updateCompetitionDTO.getSignUpDeadline() != null
+                && updateCompetitionDTO.getStartTime() != null
+                && updateCompetitionDTO.getEndTime() != null
+                && updateCompetitionDTO.getSignUpDeadline().isAfter(updateCompetitionDTO.getStartTime())) {
+            throw new BizException(StatusCodeEnum.COMPETITION_SIGN_UP_DEADLINE_AFTER_START_TIME);
         }
 
         // 检查赛事名称是否已存在(不包括自己)

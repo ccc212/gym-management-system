@@ -1,6 +1,8 @@
 package com.gymsys.service.competition.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,6 +16,7 @@ import com.gymsys.entity.competition.dto.team.UpdateTeamDTO;
 import com.gymsys.entity.competition.vo.TeamDetailVO;
 import com.gymsys.entity.system.User;
 import com.gymsys.enums.StatusCodeEnum;
+import com.gymsys.enums.TeamMemberStatusEnum;
 import com.gymsys.exception.BizException;
 import com.gymsys.mapper.competition.CompetitionSignUpTeamMapper;
 import com.gymsys.mapper.competition.TeamMapper;
@@ -149,20 +152,19 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements IT
             throw new BizException(StatusCodeEnum.TEAM_NOT_EXIST);
         }
         
-        // 获取团队成员关系
+        // 获取团队成员信息
         LambdaQueryWrapper<TeamMemberRelation> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(TeamMemberRelation::getTeamId, id);
+        queryWrapper.eq(TeamMemberRelation::getTeamId, id)
+                    .eq(TeamMemberRelation::getStatus, 1); // 只获取已通过的成员
+                
         List<TeamMemberRelation> relations = teamMemberRelationMapper.selectList(queryWrapper);
-        
-        // 获取所有成员信息
+        List<Long> memberIds = relations.stream()
+                .map(TeamMemberRelation::getUserId)
+                .collect(Collectors.toList());
+
         List<User> members = new ArrayList<>();
-        if (!relations.isEmpty()) {
-            List<Long> userIds = relations.stream()
-                                         .map(TeamMemberRelation::getUserId)
-                                         .collect(Collectors.toList());
-            LambdaQueryWrapper<User> userQueryWrapper = new LambdaQueryWrapper<>();
-            userQueryWrapper.in(User::getId, userIds);
-            members = userMapper.selectList(userQueryWrapper);
+        if (CollUtil.isNotEmpty(memberIds)) {
+            members = userMapper.selectBatchIds(memberIds);
         }
         
         // 组装返回结果
@@ -180,48 +182,64 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements IT
 
     @Override
     public void addTeamMember(Long teamId, Long userId) {
-        // 检查团队是否存在
-        if (!lambdaQuery().eq(Team::getId, teamId).exists()) {
+        // 判断团队是否存在
+        Team team = getById(teamId);
+        if (team == null) {
             throw new BizException(StatusCodeEnum.TEAM_NOT_EXIST);
         }
-        
-        // 检查用户是否存在
-        User user = userMapper.selectById(userId);
-        if (user == null) {
+
+        // 判断用户是否存在
+        if (ObjectUtil.isNull(userMapper.selectById(userId))) {
             throw new BizException(StatusCodeEnum.USER_NOT_FOUND);
         }
-        
-        // 检查成员是否已在团队中
+
+        // 判断用户是否已经在团队中
         LambdaQueryWrapper<TeamMemberRelation> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(TeamMemberRelation::getTeamId, teamId)
-                   .eq(TeamMemberRelation::getUserId, userId);
-        if (teamMemberRelationMapper.exists(queryWrapper)) {
-            throw new BizException(StatusCodeEnum.TEAM_MEMBER_ALREADY_EXISTS);
-        }
+                .eq(TeamMemberRelation::getUserId, userId);
         
-        // 添加成员关系
-        TeamMemberRelation relation = new TeamMemberRelation();
-        relation.setTeamId(teamId);
-        relation.setUserId(userId);
-        teamMemberRelationMapper.insert(relation);
+        TeamMemberRelation existingRelation = teamMemberRelationMapper.selectOne(queryWrapper);
+        
+        if (existingRelation != null) {
+            // 如果已存在关联，更新状态为已通过
+            existingRelation.setStatus(1); // 已通过
+            teamMemberRelationMapper.updateById(existingRelation);
+        } else {
+            // 如果不存在关联，创建新关联
+            TeamMemberRelation relation = new TeamMemberRelation();
+            relation.setTeamId(teamId);
+            relation.setUserId(userId);
+            relation.setStatus(1); // 已通过状态
+            teamMemberRelationMapper.insert(relation);
+        }
     }
 
     @Override
     public void removeTeamMember(Long teamId, Long userId) {
-        // 检查团队是否存在
-        if (!lambdaQuery().eq(Team::getId, teamId).exists()) {
+        // 判断团队是否存在
+        Team team = getById(teamId);
+        if (team == null) {
             throw new BizException(StatusCodeEnum.TEAM_NOT_EXIST);
         }
-        
-        // 检查成员关系是否存在
+
+        // 获取用户名
+        String userName = userMapper.selectById(userId).getName();
+
+        // 判断队长不能移除自己
+        if (team.getLeaderName().equals(userName)) {
+            throw new BizException(StatusCodeEnum.TEAM_LEADER_CANNOT_REMOVE_SELF);
+        }
+
+        // 判断团队成员是否存在
         LambdaQueryWrapper<TeamMemberRelation> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(TeamMemberRelation::getTeamId, teamId)
-                   .eq(TeamMemberRelation::getUserId, userId);
+                .eq(TeamMemberRelation::getUserId, userId)
+                .eq(TeamMemberRelation::getStatus, 1); // 只能移除已通过的成员
+        
         if (!teamMemberRelationMapper.exists(queryWrapper)) {
             throw new BizException(StatusCodeEnum.TEAM_MEMBER_NOT_EXIST);
         }
-        
-        // 删除成员关系
+
         teamMemberRelationMapper.delete(queryWrapper);
     }
     
@@ -237,6 +255,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements IT
             TeamMemberRelation relation = new TeamMemberRelation();
             relation.setTeamId(teamId);
             relation.setUserId(userId);
+            relation.setStatus(TeamMemberStatusEnum.APPROVED.getCode());
             relations.add(relation);
         }
         for (TeamMemberRelation relation : relations) {

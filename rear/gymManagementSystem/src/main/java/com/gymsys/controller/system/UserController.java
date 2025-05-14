@@ -174,6 +174,7 @@ public class UserController {
         LoginVo vo = new LoginVo();
         vo.setId(one.getId());
         vo.setUserNumber(one.getUserNumber());
+        vo.setName(one.getName());
         //生成token
         Map<String,String> map = new HashMap<>();
         map.put("id",Integer.toString(one.getId()));

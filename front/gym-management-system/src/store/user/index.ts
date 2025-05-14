@@ -4,12 +4,14 @@ export const userStore = defineStore('userStore', {
   state: () => ({
     id: '',
     userNumber: '',
+    name: '',
     token: '',
     codeList:[]
   }),
   getters: {
     getId: (state) => state.id,
     getUserNumber: (state) => state.userNumber,
+    getName: (state) => state.name,
     getToken: (state) => state.token,
     getCodeList: (state) => state.codeList,
   },
@@ -19,6 +21,9 @@ export const userStore = defineStore('userStore', {
     },
     setUserNumber(userNumber: string) {
       this.userNumber = userNumber
+    },
+    setName(name: string) {
+      this.name = name
     },
     setToken(token: string) {
       this.token = token

@@ -20,7 +20,7 @@ export class EquipBasicsControllerService {
     ): CancelablePromise<Result | any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/system/equipment',
+            url: '/api/equip/equipment',
             body: equipment,
             errors: {
                 401: `Unauthorized`,
@@ -41,7 +41,7 @@ export class EquipBasicsControllerService {
     ): CancelablePromise<Result | any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/api/system/equipment',
+            url: '/api/equip/equipment',
             body: equipment,
             errors: {
                 401: `Unauthorized`,
@@ -67,7 +67,7 @@ export class EquipBasicsControllerService {
     ): CancelablePromise<Result> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/system/equipment/getList',
+            url: '/api/equip/equipment/getList',
             query: {
                 'currentPage': currentPage,
                 'equipmentName': equipmentName,
@@ -89,7 +89,7 @@ export class EquipBasicsControllerService {
     public static selectListUsingGet1(): CancelablePromise<Result> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/system/equipment/selectList',
+            url: '/api/equip/equipment/selectList',
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
@@ -108,7 +108,7 @@ export class EquipBasicsControllerService {
     ): CancelablePromise<Result> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/api/system/equipment/{id}',
+            url: '/api/equip/equipment/{id}',
             path: {
                 'id': id,
             },

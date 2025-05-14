@@ -20,4 +20,9 @@ public class AddTeamMemberRelationDTO extends BaseDTO {
      */
     @NotNull(message = "用户id不能为空")
     private Long userId;
+    
+    /**
+     * 状态：0-待审核，1-已通过，2-已拒绝
+     */
+    private Integer status = 0;
 }

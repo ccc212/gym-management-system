@@ -1,6 +1,7 @@
 <template>
     <div class="logo">
-      <img :src="MenuLogo" style="width: 70px; height: 60px;" />
+<!--      <img :src="MenuLogo" style="width: 70px; height: 60px;" />-->
+      <img src="/favicon.ico" style="margin: 10px" />
       <span v-if="show" class="logo-title">{{ title }}</span>
     </div>
   </template>

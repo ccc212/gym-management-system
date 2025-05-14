@@ -5,9 +5,12 @@
 export type AnnouncementEntity = {
     active?: boolean;
     content?: string;
+    createdAt?: string;
     expireTime?: string;
     id?: number;
     publishTime?: string;
+    status?: string;
     title?: string;
+    updatedAt?: string;
 };
 

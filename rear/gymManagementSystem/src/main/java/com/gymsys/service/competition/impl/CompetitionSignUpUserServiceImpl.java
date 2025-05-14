@@ -10,6 +10,7 @@ import com.gymsys.entity.competition.CompetitionSignUpUser;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.AddCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.ListCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.UpdateCompetitionSignUpUserDTO;
+import com.gymsys.entity.competition.vo.CompetitionSignUpUserVO;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
 import com.gymsys.mapper.competition.CompetitionMapper;
@@ -19,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * <p>
@@ -33,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CompetitionSignUpUserServiceImpl extends ServiceImpl<CompetitionSignUpUserMapper, CompetitionSignUpUser> implements ICompetitionSignUpUserService {
 
     private final CompetitionMapper competitionMapper;
+    private final CompetitionSignUpUserMapper competitionSignUpUserMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -177,5 +181,10 @@ public class CompetitionSignUpUserServiceImpl extends ServiceImpl<CompetitionSig
             competition.setSignUpNum(competition.getSignUpNum() - 1);
             competitionMapper.updateById(competition);
         }
+    }
+
+    @Override
+    public List<CompetitionSignUpUserVO> getCompetitionSignUpUser(Long userId) {
+        return competitionSignUpUserMapper.getCompetitionSignUpUser(userId);
     }
 }

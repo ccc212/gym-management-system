@@ -28,6 +28,7 @@
       <el-form-item>
         <el-button icon="Search" @click="searchBtn">搜索</el-button>
         <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
+        <el-button type="primary" @click="showMySignUpRecords = true">我的报名</el-button>
       </el-form-item>
     </el-form>
 
@@ -124,6 +125,12 @@
         @cancel="cancelTeamSelect"
         @team-created="handleTeamCreated"
     />
+    
+    <!-- 我的报名记录对话框 -->
+    <my-sign-up-records
+        v-model="showMySignUpRecords"
+        @refresh="loadSignUpStatus"
+    />
   </el-main>
 </template>
 
@@ -136,6 +143,7 @@ import CompetitionDetails from '../../../components/competition/CompetitionDetai
 import IndividualSignUp from '../../../components/competition/IndividualSignUp.vue';
 import TeamSignUp from '../../../components/competition/TeamSignUp.vue';
 import TeamSelect from '../../../components/competition/TeamSelect.vue';
+import MySignUpRecords from '../../../components/competition/MySignUpRecords.vue';
 import moment from 'moment';
 import {userStore} from '@/store/user';
 import { useRouter } from 'vue-router';
@@ -175,6 +183,7 @@ const total = ref(0);
 const showDetails = ref(false);
 const showSignUp = ref(false);
 const selectedCompetition = ref<Competition | null>(null);
+const showMySignUpRecords = ref(false);
 
 // 报名状态
 const signUpStatus = ref<number[]>([]);
@@ -489,7 +498,7 @@ const confirmTeamSelect = async (teamId: number) => {
 // 取消团队选择
 const cancelTeamSelect = () => {
   showTeamSelect.value = false;
-  selectedTeamId.value = '';
+  selectedTeamId.value = undefined;
 };
 
 // 报名成功处理

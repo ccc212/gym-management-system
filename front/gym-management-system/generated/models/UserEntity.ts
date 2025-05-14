@@ -2,16 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UsageEntity = {
-    cardNumber?: string;
-    cost?: number;
+export type UserEntity = {
     createdAt?: string;
-    endTime?: string;
     id?: number;
-    paid?: boolean;
-    startTime?: string;
+    password?: string;
+    role?: string;
     updatedAt?: string;
-    userId?: number;
-    venueId?: number;
+    username?: string;
 };
 

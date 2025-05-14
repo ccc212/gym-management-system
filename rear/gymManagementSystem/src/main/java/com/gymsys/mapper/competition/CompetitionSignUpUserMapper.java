@@ -2,6 +2,9 @@ package com.gymsys.mapper.competition;
 
 import com.gymsys.entity.competition.CompetitionSignUpUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gymsys.entity.competition.vo.CompetitionSignUpUserVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface CompetitionSignUpUserMapper extends BaseMapper<CompetitionSignUpUser> {
 
+    List<CompetitionSignUpUserVO> getCompetitionSignUpUser(Long userId);
 }

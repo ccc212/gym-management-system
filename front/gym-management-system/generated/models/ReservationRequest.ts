@@ -2,16 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UsageEntity = {
+export type ReservationRequest = {
     cardNumber?: string;
-    cost?: number;
-    createdAt?: string;
     endTime?: string;
-    id?: number;
-    paid?: boolean;
+    numberOfPeople?: number;
+    remarks?: string;
     startTime?: string;
-    updatedAt?: string;
     userId?: number;
-    venueId?: number;
 };
 

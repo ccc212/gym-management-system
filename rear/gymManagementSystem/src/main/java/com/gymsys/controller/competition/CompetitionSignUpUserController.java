@@ -7,11 +7,13 @@ import com.gymsys.entity.competition.CompetitionSignUpUser;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.AddCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.ListCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.UpdateCompetitionSignUpUserDTO;
+import com.gymsys.entity.competition.vo.CompetitionSignUpUserVO;
 import com.gymsys.service.competition.ICompetitionSignUpUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <p>
@@ -51,9 +53,9 @@ public class CompetitionSignUpUserController {
         return Result.success(competitionSignUpUserService.listCompetitionSignUpUser(listCompetitionSignUpUserDTO));
     }
 
-    @GetMapping("/get/{id}")
-    public Result<CompetitionSignUpUser> getCompetitionSignUpUser(@PathVariable Long id) {
-        return Result.success(competitionSignUpUserService.getById(id));
+    @GetMapping("/getByUserId/{userId}")
+    public Result<List<CompetitionSignUpUserVO>> getCompetitionSignUpUser(@PathVariable Long userId) {
+        return Result.success(competitionSignUpUserService.getCompetitionSignUpUser(userId));
     }
     
     @PostMapping("/approve/{id}")

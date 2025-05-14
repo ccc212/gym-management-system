@@ -2,70 +2,50 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Page_UsageEntity_ } from '../models/Page_UsageEntity_';
 import type { UsageEntity } from '../models/UsageEntity';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class UsageControllerService {
     /**
-     * getActiveUsages
-     * @returns UsageEntity OK
-     * @throws ApiError
-     */
-    public static getActiveUsagesUsingGet(): CancelablePromise<Array<UsageEntity>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/usages/active',
-            errors: {
-                401: `Unauthorized`,
-                403: `Forbidden`,
-                404: `Not Found`,
-            },
-        });
-    }
-    /**
-     * getVenuePrice
-     * @param venueId venueId
-     * @returns number OK
-     * @throws ApiError
-     */
-    public static getVenuePriceUsingGet(
-        venueId: number,
-    ): CancelablePromise<Record<string, number>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/usages/price/{venueId}',
-            path: {
-                'venueId': venueId,
-            },
-            errors: {
-                401: `Unauthorized`,
-                403: `Forbidden`,
-                404: `Not Found`,
-            },
-        });
-    }
-    /**
-     * startVenueUsage
-     * @param cardNumber cardNumber
-     * @param venueId venueId
-     * @param reservationId reservationId
+     * startUsage
+     * @param usage usage
      * @returns UsageEntity OK
      * @returns any Created
      * @throws ApiError
      */
-    public static startVenueUsageUsingPost(
-        cardNumber: string,
-        venueId: number,
-        reservationId?: number,
+    public static startUsageUsingPost(
+        usage: UsageEntity,
     ): CancelablePromise<UsageEntity | any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/usages/start',
+            url: '/api/usages',
+            body: usage,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getActiveUsages
+     * @param page page
+     * @param size size
+     * @returns Page_UsageEntity_ OK
+     * @throws ApiError
+     */
+    public static getActiveUsagesUsingGet(
+        page: number = 1,
+        size: number = 10,
+    ): CancelablePromise<Page_UsageEntity_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/usages/active',
             query: {
-                'cardNumber': cardNumber,
-                'reservationId': reservationId,
-                'venueId': venueId,
+                'page': page,
+                'size': size,
             },
             errors: {
                 401: `Unauthorized`,
@@ -75,20 +55,28 @@ export class UsageControllerService {
         });
     }
     /**
-     * getUnpaidUsages
+     * getUsagesByCardNumber
      * @param cardNumber cardNumber
-     * @returns UsageEntity OK
+     * @param page page
+     * @param size size
+     * @returns Page_UsageEntity_ OK
      * @throws ApiError
      */
-    public static getUnpaidUsagesUsingGet(
+    public static getUsagesByCardNumberUsingGet(
         cardNumber: string,
-    ): CancelablePromise<Array<UsageEntity>> {
+        page: number = 1,
+        size: number = 10,
+    ): CancelablePromise<Page_UsageEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/usages/unpaid/{cardNumber}',
+            url: '/api/usages/card/{cardNumber}',
             path: {
                 'cardNumber': cardNumber,
             },
+            query: {
+                'page': page,
+                'size': size,
+            },
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
@@ -97,17 +85,108 @@ export class UsageControllerService {
         });
     }
     /**
-     * endVenueUsage
+     * getUsagesByTimeRange
+     * @param endTime endTime
+     * @param startTime startTime
+     * @param page page
+     * @param size size
+     * @returns Page_UsageEntity_ OK
+     * @throws ApiError
+     */
+    public static getUsagesByTimeRangeUsingGet(
+        endTime: string,
+        startTime: string,
+        page: number = 1,
+        size: number = 10,
+    ): CancelablePromise<Page_UsageEntity_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/usages/time-range',
+            query: {
+                'endTime': endTime,
+                'page': page,
+                'size': size,
+                'startTime': startTime,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getUserUsages
+     * @param userId userId
+     * @param page page
+     * @param size size
+     * @returns Page_UsageEntity_ OK
+     * @throws ApiError
+     */
+    public static getUserUsagesUsingGet(
+        userId: number,
+        page: number = 1,
+        size: number = 10,
+    ): CancelablePromise<Page_UsageEntity_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/usages/user/{userId}',
+            path: {
+                'userId': userId,
+            },
+            query: {
+                'page': page,
+                'size': size,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getVenueUsages
+     * @param venueId venueId
+     * @param page page
+     * @param size size
+     * @returns Page_UsageEntity_ OK
+     * @throws ApiError
+     */
+    public static getVenueUsagesUsingGet(
+        venueId: number,
+        page: number = 1,
+        size: number = 10,
+    ): CancelablePromise<Page_UsageEntity_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/usages/venue/{venueId}',
+            path: {
+                'venueId': venueId,
+            },
+            query: {
+                'page': page,
+                'size': size,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * endUsage
      * @param id id
      * @returns UsageEntity OK
      * @returns any Created
      * @throws ApiError
      */
-    public static endVenueUsageUsingPost(
+    public static endUsageUsingPut(
         id: number,
     ): CancelablePromise<UsageEntity | any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'PUT',
             url: '/api/usages/{id}/end',
             path: {
                 'id': id,
@@ -126,11 +205,11 @@ export class UsageControllerService {
      * @returns any Created
      * @throws ApiError
      */
-    public static payUsageUsingPost(
+    public static payUsageUsingPut(
         id: number,
     ): CancelablePromise<UsageEntity | any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'PUT',
             url: '/api/usages/{id}/pay',
             path: {
                 'id': id,

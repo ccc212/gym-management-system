@@ -9,12 +9,16 @@ import com.gymsys.entity.competition.CompetitionSignUpTeam;
 import com.gymsys.entity.competition.dto.competitionSignUpTeam.AddCompetitionSignUpTeamDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpTeam.ListCompetitionSignUpTeamDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpTeam.UpdateCompetitionSignUpTeamDTO;
+import com.gymsys.entity.competition.vo.CompetitionSignUpTeamVO;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
 import com.gymsys.mapper.competition.CompetitionSignUpTeamMapper;
 import com.gymsys.service.competition.ICompetitionSignUpTeamService;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * <p>
@@ -25,7 +29,10 @@ import org.springframework.stereotype.Service;
  * @since 2025-04-19
  */
 @Service
+@RequiredArgsConstructor
 public class CompetitionSignUpTeamServiceImpl extends ServiceImpl<CompetitionSignUpTeamMapper, CompetitionSignUpTeam> implements ICompetitionSignUpTeamService {
+
+    private final CompetitionSignUpTeamMapper competitionSignUpTeamMapper;
 
     @Override
     public void addCompetitionSignUpTeam(AddCompetitionSignUpTeamDTO addCompetitionSignUpTeamDTO) {
@@ -63,5 +70,10 @@ public class CompetitionSignUpTeamServiceImpl extends ServiceImpl<CompetitionSig
                         .eq(listCompetitionSignUpTeamDTO.getCompetitionId() != null, CompetitionSignUpTeam::getCompetitionId, listCompetitionSignUpTeamDTO.getCompetitionId())
                         .like(StringUtils.isNotBlank(listCompetitionSignUpTeamDTO.getTeamName()), CompetitionSignUpTeam::getTeamName, listCompetitionSignUpTeamDTO.getTeamName())
                         .eq(listCompetitionSignUpTeamDTO.getStatus() != null, CompetitionSignUpTeam::getStatus, listCompetitionSignUpTeamDTO.getStatus()));
+    }
+
+    @Override
+    public List<CompetitionSignUpTeamVO> getCompetitionSignUpTeam(Long userId) {
+        return competitionSignUpTeamMapper.getCompetitionSignUpTeam(userId);
     }
 }

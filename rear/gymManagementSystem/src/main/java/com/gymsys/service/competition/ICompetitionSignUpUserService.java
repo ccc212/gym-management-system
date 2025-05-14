@@ -6,6 +6,9 @@ import com.gymsys.entity.competition.CompetitionSignUpUser;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.AddCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.ListCompetitionSignUpUserDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpUser.UpdateCompetitionSignUpUserDTO;
+import com.gymsys.entity.competition.vo.CompetitionSignUpUserVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -59,4 +62,6 @@ public interface ICompetitionSignUpUserService extends IService<CompetitionSignU
      * @param rejectReason 拒绝原因
      */
     void rejectSignUp(Long id, String rejectReason);
+
+    List<CompetitionSignUpUserVO> getCompetitionSignUpUser(Long userId);
 }

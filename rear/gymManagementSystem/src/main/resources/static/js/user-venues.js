@@ -85,7 +85,7 @@ const UserVenuesComponent = {
                     
                     <div class="time-slots-container">
                         <el-row :gutter="10">
-                            <el-col :span="6" v-for="timeSlot in timeSlots" :key="timeSlot.startTime">
+                            <el-col :span="8" v-for="timeSlot in timeSlots" :key="timeSlot.startTime">
                                 <div 
                                     :class="['time-slot', {
                                         'available': timeSlot.status === 'AVAILABLE',
@@ -96,7 +96,7 @@ const UserVenuesComponent = {
                                     @click="timeSlot.status === 'AVAILABLE' && selectTimeSlot(timeSlot)">
                                     {{ timeSlot.startTime }} - {{ timeSlot.endTime }}
                                     <div class="time-slot-price" v-if="timeSlot.status === 'AVAILABLE'">
-                                        {{ timeSlot.price }}元
+                                        {{ timeSlot.price }}元/小时
                                     </div>
                                 </div>
                             </el-col>
@@ -288,12 +288,21 @@ const UserVenuesComponent = {
                 console.log('获取到的时间段数据:', response.data);
                 
                 if (response.data && Array.isArray(response.data)) {
-                    this.timeSlots = response.data.map(slot => ({
-                        ...slot,
-                        startTime: slot.startTime.format ? slot.startTime.format('HH:mm') : slot.startTime,
-                        endTime: slot.endTime.format ? slot.endTime.format('HH:mm') : slot.endTime,
-                        price: Number(slot.price).toFixed(2)
-                    }));
+                    this.timeSlots = response.data.map(slot => {
+                        // 确保时间格式正确
+                        const startTime = typeof slot.startTime === 'string' ? slot.startTime : 
+                                       (slot.startTime.format ? slot.startTime.format('HH:mm') : '00:00');
+                        const endTime = typeof slot.endTime === 'string' ? slot.endTime : 
+                                     (slot.endTime.format ? slot.endTime.format('HH:mm') : '00:00');
+                        
+                        return {
+                            ...slot,
+                            startTime: startTime,
+                            endTime: endTime,
+                            price: Number(slot.price || this.selectedVenue.pricePerHour).toFixed(2),
+                            status: slot.status || 'AVAILABLE'
+                        };
+                    });
                     console.log('处理后的时间段数据:', this.timeSlots);
                 } else {
                     this.timeSlots = [];
@@ -308,9 +317,14 @@ const UserVenuesComponent = {
         // 选择时间段
         selectTimeSlot(timeSlot) {
             if (timeSlot.status === 'AVAILABLE') {
-                this.selectedTimeSlot = timeSlot;
-                this.bookingForm.startTime = timeSlot.startTime;
-                this.bookingForm.endTime = timeSlot.endTime;
+                console.log('选择的时间段原始数据:', timeSlot);
+                this.selectedTimeSlot = {
+                    ...timeSlot,
+                    startTime: timeSlot.startTime,
+                    endTime: timeSlot.endTime,
+                    price: Number(timeSlot.price || this.selectedVenue.pricePerHour).toFixed(2)
+                };
+                console.log('处理后的选中时间段:', this.selectedTimeSlot);
             }
         },
         // 计算预估费用
@@ -329,40 +343,77 @@ const UserVenuesComponent = {
 
             this.$refs.bookingForm.validate(valid => {
                 if (valid) {
-                    // 只取时间段的HH:mm部分
-                    const startTime = this.selectedTimeSlot.startTime;
-                    const endTime = this.selectedTimeSlot.endTime;
-
                     // 获取当前用户
                     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
                     const userId = currentUser && currentUser.id ? currentUser.id : null;
                     const cardNumber = currentUser && currentUser.cardNumber ? currentUser.cardNumber : '12345678';
 
-                    // 获取预约人数（如有输入框可用bookingForm.numberOfPeople，否则默认1）
-                    const numberOfPeople = this.bookingForm.numberOfPeople ? this.bookingForm.numberOfPeople : 1;
+                    if (!userId) {
+                        this.$message.error('请先登录');
+                        return;
+                    }
 
-                    // 调用后端预约API，使用JSON body
-                    this.loading = true;
-                    axios.post('/api/reservations', {
+                    // 计算时间差（小时）
+                    const startTime = this.selectedTimeSlot.startTime;
+                    const endTime = this.selectedTimeSlot.endTime;
+                    const [startHour, startMinute] = startTime.split(':').map(Number);
+                    const [endHour, endMinute] = endTime.split(':').map(Number);
+                    const duration = (endHour - startHour) + (endMinute - startMinute) / 60;
+
+                    // 构建预约请求数据
+                    const bookingData = {
                         venueId: this.selectedVenue.id,
                         userId: userId,
                         cardNumber: cardNumber,
-                        startTime: startTime, // 只传 "HH:mm"
-                        endTime: endTime,     // 只传 "HH:mm"
-                        numberOfPeople: numberOfPeople, // 新增预约人数
-                        remarks: this.bookingForm.remarks
+                        date: this.searchForm.date,
+                        startTime: startTime,
+                        endTime: endTime,
+                        numberOfPeople: 1,
+                        remarks: this.bookingForm.remarks || '',
+                        status: 'PENDING',
+                        cost: Number((this.selectedVenue.pricePerHour * duration).toFixed(2)),
+                        duration: duration
+                    };
+
+                    console.log('选中的场地信息:', {
+                        id: this.selectedVenue.id,
+                        name: this.selectedVenue.name,
+                        pricePerHour: this.selectedVenue.pricePerHour
+                    });
+                    console.log('选中的时间段信息:', {
+                        startTime: startTime,
+                        endTime: endTime,
+                        duration: duration
+                    });
+                    console.log('发送预约请求:', JSON.stringify(bookingData, null, 2));
+
+                    // 调用后端预约API
+                    this.loading = true;
+                    axios.post('/api/reservations', bookingData, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
                     })
                     .then(response => {
-                        this.timeSlotDialogVisible = false;
-                        this.$message.success('预约成功！');
-                        // 可以跳转到我的预约页面
-                        // this.$router.push('/user/myreservations');
+                        console.log('预约成功响应:', response.data);
+                        if (response.data && response.data.id) {  // 检查响应是否包含id字段
+                            this.timeSlotDialogVisible = false;
+                            this.$message.success('预约成功！');
+                            // 跳转到我的预约页面
+                            this.$router.push('/user/myreservations');
+                        } else {
+                            // 处理业务错误
+                            const errorMsg = response.data.msg || '预约失败，请稍后重试';
+                            this.$message.error(errorMsg);
+                            console.error('预约失败:', response.data);
+                        }
                     })
                     .catch(error => {
                         console.error('预约失败:', error);
                         let errorMsg = '预约失败，请稍后重试';
-                        if (error.response && error.response.data && error.response.data.message) {
-                            errorMsg = error.response.data.message;
+                        if (error.response) {
+                            console.error('错误响应:', error.response.data);
+                            errorMsg = error.response.data.msg || errorMsg;
                         }
                         this.$message.error(errorMsg);
                     })

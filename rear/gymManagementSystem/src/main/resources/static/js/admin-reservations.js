@@ -1,141 +1,141 @@
-    // 预约管理组件
-    const AdminReservationsComponent = {
-        template: `
-            <div class="admin-reservations-container">
-                <el-card>
-                    <div slot="header" class="card-header">
-                        <h2>预约管理</h2>
-                    </div>
-                    
-                    <!-- 搜索筛选区域 -->
-                    <el-form :inline="true" class="search-form" size="small">
-                        <el-form-item label="场地类型">
-                            <el-select v-model="searchForm.venueType" placeholder="选择场地类型" clearable @change="searchReservations">
-                                <el-option v-for="item in venueTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="预约状态">
-                            <el-select v-model="searchForm.status" placeholder="选择预约状态" clearable @change="searchReservations">
-                                <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item label="日期范围">
-                            <el-date-picker
-                                v-model="searchForm.dateRange"
-                                type="daterange"
-                                range-separator="至"
-                                start-placeholder="开始日期"
-                                end-placeholder="结束日期"
-                                value-format="yyyy-MM-dd"
-                                @change="searchReservations">
-                            </el-date-picker>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="searchReservations">查询</el-button>
-                            <el-button @click="resetSearch">重置</el-button>
-                        </el-form-item>
-                    </el-form>
-                    
-                    <!-- 预约列表 -->
-                    <el-table 
-                        v-loading="loading" 
-                        :data="reservationList" 
-                        style="width: 100%"
-                        :header-cell-style="{background:'#f5f7fa', color:'#606266'}"
-                        border>
-                        <el-table-column prop="id" label="ID" width="80"></el-table-column>
-                        <el-table-column prop="venueName" label="场地名称" width="120"></el-table-column>
-                        <el-table-column prop="venueType" label="场地类型" width="100"></el-table-column>
-                        <el-table-column prop="userName" label="预约用户" width="100"></el-table-column>
-                        <el-table-column prop="date" label="预约日期" width="120"></el-table-column>
-                        <el-table-column prop="timeRange" label="时间段" width="160"></el-table-column>
-                        <el-table-column prop="numberOfPeople" label="人数" width="80" align="center"></el-table-column>
-                        <el-table-column prop="status" label="状态" width="100">
-                            <template slot-scope="scope">
-                                <el-tag :type="getStatusType(scope.row.status)">{{ getStatusText(scope.row.status) }}</el-tag>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
-                        <el-table-column label="操作" width="240">
-                            <template slot-scope="scope">
-                                <el-button type="primary" size="mini" @click="showReservationDetail(scope.row)">详情</el-button>
-                                <el-button v-if="scope.row.status === 'PENDING'" type="success" size="mini" @click="approveReservation(scope.row)">批准</el-button>
-                                <el-button v-if="scope.row.status === 'PENDING'" type="danger" size="mini" @click="rejectReservation(scope.row)">拒绝</el-button>
-                                <el-button v-if="scope.row.status === 'APPROVED' && !isReservationStarted(scope.row)" type="warning" size="mini" @click="cancelReservation(scope.row)">取消</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    
-                    <!-- 分页组件 -->
-                    <div class="pagination-container">
-                        <el-pagination
-                            @size-change="handleSizeChange"
-                            @current-change="handleCurrentChange"
-                            :current-page="pagination.currentPage"
-                            :page-sizes="[10, 20, 50, 100]"
-                            :page-size="pagination.pageSize"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="pagination.total">
-                        </el-pagination>
-                    </div>
-                </el-card>
+// 预约管理组件
+const AdminReservationsComponent = {
+    template: `
+        <div class="admin-reservations-container">
+            <el-card>
+                <div slot="header" class="card-header">
+                    <h2>预约管理</h2>
+                </div>
                 
-                <!-- 预约详情弹窗 -->
-                <el-dialog title="预约详情" :visible.sync="detailDialogVisible" width="600px">
-                    <div v-if="selectedReservation" class="reservation-detail">
-                        <el-descriptions :column="2" border>
-                            <el-descriptions-item label="预约ID">{{ selectedReservation.id }}</el-descriptions-item>
-                            <el-descriptions-item label="预约状态">
-                                <el-tag :type="getStatusType(selectedReservation.status)">{{ getStatusText(selectedReservation.status) }}</el-tag>
-                            </el-descriptions-item>
-                            <el-descriptions-item label="场地名称">{{ selectedReservation.venueName }}</el-descriptions-item>
-                            <el-descriptions-item label="场地类型">{{ selectedReservation.venueType }}</el-descriptions-item>
-                            <el-descriptions-item label="预约用户">{{ selectedReservation.userName }}</el-descriptions-item>
-                            <el-descriptions-item label="用户手机">{{ selectedReservation.userPhone || '无' }}</el-descriptions-item>
-                            <el-descriptions-item label="预约日期">{{ selectedReservation.date }}</el-descriptions-item>
-                            <el-descriptions-item label="时间段">{{ selectedReservation.timeRange }}</el-descriptions-item>
-                            <el-descriptions-item label="预约人数">{{ selectedReservation.numberOfPeople }} 人</el-descriptions-item>
-                            <el-descriptions-item label="费用">{{ selectedReservation.cost }} 元</el-descriptions-item>
-                            <el-descriptions-item label="创建时间" :span="2">{{ selectedReservation.createTime }}</el-descriptions-item>
-                            <el-descriptions-item label="修改时间" :span="2">{{ selectedReservation.updateTime || '无' }}</el-descriptions-item>
-                            <el-descriptions-item label="备注" :span="2">{{ selectedReservation.remarks || '无' }}</el-descriptions-item>
-                        </el-descriptions>
-                        
-                        <!-- 操作记录 -->
-                        <div class="operation-history" v-if="selectedReservation.operationHistory && selectedReservation.operationHistory.length > 0">
-                            <h3>操作记录</h3>
-                            <el-timeline>
-                                <el-timeline-item
-                                    v-for="(activity, index) in selectedReservation.operationHistory"
-                                    :key="index"
-                                    :timestamp="activity.time"
-                                    :type="getOperationHistoryType(activity.type)">
-                                    {{ activity.content }}
-                                    <div class="history-operator">操作人: {{ activity.operator }}</div>
-                                </el-timeline-item>
-                            </el-timeline>
-                        </div>
-                        
-                        <!-- 审核操作 -->
-                        <div class="approval-section" v-if="selectedReservation.status === 'PENDING'">
-                            <h3>预约审核</h3>
-                            <el-form :model="approvalForm" ref="approvalForm" label-width="80px">
-                                <el-form-item label="审核意见" prop="comment">
-                                    <el-input type="textarea" v-model="approvalForm.comment" placeholder="请输入审核意见"></el-input>
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-button type="success" @click="doApprove">批准预约</el-button>
-                                    <el-button type="danger" @click="doReject">拒绝预约</el-button>
-                                </el-form-item>
-                            </el-form>
-                        </div>
+                <!-- 搜索筛选区域 -->
+                <el-form :inline="true" class="search-form" size="small">
+                    <el-form-item label="场地类型">
+                        <el-select v-model="searchForm.venueType" placeholder="选择场地类型" clearable @change="searchReservations">
+                            <el-option v-for="item in venueTypes" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="预约状态">
+                        <el-select v-model="searchForm.status" placeholder="选择预约状态" clearable @change="searchReservations">
+                            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="日期范围">
+                        <el-date-picker
+                            v-model="searchForm.dateRange"
+                            type="daterange"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期"
+                            value-format="yyyy-MM-dd"
+                            @change="searchReservations">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="searchReservations">查询</el-button>
+                        <el-button @click="resetSearch">重置</el-button>
+                    </el-form-item>
+                </el-form>
+                
+                <!-- 预约列表 -->
+                <el-table 
+                    v-loading="loading" 
+                    :data="reservationList" 
+                    style="width: 100%"
+                    :header-cell-style="{background:'#f5f7fa', color:'#606266'}"
+                    border>
+                    <el-table-column prop="id" label="ID" width="80"></el-table-column>
+                    <el-table-column prop="venueName" label="场地名称" width="120"></el-table-column>
+                    <el-table-column prop="venueType" label="场地类型" width="100"></el-table-column>
+                    <el-table-column prop="userName" label="预约用户" width="100"></el-table-column>
+                    <el-table-column prop="date" label="预约日期" width="120"></el-table-column>
+                    <el-table-column prop="timeRange" label="时间段" width="160"></el-table-column>
+                    <el-table-column prop="numberOfPeople" label="人数" width="80" align="center"></el-table-column>
+                    <el-table-column prop="status" label="状态" width="100">
+                        <template slot-scope="scope">
+                            <el-tag :type="getStatusType(scope.row.status)">{{ getStatusText(scope.row.status) }}</el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
+                    <el-table-column label="操作" width="240">
+                        <template slot-scope="scope">
+                            <el-button type="primary" size="mini" @click="showReservationDetail(scope.row)">详情</el-button>
+                            <el-button v-if="scope.row.status === 'PENDING'" type="success" size="mini" @click="approveReservation(scope.row)">批准</el-button>
+                            <el-button v-if="scope.row.status === 'PENDING'" type="danger" size="mini" @click="rejectReservation(scope.row)">拒绝</el-button>
+                            <el-button v-if="scope.row.status === 'APPROVED' && !isReservationStarted(scope.row)" type="warning" size="mini" @click="cancelReservation(scope.row)">取消</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                
+                <!-- 分页组件 -->
+                <div class="pagination-container">
+                    <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="pagination.currentPage"
+                        :page-sizes="[10, 20, 50, 100]"
+                        :page-size="pagination.pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="pagination.total">
+                    </el-pagination>
+                </div>
+            </el-card>
+            
+            <!-- 预约详情弹窗 -->
+            <el-dialog title="预约详情" :visible.sync="detailDialogVisible" width="600px">
+                <div v-if="selectedReservation" class="reservation-detail">
+                    <el-descriptions :column="2" border>
+                        <el-descriptions-item label="预约ID">{{ selectedReservation.id }}</el-descriptions-item>
+                        <el-descriptions-item label="预约状态">
+                            <el-tag :type="getStatusType(selectedReservation.status)">{{ getStatusText(selectedReservation.status) }}</el-tag>
+                        </el-descriptions-item>
+                        <el-descriptions-item label="场地名称">{{ selectedReservation.venueName }}</el-descriptions-item>
+                        <el-descriptions-item label="场地类型">{{ selectedReservation.venueType }}</el-descriptions-item>
+                        <el-descriptions-item label="预约用户">{{ selectedReservation.userName }}</el-descriptions-item>
+                        <el-descriptions-item label="用户手机">{{ selectedReservation.userPhone || '无' }}</el-descriptions-item>
+                        <el-descriptions-item label="预约日期">{{ selectedReservation.date }}</el-descriptions-item>
+                        <el-descriptions-item label="时间段">{{ selectedReservation.timeRange }}</el-descriptions-item>
+                        <el-descriptions-item label="预约人数">{{ selectedReservation.numberOfPeople }} 人</el-descriptions-item>
+                        <el-descriptions-item label="费用">{{ selectedReservation.cost }} 元</el-descriptions-item>
+                        <el-descriptions-item label="创建时间" :span="2">{{ selectedReservation.createTime }}</el-descriptions-item>
+                        <el-descriptions-item label="修改时间" :span="2">{{ selectedReservation.updateTime || '无' }}</el-descriptions-item>
+                        <el-descriptions-item label="备注" :span="2">{{ selectedReservation.remarks || '无' }}</el-descriptions-item>
+                    </el-descriptions>
+                    
+                    <!-- 操作记录 -->
+                    <div class="operation-history" v-if="selectedReservation.operationHistory && selectedReservation.operationHistory.length > 0">
+                        <h3>操作记录</h3>
+                        <el-timeline>
+                            <el-timeline-item
+                                v-for="(activity, index) in selectedReservation.operationHistory"
+                                :key="index"
+                                :timestamp="activity.time"
+                                :type="getOperationHistoryType(activity.type)">
+                                {{ activity.content }}
+                                <div class="history-operator">操作人: {{ activity.operator }}</div>
+                            </el-timeline-item>
+                        </el-timeline>
                     </div>
-                    <span slot="footer" class="dialog-footer">
-                        <el-button @click="detailDialogVisible = false">关闭</el-button>
-                    </span>
-                </el-dialog>
-            </div>
-        `,
+                    
+                    <!-- 审核操作 -->
+                    <div class="approval-section" v-if="selectedReservation.status === 'PENDING'">
+                        <h3>预约审核</h3>
+                        <el-form :model="approvalForm" ref="approvalForm" label-width="80px">
+                            <el-form-item label="审核意见" prop="comment">
+                                <el-input type="textarea" v-model="approvalForm.comment" placeholder="请输入审核意见"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="success" @click="doApprove">批准预约</el-button>
+                                <el-button type="danger" @click="doReject">拒绝预约</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="detailDialogVisible = false">关闭</el-button>
+                </span>
+            </el-dialog>
+        </div>
+    `,
     data() {
         return {
             // 搜索表单
@@ -442,11 +442,11 @@
         async cancelReservation(reservation) {
             try {
                 const { value } = await this.$prompt('请输入取消原因', '取消预约', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    inputType: 'textarea',
-                    inputPattern: /\S+/,
-                    inputErrorMessage: '取消原因不能为空'
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                inputType: 'textarea',
+                inputPattern: /\S+/,
+                inputErrorMessage: '取消原因不能为空'
                 });
 
                 this.loading = true;
@@ -464,7 +464,7 @@
                     this.$message.error('取消预约失败');
                 }
             } finally {
-                this.loading = false;
+                    this.loading = false;
             }
         }
     }

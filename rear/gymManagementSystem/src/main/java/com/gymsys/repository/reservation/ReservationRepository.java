@@ -3,15 +3,20 @@ package com.gymsys.repository.reservation;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.entity.reservation.ReservationEntity;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
 public interface ReservationRepository extends BaseMapper<ReservationEntity> {
+    
+    @Insert("INSERT INTO reservations (venue_id, user_id, card_number, date, start_time, end_time, " +
+            "number_of_people, status, remarks, cost, created_time, updated_time) " +
+            "VALUES (#{venueId}, #{userId}, #{cardNumber}, #{date}, #{startTime}, #{endTime}, " +
+            "#{numberOfPeople}, #{status}, #{remarks}, #{cost}, #{createdTime}, #{updatedTime})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insertReservation(ReservationEntity reservation);
     
     @Select("SELECT * FROM reservations WHERE status = #{status}")
     Page<ReservationEntity> findByStatus(@Param("status") String status, Page<ReservationEntity> page);

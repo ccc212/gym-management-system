@@ -48,11 +48,11 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
                 while (startTime.isBefore(endTime)) {
                     TimeSlot timeSlot = new TimeSlot();
                     timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
-                    timeSlot.setEndTime(startTime.plusMinutes(30).format(TIME_FORMATTER));
+                    timeSlot.setEndTime(startTime.plusHours(1).format(TIME_FORMATTER));
                     timeSlot.setStatus("MAINTENANCE");
-                    timeSlot.setPrice(venue.getPricePerHour().divide(BigDecimal.valueOf(2)));
+                    timeSlot.setPrice(venue.getPricePerHour());
                     timeSlots.add(timeSlot);
-                    startTime = startTime.plusMinutes(30);
+                    startTime = startTime.plusHours(1);
                 }
                 return timeSlots;
             }
@@ -80,20 +80,20 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
                   .eq(ReservationEntity::getDate, localDate);
             List<ReservationEntity> reservations = reservationRepository.selectList(wrapper);
             
-            // 生成所有时间段（半小时一段）
+            // 生成所有时间段（每小时一段）
             while (startTime.isBefore(endTime)) {
                 LocalTime slotStartTime = startTime;
-                LocalTime slotEndTime = startTime.plusMinutes(30);
+                LocalTime slotEndTime = startTime.plusHours(1);
                 
                 // 检查是否是过期时间段（只有当天的过去时间才标记为已过期）
                 if (localDate.equals(today) && slotEndTime.isBefore(nowTime)) {
                     TimeSlot timeSlot = new TimeSlot();
                     timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
-                    timeSlot.setEndTime(startTime.plusMinutes(30).format(TIME_FORMATTER));
+                    timeSlot.setEndTime(startTime.plusHours(1).format(TIME_FORMATTER));
                     timeSlot.setStatus("EXPIRED");
-                    timeSlot.setPrice(venue.getPricePerHour().divide(BigDecimal.valueOf(2)));
+                    timeSlot.setPrice(venue.getPricePerHour());
                     timeSlots.add(timeSlot);
-                    startTime = startTime.plusMinutes(30);
+                    startTime = startTime.plusHours(1);
                     continue;
                 }
                 
@@ -102,11 +102,11 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
                     startTime.getHour() >= 8 && startTime.getHour() < 10) {
                     TimeSlot timeSlot = new TimeSlot();
                     timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
-                    timeSlot.setEndTime(startTime.plusMinutes(30).format(TIME_FORMATTER));
+                    timeSlot.setEndTime(startTime.plusHours(1).format(TIME_FORMATTER));
                     timeSlot.setStatus("MAINTENANCE");
-                    timeSlot.setPrice(venue.getPricePerHour().divide(BigDecimal.valueOf(2)));
+                    timeSlot.setPrice(venue.getPricePerHour());
                     timeSlots.add(timeSlot);
-                    startTime = startTime.plusMinutes(30);
+                    startTime = startTime.plusHours(1);
                     continue;
                 }
                 
@@ -115,11 +115,11 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
                     startTime.getHour() >= 14 && startTime.getHour() < 18) {
                     TimeSlot timeSlot = new TimeSlot();
                     timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
-                    timeSlot.setEndTime(startTime.plusMinutes(30).format(TIME_FORMATTER));
+                    timeSlot.setEndTime(startTime.plusHours(1).format(TIME_FORMATTER));
                     timeSlot.setStatus("SPECIAL");
-                    timeSlot.setPrice(venue.getPricePerHour().divide(BigDecimal.valueOf(2)));
+                    timeSlot.setPrice(venue.getPricePerHour());
                     timeSlots.add(timeSlot);
-                    startTime = startTime.plusMinutes(30);
+                    startTime = startTime.plusHours(1);
                     continue;
                 }
                 
@@ -136,12 +136,12 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
                 
                 TimeSlot timeSlot = new TimeSlot();
                 timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
-                timeSlot.setEndTime(startTime.plusMinutes(30).format(TIME_FORMATTER));
+                timeSlot.setEndTime(startTime.plusHours(1).format(TIME_FORMATTER));
                 timeSlot.setStatus(isAvailable ? "AVAILABLE" : "BOOKED");
-                timeSlot.setPrice(venue.getPricePerHour().divide(BigDecimal.valueOf(2)));
+                timeSlot.setPrice(venue.getPricePerHour());
                 timeSlots.add(timeSlot);
                 
-                startTime = startTime.plusMinutes(30);
+                startTime = startTime.plusHours(1);
             }
         }
         
@@ -167,6 +167,7 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
         ReservationEntity reservation = new ReservationEntity();
         reservation.setVenueId(venueId);
         reservation.setUserId(userId);
+        reservation.setCardNumber("12345678"); // 设置默认卡号
         reservation.setStartTime(startTime);
         reservation.setEndTime(endTime);
         reservation.setNumberOfPeople(numberOfPeople);
@@ -188,7 +189,7 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
         }
 
         // 保存预约
-        save(reservation);
+        reservationRepository.insertReservation(reservation);
         
         // 设置场馆信息
         reservation.setVenueInfo(venue);
@@ -300,5 +301,89 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
         });
         
         return result;
+    }
+
+    public List<TimeSlot> getVenueTimeSlots(Long venueId, String date) {
+        List<TimeSlot> timeSlots = new ArrayList<>();
+        LocalDate localDate;
+        
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            localDate = LocalDate.parse(date, formatter);
+        } catch (Exception ex) {
+            throw new RuntimeException("无效的日期格式: " + date);
+        }
+        
+        LocalDate today = LocalDate.now();
+        LocalTime nowTime = LocalTime.now();
+        
+        // 获取该日期的所有预约
+        LambdaQueryWrapper<ReservationEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ReservationEntity::getVenueId, venueId)
+              .eq(ReservationEntity::getStatus, "CONFIRMED")
+              .eq(ReservationEntity::getDate, localDate);
+        List<ReservationEntity> reservations = reservationRepository.selectList(wrapper);
+        
+        // 获取场馆信息
+        VenueEntity venue = venueRepository.selectById(venueId);
+        if (venue == null) {
+            throw new RuntimeException("场馆不存在");
+        }
+        
+        // 生成时间段（每小时一段）
+        LocalTime startTime = LocalTime.parse("08:00", TIME_FORMATTER);
+        LocalTime endTime = LocalTime.parse("22:00", TIME_FORMATTER);
+        
+        while (startTime.isBefore(endTime)) {
+            LocalTime slotEndTime = startTime.plusHours(1);
+            
+            // 检查是否是维护时间（周一 8:00-10:00）
+            if (localDate.getDayOfWeek().getValue() == 1 && 
+                startTime.getHour() >= 8 && startTime.getHour() < 10) {
+                TimeSlot timeSlot = new TimeSlot();
+                timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
+                timeSlot.setEndTime(slotEndTime.format(TIME_FORMATTER));
+                timeSlot.setStatus("MAINTENANCE");
+                timeSlot.setPrice(venue.getPricePerHour());
+                timeSlots.add(timeSlot);
+                startTime = slotEndTime;
+                continue;
+            }
+            
+            // 检查是否是特殊场地时间（周六 14:00-18:00）
+            if (localDate.getDayOfWeek().getValue() == 6 && 
+                startTime.getHour() >= 14 && startTime.getHour() < 18) {
+                TimeSlot timeSlot = new TimeSlot();
+                timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
+                timeSlot.setEndTime(slotEndTime.format(TIME_FORMATTER));
+                timeSlot.setStatus("SPECIAL");
+                timeSlot.setPrice(venue.getPricePerHour());
+                timeSlots.add(timeSlot);
+                startTime = slotEndTime;
+                continue;
+            }
+            
+            // 检查该时间段是否已被预约
+            boolean isAvailable = true;
+            for (ReservationEntity reservation : reservations) {
+                LocalTime reservedStart = LocalTime.parse(reservation.getStartTime(), TIME_FORMATTER);
+                LocalTime reservedEnd = LocalTime.parse(reservation.getEndTime(), TIME_FORMATTER);
+                if (!(slotEndTime.isBefore(reservedStart) || startTime.isAfter(reservedEnd))) {
+                    isAvailable = false;
+                    break;
+                }
+            }
+            
+            TimeSlot timeSlot = new TimeSlot();
+            timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
+            timeSlot.setEndTime(slotEndTime.format(TIME_FORMATTER));
+            timeSlot.setStatus(isAvailable ? "AVAILABLE" : "BOOKED");
+            timeSlot.setPrice(venue.getPricePerHour());
+            timeSlots.add(timeSlot);
+            
+            startTime = slotEndTime;
+        }
+        
+        return timeSlots;
     }
 } 

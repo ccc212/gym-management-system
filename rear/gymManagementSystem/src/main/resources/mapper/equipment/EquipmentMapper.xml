@@ -12,17 +12,42 @@
         DELETE FROM equipment WHERE id = #{id}
     </delete>
 
+
     <!-- 添加器材 -->
     <insert id="addEquipment" parameterType="com.gymsys.entity.equip.Equipment">
-        INSERT INTO equipment (name, type, quantity, status) VALUES (#{name}, #{type}, #{quantity}, #{status})
+        INSERT INTO equipment (
+            equipment_name,
+            type,
+            remaining_quantity,
+            status,
+            administrator,
+            set_create_time,
+            set_update_time
+        ) VALUES (
+                     #{equipmentName},
+                     #{type},
+                     #{remainingQuantity},
+                     #{status},
+                     #{administrator},
+                     #{setCreateTime},
+                     #{setUpdateTime}
+                 )
     </insert>
 
     <!-- 修改器材信息 -->
     <update id="updateEquipment" parameterType="com.gymsys.entity.equip.Equipment">
         UPDATE equipment
-        SET name = #{name}, type = #{type}, quantity = #{quantity}, status = #{status}
+        SET
+            equipment_name = #{equipmentName},
+            type = #{type},
+            remaining_quantity = #{remainingQuantity},
+            status = #{status},
+            administrator = #{administrator},
+            set_update_time = #{setUpdateTime},
+            update_time = #{updateTime}
         WHERE id = #{id}
     </update>
+
 
     <!-- 报修器材 -->
     <update id="reportRepair">

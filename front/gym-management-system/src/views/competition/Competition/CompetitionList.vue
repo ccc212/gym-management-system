@@ -16,7 +16,6 @@
         ></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button icon="Search" @click="searchBtn">搜索</el-button>
         <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
         <el-button icon="Plus" type="primary" @click="addBtn">新增</el-button>
       </el-form-item>
@@ -152,7 +151,7 @@
     </el-dialog>
 
     <!-- 详情对话框 -->
-    <competition-details v-model="openDetailDialog" :competition="detailData" />
+    <competition-details v-model="openDetailDialog" :competition="detailData"/>
 
     <!-- 器材预约对话框 -->
     <equipment-reservation
@@ -164,16 +163,16 @@
 
     <!-- 场地预约对话框 -->
     <venue-reservation
-      v-model="openVenueDialog"
-      :competition-id="currentCompetition?.id"
-      :competition-name="currentCompetition?.name"
-      @success="handleVenueReservationSuccess"
+        v-model="openVenueDialog"
+        :competition-id="currentCompetition?.id"
+        :competition-name="currentCompetition?.name"
+        @success="handleVenueReservationSuccess"
     />
   </el-main>
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref, watchEffect} from 'vue';
+import {onMounted, reactive, ref, watch} from 'vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
 import {CompetitionControllerService} from '../../../../generated/services/CompetitionControllerService';
 import {CompetitionItemControllerService} from '../../../../generated/services/CompetitionItemControllerService';
@@ -316,29 +315,33 @@ const loadData = async () => {
   }
 };
 
-/**
- * 监听 searchParm 变量，改变时触发页面的重新加载
- */
-watchEffect(() => {
-  loadData();
-});
-
-// 获取赛事项目选项
-const getCompetitionItemOptions = async () => {
+// 根据条件获取赛事项目选项
+const fetchCompetitionItems = async () => {
   try {
-    const res = await CompetitionItemControllerService.listCompetitionItemUsingGet(
-        undefined, // category
-        null, // isTeamCompetition
-        '', // name
-        1, // page
-        100, // pageSize
-        null // type
-    );
-    if (res && res.data && res.data.records) {
-      competitionItemOptions.value = res.data.records.map((item: any) => ({
-        value: item.id,
-        label: item.name
-      }));
+    // 只有当三个条件都选择了才进行查询
+    if (formData.type !== null && formData.category !== null && formData.isTeamCompetition !== null) {
+      const res = await CompetitionItemControllerService.listCompetitionItemUsingGet(
+          formData.category, // category
+          formData.isTeamCompetition, // isTeamCompetition
+          '', // name
+          1, // page
+          100, // pageSize
+          formData.type // type
+      );
+      if (res && res.data && res.data.records) {
+        competitionItemOptions.value = res.data.records.map((item: any) => ({
+          value: item.id,
+          label: item.name
+        }));
+
+        // 如果当前选择的项目不在筛选结果中，则清空选择
+        if (formData.competitionItemIds.length > 0) {
+          const validItemIds = competitionItemOptions.value.map((item: any) => item.value);
+          formData.competitionItemIds = formData.competitionItemIds.filter((id: any) =>
+              validItemIds.includes(id)
+          );
+        }
+      }
     }
   } catch (error) {
     console.error('获取赛事项目选项失败:', error);
@@ -346,20 +349,30 @@ const getCompetitionItemOptions = async () => {
   }
 };
 
-/**
- * 页面加载时，初始化数据
- */
-onMounted(() => {
-  // 计算表格高度
-  tableHeight.value = window.innerHeight - 320;
-  // 获取赛事项目选项
-  getCompetitionItemOptions();
+
+// 监听 searchParm 变量，改变时触发页面的重新加载
+watch(() => searchParm, () => {
+  loadData();
+}, {deep: true});
+
+// 监听表单中三个条件的变化
+watch(() => formData.type, () => {
+  fetchCompetitionItems();
 });
 
-// 搜索按钮
-const searchBtn = () => {
-  searchParm.page = 1;
-};
+watch(() => formData.category, () => {
+  fetchCompetitionItems();
+});
+
+watch(() => formData.isTeamCompetition, () => {
+  fetchCompetitionItems();
+});
+
+onMounted(() => {
+  loadData();
+  // 计算表格高度
+  tableHeight.value = window.innerHeight - 320;
+});
 
 // 重置按钮
 const resetBtn = () => {
@@ -399,7 +412,7 @@ const editBtn = async (row: any) => {
     const res = await CompetitionControllerService.getDetailUsingGet(Number(row.id));
     if (res && res.data) {
       const detail = res.data;
-      
+
       // 设置基本信息
       formData.id = detail.id;
       formData.name = detail.name;
@@ -415,7 +428,7 @@ const editBtn = async (row: any) => {
       formData.signUpDeadline = detail.signUpDeadline;
       formData.competitionTimeRange = [detail.startTime, detail.endTime];
       formData.requirement = detail.requirement;
-      
+
       // 设置赛事项目ID
       if (detail.itemRelations && detail.itemRelations.length > 0) {
         formData.competitionItemIds = detail.itemRelations.map(item => item.id);
@@ -424,6 +437,8 @@ const editBtn = async (row: any) => {
       }
 
       openDialog.value = true;
+      // 加载编辑模式下的赛事项目选项
+      fetchCompetitionItems();
     }
   } catch (error) {
     console.error('获取详情失败:', error);

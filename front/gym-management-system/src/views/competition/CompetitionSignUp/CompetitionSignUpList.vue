@@ -16,7 +16,6 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button icon="Search" @click="searchBtn">搜索</el-button>
         <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
         <el-button type="primary" @click="showMySignUpRecords = true">我的报名</el-button>
       </el-form-item>
@@ -40,7 +39,6 @@
       <el-table-column prop="signUpNum" label="报名人数" width="150">
         <template #default="scope">
           {{ scope.row.signUpNum || 0 }}/{{ scope.row.maxSignUpNum || 0 }}
-          ({{ calculatePercentage(scope.row.signUpNum, scope.row.maxSignUpNum) }}%)
         </template>
       </el-table-column>
       <el-table-column prop="signUpDeadline" label="报名截止时间" width="180"></el-table-column>
@@ -131,12 +129,13 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref} from 'vue';
+import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
 import {
   CompetitionControllerService,
   CompetitionSignUpTeamControllerService,
-  CompetitionSignUpUserControllerService, CompetitionVO,
+  CompetitionSignUpUserControllerService,
+  CompetitionVO,
   TeamControllerService,
   TeamMemberRelationControllerService
 } from '../../../../generated';
@@ -183,7 +182,10 @@ const teamSignUpRecords = ref<Map<number, number>>(new Map());
 
 // 团队选择相关
 const showTeamSelect = ref(false);
-const teamOptions = ref<{ value: string | number, label: string }[]>([]);
+const teamOptions = ref<{
+  value: string | number,
+  label: string
+}[]>([]);
 const selectedTeamId = ref<number | undefined>(undefined);
 const selectedTeam = ref<any>(null);
 
@@ -380,13 +382,13 @@ const signUp = async (row: any) => {
     const res = await CompetitionControllerService.getDetailUsingGet(row.id);
     if (res && res.data) {
       selectedCompetition.value = res.data;
-      
+
       // 如果没有赛事项目，提示用户
       if (!res.data.itemRelations || res.data.itemRelations.length === 0) {
         ElMessage.warning('该赛事未设置比赛项目，无法报名');
         return;
       }
-      
+
       // 如果是团队赛事，先检查用户是否在团队中
       if (selectedCompetition.value.isTeamCompetition === 1) {
         try {
@@ -549,29 +551,20 @@ const handleSignUpSuccess = (result: any) => {
   loadData();
 };
 
-// 搜索
-const searchBtn = () => {
-  searchParm.page = 1;
-  loadData();
-};
-
 // 重置
 const resetBtn = () => {
   searchParm.name = '';
   searchParm.type = null;
   searchParm.page = 1;
-  loadData();
 };
 
 // 分页处理
 const handleSizeChange = (val: number) => {
   searchParm.pageSize = val;
-  loadData();
 };
 
 const handleCurrentChange = (val: number) => {
   searchParm.page = val;
-  loadData();
 };
 
 // 判断是否可以报名
@@ -592,13 +585,11 @@ const handleTeamCreated = (newTeam: any) => {
   selectedTeamId.value = newTeam.value;
 };
 
-// 计算报名百分比
-const calculatePercentage = (signUpNum: number = 0, maxSignUpNum: number = 0) => {
-  if (maxSignUpNum === 0) return 0;
-  return Math.round((signUpNum / maxSignUpNum) * 100);
-};
+// 监听 searchParm 变量，改变时触发页面的重新加载
+watch(() => searchParm, () => {
+  loadData();
+}, {deep: true});
 
-// 初始化
 onMounted(() => {
   loadData();
 });

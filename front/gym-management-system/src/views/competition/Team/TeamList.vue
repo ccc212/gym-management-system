@@ -19,7 +19,6 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button icon="Search" @click="searchBtn">搜索</el-button>
         <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
         <el-button icon="Plus" type="primary" @click="addBtn">新增</el-button>
       </el-form-item>
@@ -60,13 +59,13 @@
     <el-dialog :title="dialogTitle" v-model="openDialog" width="500px" append-to-body>
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="80px">
         <el-form-item label="团队名称" prop="teamName">
-          <el-input v-model="formData.teamName" placeholder="请输入团队名称" />
+          <el-input v-model="formData.teamName" placeholder="请输入团队名称"/>
         </el-form-item>
         <el-form-item label="领队姓名" prop="leaderName">
-          <el-input v-model="formData.leaderName" placeholder="请输入领队姓名" />
+          <el-input v-model="formData.leaderName" placeholder="请输入领队姓名"/>
         </el-form-item>
         <el-form-item label="联系电话" prop="leaderPhone">
-          <el-input v-model="formData.leaderPhone" placeholder="请输入联系电话" />
+          <el-input v-model="formData.leaderPhone" placeholder="请输入联系电话"/>
         </el-form-item>
         <el-form-item label="所属部门" prop="departId">
           <el-select v-model="formData.departId" placeholder="请选择部门" clearable>
@@ -116,11 +115,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watchEffect } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { TeamControllerService } from '../../../../generated/services/TeamControllerService';
-import { DepartmentControllerService } from '../../../../generated/services/DepartmentControllerService';
-import { UserControllerService } from '../../../../generated/services/UserControllerService';
+import {onMounted, reactive, ref, watch} from 'vue';
+import {ElMessage, ElMessageBox} from 'element-plus';
+import {TeamControllerService} from '../../../../generated/services/TeamControllerService';
+import {DepartmentControllerService} from '../../../../generated/services/DepartmentControllerService';
+import {UserControllerService} from '../../../../generated/services/UserControllerService';
 
 // 表格高度
 const tableHeight = ref(0);
@@ -203,16 +202,16 @@ const currentTeamId = ref('');
 // 表单校验规则
 const rules = {
   teamName: [
-    { required: true, message: '请输入团队名称', trigger: 'blur' }
+    {required: true, message: '请输入团队名称', trigger: 'blur'}
   ],
   leaderName: [
-    { required: true, message: '请输入领队姓名', trigger: 'blur' }
+    {required: true, message: '请输入领队姓名', trigger: 'blur'}
   ],
   leaderPhone: [
-    { required: true, message: '请输入联系电话', trigger: 'blur' }
+    {required: true, message: '请输入联系电话', trigger: 'blur'}
   ],
   departId: [
-    { required: true, message: '请选择所属部门', trigger: 'change' }
+    {required: true, message: '请选择所属部门', trigger: 'change'}
   ]
 };
 
@@ -247,29 +246,19 @@ const loadData = async () => {
   }
 };
 
-/**
- * 监听 searchParm 变量，改变时触发页面的重新加载
- */
-watchEffect(() => {
-  const { page, pageSize, teamName, leaderName, departId } = searchParm;
+// 监听 searchParm 变量，改变时触发页面的重新加载
+watch(() => searchParm, () => {
   loadData();
-});
+}, {deep: true});
 
-/**
- * 页面加载时，计算表格高度
- */
 onMounted(() => {
+  loadData();
   // 计算表格高度
   tableHeight.value = window.innerHeight - 320;
   // 获取部门和用户选项
   getDepartmentOptions();
   getUserOptions();
 });
-
-// 搜索按钮
-const searchBtn = () => {
-  searchParm.page = 1;
-};
 
 // 重置按钮
 const resetBtn = () => {
@@ -337,7 +326,7 @@ const removeMemberBtn = (userId: string) => {
       if (res && res.code === 0) {
         ElMessage.success('移除成员成功');
         // 刷新成员列表
-        await viewBtn({ id: currentTeamId.value });
+        await viewBtn({id: currentTeamId.value});
       } else {
         ElMessage.error(res?.msg || '移除成员失败');
       }
@@ -345,7 +334,8 @@ const removeMemberBtn = (userId: string) => {
       console.error('移除成员错误:', error);
       ElMessage.error('移除成员失败，请检查网络或联系管理员');
     }
-  }).catch(() => {});
+  }).catch(() => {
+  });
 };
 
 // 删除按钮
@@ -368,7 +358,8 @@ const deleteBtn = (id: string) => {
       console.error('删除错误:', error);
       ElMessage.error('删除失败，请检查网络或联系管理员');
     }
-  }).catch(() => {});
+  }).catch(() => {
+  });
 };
 
 // 提交表单

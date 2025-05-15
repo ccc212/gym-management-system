@@ -15,6 +15,6 @@
             e.equipment_name
         from competition_equipment_relation as cre
         left join equipment as e on cre.equipment_id = e.id
-        where competition_id = #{competitionId}
+        where cre.competition_id = #{competitionId}
     </select>
 </mapper>

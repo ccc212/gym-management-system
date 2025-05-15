@@ -15,6 +15,7 @@ import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
 import com.gymsys.entity.competition.vo.CompetitionDetailVO;
 import com.gymsys.entity.competition.vo.CompetitionEquipmentRelationVO;
 import com.gymsys.entity.competition.vo.CompetitionVO;
+import com.gymsys.entity.competition.vo.CompetitionVenueRelationVO;
 import com.gymsys.enums.CompetitionStatusEnum;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
@@ -185,8 +186,7 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
             competitionItemRelations = competitionItemMapper.selectBatchIds(competitionItemIds);
         }
 
-        List<CompetitionVenueRelation> competitionVenueRelations = competitionVenueRelationMapper.selectList(new LambdaQueryWrapper<CompetitionVenueRelation>()
-                .eq(CompetitionVenueRelation::getCompetitionId, id));
+        List<CompetitionVenueRelationVO> competitionVenueRelations = competitionVenueRelationMapper.getCompetitionVenueRelation(id);
 
         List<CompetitionEquipmentRelationVO> competitionEquipmentRelations = competitionEquipmentRelationMapper.getCompetitionEquipmentRelation(id);
 

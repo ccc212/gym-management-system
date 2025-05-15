@@ -66,8 +66,9 @@
     <el-divider v-if="competition.venueRelations && competition.venueRelations.length > 0">场地信息</el-divider>
     <el-table v-if="competition.venueRelations && competition.venueRelations.length > 0" :data="competition.venueRelations" border>
       <el-table-column prop="venueName" label="场地名称" width="150px"></el-table-column>
-      <el-table-column prop="responsibleName" label="负责人" width="120px"></el-table-column>
-      <el-table-column prop="phone" label="联系电话" width="120px"></el-table-column>
+      <el-table-column prop="num" label="数量" width="80px"></el-table-column>
+<!--      <el-table-column prop="responsibleName" label="负责人" width="120px"></el-table-column>-->
+<!--      <el-table-column prop="phone" label="联系电话" width="120px"></el-table-column>-->
       <el-table-column prop="startTime" label="开始时间" width="160px"></el-table-column>
       <el-table-column prop="endTime" label="结束时间" width="160px"></el-table-column>
       <el-table-column prop="status" label="状态" width="100px">

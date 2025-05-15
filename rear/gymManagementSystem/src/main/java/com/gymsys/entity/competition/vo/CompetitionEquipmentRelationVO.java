@@ -8,5 +8,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class CompetitionEquipmentRelationVO extends CompetitionEquipmentRelation {
 
-    private String venueName;
+    private String equipmentName;
 }

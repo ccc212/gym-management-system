@@ -93,7 +93,7 @@ public class CompetitionDetailVO {
     /**
      * 场地
      */
-    private List<CompetitionVenueRelation> venueRelations;
+    private List<CompetitionVenueRelationVO> venueRelations;
 
     /**
      * 器材

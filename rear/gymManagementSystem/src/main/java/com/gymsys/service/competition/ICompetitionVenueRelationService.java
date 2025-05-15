@@ -1,10 +1,12 @@
 package com.gymsys.service.competition;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.gymsys.entity.competition.CompetitionVenueRelation;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.AddCompetitionVenueRelationDTO;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.ListCompetitionVenueRelationDTO;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.UpdateCompetitionVenueRelationDTO;
+import com.gymsys.entity.competition.vo.CompetitionVenueRelationVO;
 
 import java.util.List;
 
@@ -16,7 +18,7 @@ import java.util.List;
  * @author ccc212
  * @since 2025-04-19
  */
-public interface ICompetitionVenueRelationService {
+public interface ICompetitionVenueRelationService extends IService<CompetitionVenueRelation> {
     /**
      * 添加赛事场地关联
      *
@@ -53,12 +55,6 @@ public interface ICompetitionVenueRelationService {
      * @return 场地关联列表
      */
     List<CompetitionVenueRelation> listByCompetitionId(Long competitionId);
-    
-    /**
-     * 根据ID获取场地关联
-     *
-     * @param id 关联ID
-     * @return 场地关联
-     */
-    CompetitionVenueRelation getById(Long id);
+
+    List<CompetitionVenueRelationVO> getCompetitionVenueRelation(Long competitionId);
 }

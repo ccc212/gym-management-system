@@ -1,7 +1,10 @@
 package com.gymsys.mapper.competition;
 
-import com.gymsys.entity.competition.CompetitionVenueRelation;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gymsys.entity.competition.CompetitionVenueRelation;
+import com.gymsys.entity.competition.vo.CompetitionVenueRelationVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface CompetitionVenueRelationMapper extends BaseMapper<CompetitionVenueRelation> {
 
+    List<CompetitionVenueRelationVO> getCompetitionVenueRelation(Long competitionId);
 }

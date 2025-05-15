@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-      title="器材预约"
+      title="场地预约"
       v-model="dialogVisible"
       width="600px"
       append-to-body
@@ -12,15 +12,15 @@
         <el-input :value="competitionName" disabled></el-input>
       </el-form-item>
 
-      <el-form-item label="选择器材" prop="equipmentId">
+      <el-form-item label="选择场地" prop="venueId">
         <el-select
-            v-model="formData.equipmentId"
-            placeholder="请选择器材"
+            v-model="formData.venueId"
+            placeholder="请选择场地"
             filterable
-            @change="handleEquipmentChange"
+            @change="handleVenueChange"
         >
           <el-option
-              v-for="item in equipmentOptions"
+              v-for="item in venueOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -37,7 +37,7 @@
         <el-input-number
             v-model="formData.num"
             :min="1"
-            :max="selectedEquipment ? selectedEquipment.remainingQuantity : 999"
+            :max="selectedVenue ? selectedVenue.remainingQuantity : 999"
             placeholder="请输入数量"
         ></el-input-number>
       </el-form-item>
@@ -54,11 +54,11 @@
       </el-form-item>
     </el-form>
 
-    <!-- 已预约的器材 -->
-    <div v-if="reservedEquipments.length > 0" class="reserved-equipment-section">
-      <el-divider content-position="left">已预约器材</el-divider>
-      <el-table :data="reservedEquipments" border stripe size="small">
-        <el-table-column prop="equipmentName" label="器材名称" width="150"></el-table-column>
+    <!-- 已预约的场地 -->
+    <div v-if="reservedVenues.length > 0" class="reserved-venue-section">
+      <el-divider content-position="left">已预约场地</el-divider>
+      <el-table :data="reservedVenues" border stripe size="small">
+        <el-table-column prop="venueName" label="场地名称" width="150"></el-table-column>
         <el-table-column prop="num" label="数量" width="80"></el-table-column>
         <el-table-column prop="startTime" label="开始时间" width="150"></el-table-column>
         <el-table-column prop="endTime" label="结束时间" width="150"></el-table-column>
@@ -96,10 +96,10 @@
 import {onMounted, reactive, ref, watch} from 'vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
 import {
-  CompetitionEquipmentRelationControllerService
-} from '../../../generated/services/CompetitionEquipmentRelationControllerService';
-import {EquipBasicsControllerService} from '../../../generated/services/EquipBasicsControllerService';
-import type {Equipment} from '../../../generated/models/Equipment';
+  CompetitionVenueRelationControllerService
+} from '../../../generated/services/CompetitionVenueRelationControllerService';
+import type {Venue} from '../../../generated/models/VenueEntity';
+import {VenueControllerService} from "../../../generated";
 
 const props = defineProps({
   modelValue: {
@@ -122,20 +122,20 @@ const dialogVisible = ref(props.modelValue);
 const loading = ref(false);
 const formRef = ref();
 
-const equipmentOptions = ref<{ value: number, label: string, remainingQuantity: number }[]>([]);
-const selectedEquipment = ref<Equipment | null>(null);
-const reservedEquipments = ref<any[]>([]);
+const venueOptions = ref<{ value: number, label: string, remainingQuantity: number }[]>([]);
+const selectedVenue = ref<Venue | null>(null);
+const reservedVenues = ref<any[]>([]);
 
 // 表单数据
 const formData = reactive({
-  equipmentId: undefined as number | undefined,
+  venueId: undefined as number | undefined,
   num: 1,
   timeRange: [] as string[],
 });
 
 // 表单验证规则
 const rules = {
-  equipmentId: [{required: true, message: '请选择器材', trigger: 'change'}],
+  venueId: [{required: true, message: '请选择场地', trigger: 'change'}],
   num: [{required: true, message: '请输入数量', trigger: 'blur'}],
   timeRange: [{required: true, message: '请选择预约时间', trigger: 'change'}]
 };
@@ -144,9 +144,9 @@ const rules = {
 watch(() => props.modelValue, (val) => {
   dialogVisible.value = val;
   if (val) {
-    // 加载器材列表和已预约器材
-    loadEquipments();
-    loadReservedEquipments();
+    // 加载场地列表和已预约场地
+    loadVenues();
+    loadReservedVenues();
   }
 });
 
@@ -155,67 +155,66 @@ watch(dialogVisible, (val) => {
   emit('update:modelValue', val);
 });
 
-// 加载器材列表
-const loadEquipments = async () => {
+// 加载场地列表
+const loadVenues = async () => {
   try {
     loading.value = true;
-    const res = await EquipBasicsControllerService.getListUsingGet1(
-        1, // page
-        '', // equipmentName
-        100, // pageSize
-        0 // status - 在库中
+    const res = await VenueControllerService.getAllVenuesUsingGet(
+        1,
+        100,
+        undefined
     );
 
-    if (res && res.data && res.data.records) {
-      equipmentOptions.value = res.data.records.map((item: Equipment) => ({
+    if (res.data?.records) {
+      venueOptions.value = res.data.records.map((item: Venue) => ({
         value: item.id!,
-        label: item.equipmentName || '',
-        remainingQuantity: item.remainingQuantity || 0
+        label: item.name || '',
+        remainingQuantity: item.capacity || 0
       }));
     }
   } catch (error) {
-    console.error('获取器材列表失败:', error);
-    ElMessage.error('获取器材列表失败');
+    console.error('获取场地列表失败:', error);
+    ElMessage.error('获取场地列表失败');
   } finally {
     loading.value = false;
   }
 };
 
-// 加载已预约器材
-const loadReservedEquipments = async () => {
+// 加载已预约场地
+const loadReservedVenues = async () => {
   try {
     loading.value = true;
-    const res = await CompetitionEquipmentRelationControllerService.getCompetitionEquipmentRelationUsingGet(
+    const res = await CompetitionVenueRelationControllerService.getCompetitionVenueRelationUsingGet(
         props.competitionId
     );
 
     if (res && res.data) {
-      reservedEquipments.value = res.data;
+      reservedVenues.value = res.data;
     }
   } catch (error) {
-    console.error('获取已预约器材失败:', error);
-    ElMessage.error('获取已预约器材失败');
+    console.error('获取已预约场地失败:', error);
+    ElMessage.error('获取已预约场地失败');
   } finally {
     loading.value = false;
   }
 };
 
-// 处理器材选择变更
-const handleEquipmentChange = (value: number) => {
+// 处理场地选择变更
+const handleVenueChange = (value: number) => {
   if (!value) {
-    selectedEquipment.value = null;
+    selectedVenue.value = null;
     return;
   }
 
-  const option = equipmentOptions.value.find(item => item.value === value);
+  const option = venueOptions.value.find(item => item.value === value);
   if (option) {
-    // 查找器材详情
-    const equipment = {
+    // 查找场地详情
+    const venue = {
       id: option.value,
-      equipmentName: option.label,
+      venueName: option.label,
       remainingQuantity: option.remainingQuantity
-    } as Equipment;
-    selectedEquipment.value = equipment;
+    } as Venue;
+    selectedVenue.value = venue;
 
     // 限制预约数量不超过库存
     if (formData.num > option.remainingQuantity) {
@@ -233,10 +232,10 @@ const cancelReservation = (row: any) => {
   }).then(async () => {
     try {
       loading.value = true;
-      const res = await CompetitionEquipmentRelationControllerService.deleteCompetitionEquipmentRelationUsingDelete(row.id);
+      const res = await CompetitionVenueRelationControllerService.deleteCompetitionVenueRelationUsingDelete(row.id);
       if (res.code === 0) {
         ElMessage.success('取消预约成功');
-        loadReservedEquipments(); // 重新加载列表
+        loadReservedVenues(); // 重新加载列表
       } else {
         ElMessage.error(res.msg || '取消预约失败');
       }
@@ -266,25 +265,25 @@ const submitForm = async () => {
 
         const params = {
           competitionId: props.competitionId,
-          equipmentId: formData.equipmentId,
+          venueId: formData.venueId,
           num: formData.num,
           startTime: formData.timeRange[0],
           endTime: formData.timeRange[1],
           status: 0 // 预约中
         };
 
-        const res = await CompetitionEquipmentRelationControllerService.addCompetitionEquipmentRelationUsingPost(params);
+        const res = await CompetitionVenueRelationControllerService.addCompetitionVenueRelationUsingPost(params);
 
         if (res.code === 0) {
           ElMessage.success('预约提交成功，等待管理员审核');
           // 重置表单
-          formData.equipmentId = undefined;
+          formData.venueId = undefined;
           formData.num = 1;
           formData.timeRange = [];
-          selectedEquipment.value = null;
+          selectedVenue.value = null;
 
           // 重新加载列表
-          loadReservedEquipments();
+          loadReservedVenues();
 
           // 通知父组件更新
           emit('success');
@@ -311,14 +310,18 @@ const handleClose = () => {
 // 组件挂载时
 onMounted(() => {
   if (dialogVisible.value) {
-    loadEquipments();
-    loadReservedEquipments();
+    loadVenues();
+    loadReservedVenues();
   }
 });
 </script>
 
 <style scoped>
-.reserved-equipment-section {
+.reserved-venue-section {
   margin-top: 20px;
+}
+
+.el-divider {
+  margin: 15px 0;
 }
 </style>

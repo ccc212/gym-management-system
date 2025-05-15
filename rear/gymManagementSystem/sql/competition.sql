@@ -82,6 +82,7 @@ create table `competition_venue_relation`
     id               bigint                  not null auto_increment primary key,
     competition_id   bigint                  not null comment '赛事id',
     venue_id         bigint                  not null comment '场地id',
+    num              int                     not null comment '数量',
     responsible_name varchar(255) default '' not null comment '负责人姓名',
     phone            varchar(255) default '' not null comment '联系电话',
     start_time       datetime     default current_timestamp comment '开始时间',
@@ -119,7 +120,7 @@ create table `competition_sign_up_user`
     user_stuorfac       varchar(255)            not null comment '区分学生或教职工 0 学生 1教师',
     remark              text comment '备注',
     status              tinyint      default 0  not null comment '状态(0为报名中，1为报名成功，2为报名失败)',
-    reject_reason              text comment '拒绝原因'
+    reject_reason       text comment '拒绝原因'
 ) engine = innodb
   default charset = utf8mb4 comment ='赛事个人报名表';
 
@@ -136,7 +137,7 @@ create table `competition_sign_up_team`
     competition_item_id bigint                  not null comment '赛事项目id',
     remark              text comment '备注',
     status              tinyint      default 0  not null comment '状态(0为报名中，1为报名成功，2为报名失败)',
-    reject_reason              text comment '拒绝原因'
+    reject_reason       text comment '拒绝原因'
 ) engine = innodb
   default charset = utf8mb4 comment ='赛事团体报名表';
 
@@ -156,10 +157,10 @@ create table `team`
 drop table if exists team_member_relation;
 create table `team_member_relation`
 (
-    id          bigint not null auto_increment primary key,
-    team_id     bigint not null comment '团队id',
-    user_id     bigint not null comment '用户id',
-    status      tinyint   default 0 not null comment '状态：0-待审核，1-已通过，2-已拒绝',
+    id          bigint             not null auto_increment primary key,
+    team_id     bigint             not null comment '团队id',
+    user_id     bigint             not null comment '用户id',
+    status      tinyint  default 0 not null comment '状态：0-待审核，1-已通过，2-已拒绝',
     create_time datetime default current_timestamp comment '创建时间',
     update_time datetime default current_timestamp on update current_timestamp comment '更新时间'
 ) engine = innodb

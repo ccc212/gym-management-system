@@ -23,15 +23,19 @@ public class AddCompetitionVenueRelationDTO extends BaseDTO {
     private Long venueId;
 
     /**
+     * 数量
+     */
+    @NotNull(message = "数量不能为空")
+    private Integer num;
+
+    /**
      * 负责人姓名
      */
-    @NotBlank(message = "负责人姓名不能为空")
     private String responsibleName;
 
     /**
      * 联系电话
      */
-    @NotBlank(message = "联系电话不能为空")
     private String phone;
 
     /**

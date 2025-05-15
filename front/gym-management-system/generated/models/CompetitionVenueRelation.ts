@@ -4,14 +4,13 @@
 /* eslint-disable */
 export type CompetitionVenueRelation = {
     competitionId?: number;
-    createTime?: string;
     endTime?: string;
     id?: number;
+    num?: number;
     phone?: string;
     responsibleName?: string;
     startTime?: string;
     status?: number;
-    updateTime?: string;
     venueId?: number;
 };
 

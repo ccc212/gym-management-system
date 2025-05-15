@@ -2,13 +2,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type AddCompetitionVenueRelationDTO = {
+export type CompetitionVenueRelationVO = {
     competitionId?: number;
     endTime?: string;
+    equipmentName?: string;
+    id?: number;
     num?: number;
     phone?: string;
     responsibleName?: string;
     startTime?: string;
+    status?: number;
     venueId?: number;
 };
 

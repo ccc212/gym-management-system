@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gymsys.entity.competition.*;
+import com.gymsys.entity.competition.Competition;
+import com.gymsys.entity.competition.CompetitionItem;
+import com.gymsys.entity.competition.CompetitionItemRelation;
+import com.gymsys.entity.competition.CompetitionVenueRelation;
 import com.gymsys.entity.competition.dto.competition.AddCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
@@ -15,19 +18,13 @@ import com.gymsys.entity.competition.vo.CompetitionVO;
 import com.gymsys.enums.CompetitionStatusEnum;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
-import com.gymsys.mapper.competition.CompetitionEquipmentRelationMapper;
-import com.gymsys.mapper.competition.CompetitionItemMapper;
-import com.gymsys.mapper.competition.CompetitionItemRelationMapper;
-import com.gymsys.mapper.competition.CompetitionMapper;
-import com.gymsys.repository.competition.CompetitionVenueRelationRepository;
+import com.gymsys.mapper.competition.*;
 import com.gymsys.service.competition.ICompetitionService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,11 +42,8 @@ import java.util.stream.Collectors;
 public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Competition> implements ICompetitionService {
 
     private final CompetitionItemRelationMapper competitionItemRelationMapper;
-
-    private final CompetitionVenueRelationRepository competitionVenueRelationRepository;
-
+    private final CompetitionVenueRelationMapper competitionVenueRelationMapper;
     private final CompetitionEquipmentRelationMapper competitionEquipmentRelationMapper;
-
     private final CompetitionItemMapper competitionItemMapper;
 
     @Override
@@ -183,7 +177,7 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
         Competition competition = lambdaQuery().eq(Competition::getId, id).one();
 
         List<Long> competitionItemIds = competitionItemRelationMapper.selectList(new LambdaQueryWrapper<CompetitionItemRelation>()
-                .eq(CompetitionItemRelation::getCompetitionId, id))
+                        .eq(CompetitionItemRelation::getCompetitionId, id))
                 .stream().map(CompetitionItemRelation::getCompetitionItemId)
                 .toList();
         List<CompetitionItem> competitionItemRelations = Collections.emptyList();
@@ -191,7 +185,8 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
             competitionItemRelations = competitionItemMapper.selectBatchIds(competitionItemIds);
         }
 
-        List<CompetitionVenueRelation> competitionVenueRelations = competitionVenueRelationRepository.findByCompetitionId(id);
+        List<CompetitionVenueRelation> competitionVenueRelations = competitionVenueRelationMapper.selectList(new LambdaQueryWrapper<CompetitionVenueRelation>()
+                .eq(CompetitionVenueRelation::getCompetitionId, id));
 
         List<CompetitionEquipmentRelationVO> competitionEquipmentRelations = competitionEquipmentRelationMapper.getCompetitionEquipmentRelation(id);
 
@@ -229,9 +224,9 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
      */
     private void saveCompetitionItemRelations(Long competitionId, List<Long> itemIds) {
         List<CompetitionItemRelation> relations = itemIds.stream().map(itemId ->
-            new CompetitionItemRelation()
-                    .setCompetitionId(competitionId)
-                    .setCompetitionItemId(itemId)
+                new CompetitionItemRelation()
+                        .setCompetitionId(competitionId)
+                        .setCompetitionItemId(itemId)
         ).collect(Collectors.toList());
         competitionItemRelationMapper.insert(relations);
     }

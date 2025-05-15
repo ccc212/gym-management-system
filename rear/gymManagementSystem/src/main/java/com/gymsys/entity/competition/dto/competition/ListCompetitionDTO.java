@@ -2,7 +2,9 @@ package com.gymsys.entity.competition.dto.competition;
 
 import com.gymsys.entity.PageDTO;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -29,12 +31,19 @@ public class ListCompetitionDTO extends PageDTO {
     private String hoster;
 
     /**
-     * 赛事状态(0为未开始，1为正在进行，2为已结束，3为报名已截止)
-     */
-    private Integer status;
-
-    /**
      * 是否为团体赛事
      */
     private Integer isTeamCompetition;
+
+    /**
+     * 赛事开始时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startTime;
+
+    /**
+     * 赛事结束时间
+     */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime endTime;
 }

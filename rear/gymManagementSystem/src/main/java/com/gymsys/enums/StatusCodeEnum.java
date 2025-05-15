@@ -40,7 +40,7 @@ public enum StatusCodeEnum {
     TEAM_NOT_EXIST(-10406, "团队不存在"),
     TEAM_MEMBER_RELATION_NOT_EXIST(-10407, "团队成员关联不存在"),
     TEAM_MEMBER_RELATION_EXISTS(-10408, "已加入该团队"),
-    TEAM_IS_USED(-10409, "团队已存在"),
+    TEAM_IS_USED(-10409, "团队存在报名的赛事"),
     TEAM_NAME_ALREADY_EXISTS(-10410, "团队名称已存在"),
     TEAM_MEMBER_ALREADY_EXISTS(-10411, "团队成员已存在"),
     TEAM_MEMBER_NOT_EXIST(-10412, "团队成员不存在"),
@@ -54,6 +54,7 @@ public enum StatusCodeEnum {
     COMPETITION_SIGN_UP_ALREADY_EXISTS(-10420, "赛事报名已存在"),
     COMPETITION_SIGN_UP_STATUS_ERROR(-10421, "赛事报名状态异常"),
     COMPETITION_SIGN_UP_DEADLINE_AFTER_START_TIME(-10422, "赛事报名截止时间不能在赛事开始时间之后"),
+    COMPETITION_END_TIME_BEFORE_START_TIME(-10423, "赛事结束时间不能在赛事开始时间之前"),
 
     // 器材管理相关
     EQUIPMENT_NOT_EXIST(-10501, "器材不存在");

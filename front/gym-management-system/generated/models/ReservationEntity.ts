@@ -4,13 +4,26 @@
 /* eslint-disable */
 import type { VenueEntity } from './VenueEntity';
 export type ReservationEntity = {
-    cardNumber?: string;
+    actualCost?: number;
+    actualEndTime?: string;
+    actualStartTime?: string;
+    cancelReason?: string;
+    cost?: number;
+    createdTime?: string;
+    date?: string;
+    duration?: string;
     endTime?: string;
     id?: number;
-    remark?: string;
+    numberOfPeople?: number;
+    paymentMethod?: string;
+    paymentTime?: string;
+    remarks?: string;
     reservationType?: string;
     startTime?: string;
     status?: string;
-    venue?: VenueEntity;
+    updatedTime?: string;
+    userId?: number;
+    venueId?: number;
+    venueInfo?: VenueEntity;
 };
 

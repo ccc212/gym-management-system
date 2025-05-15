@@ -23,7 +23,7 @@ public interface ITeamService extends IService<Team> {
      *
      * @param addTeamDTO 添加团队DTO
      */
-    void addTeam(AddTeamDTO addTeamDTO);
+    Long addTeam(AddTeamDTO addTeamDTO);
 
     /**
      * 删除团队

@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Competition } from './Competition';
-export type IPage_Competition_ = {
+import type { UsageEntity } from './UsageEntity';
+export type Page_UsageEntity_ = {
     current?: number;
     pages?: number;
-    records?: Array<Competition>;
+    records?: Array<UsageEntity>;
     size?: number;
     total?: number;
 };

@@ -206,7 +206,7 @@ export class UserControllerService {
      * @returns any Created
      * @throws ApiError
      */
-    public static loginUsingPost(
+    public static loginUsingPost1(
         parm: LoginParm,
     ): CancelablePromise<Result | any> {
         return __request(OpenAPI, {

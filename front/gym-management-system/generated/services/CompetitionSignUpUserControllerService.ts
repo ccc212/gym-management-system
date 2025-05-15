@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddCompetitionSignUpUserDTO } from '../models/AddCompetitionSignUpUserDTO';
-import type { Result_CompetitionSignUpUser_ } from '../models/Result_CompetitionSignUpUser_';
 import type { Result_IPage_CompetitionSignUpUser_ } from '../models/Result_IPage_CompetitionSignUpUser_';
+import type { Result_List_CompetitionSignUpUserVO_ } from '../models/Result_List_CompetitionSignUpUserVO_';
 import type { Result_object_ } from '../models/Result_object_';
 import type { UpdateCompetitionSignUpUserDTO } from '../models/UpdateCompetitionSignUpUserDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -78,18 +78,18 @@ export class CompetitionSignUpUserControllerService {
     }
     /**
      * getCompetitionSignUpUser
-     * @param id id
-     * @returns Result_CompetitionSignUpUser_ OK
+     * @param userId userId
+     * @returns Result_List_CompetitionSignUpUserVO_ OK
      * @throws ApiError
      */
     public static getCompetitionSignUpUserUsingGet(
-        id: number,
-    ): CancelablePromise<Result_CompetitionSignUpUser_> {
+        userId: number,
+    ): CancelablePromise<Result_List_CompetitionSignUpUserVO_> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/competition-sign-up-user/get/{id}',
+            url: '/competition-sign-up-user/getByUserId/{userId}',
             path: {
-                'id': id,
+                'userId': userId,
             },
             errors: {
                 401: `Unauthorized`,

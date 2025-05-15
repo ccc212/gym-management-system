@@ -2,4 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gymsys.mapper.competition.CompetitionSignUpTeamMapper">
 
+    <select id="getCompetitionSignUpTeam"
+            resultType="com.gymsys.entity.competition.vo.CompetitionSignUpTeamVO">
+        select
+            c.name as competitionName,
+            c.type as competitionType,
+            c.start_time as startTime,
+            c.sign_up_deadline as signUpDeadline,
+            c.end_time as endTime,
+            t.team_name as teamName,
+            csut.status as signUpStatus,
+            csut.reject_reason as rejectReason,
+            csut.id as id
+        from competition_sign_up_team csut
+        left join competition c on c.id = csut.competition_id
+        left join team_member_relation tmr on csut.team_id = tmr.team_id
+        left join team t on t.id = csut.team_id
+        where tmr.status = 1 and tmr.user_id = #{userId}
+    </select>
 </mapper>

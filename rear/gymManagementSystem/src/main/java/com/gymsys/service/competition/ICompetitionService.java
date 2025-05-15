@@ -9,6 +9,7 @@ import com.gymsys.entity.competition.dto.competition.AddCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
 import com.gymsys.entity.competition.vo.CompetitionDetailVO;
+import com.gymsys.entity.competition.vo.CompetitionVO;
 
 import java.util.List;
 
@@ -49,7 +50,7 @@ public interface ICompetitionService extends IService<Competition> {
      * @param listCompetitionDTO 查询条件
      * @return 赛事列表
      */
-    IPage<Competition> listCompetition(ListCompetitionDTO listCompetitionDTO);
+    IPage<CompetitionVO> listCompetition(ListCompetitionDTO listCompetitionDTO);
 
     CompetitionDetailVO getDetail(Long id);
 

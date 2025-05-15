@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gymsys.entity.competition.dto.competitionSignUpTeam.AddCompetitionSignUpTeamDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpTeam.ListCompetitionSignUpTeamDTO;
 import com.gymsys.entity.competition.dto.competitionSignUpTeam.UpdateCompetitionSignUpTeamDTO;
+import com.gymsys.entity.competition.vo.CompetitionSignUpTeamVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -24,4 +27,6 @@ public interface ICompetitionSignUpTeamService extends IService<CompetitionSignU
     void updateCompetitionSignUpTeam(UpdateCompetitionSignUpTeamDTO updateCompetitionSignUpTeamDTO);
 
     IPage<CompetitionSignUpTeam> listCompetitionSignUpTeamDTO(ListCompetitionSignUpTeamDTO listCompetitionSignUpTeamDTO);
+
+    List<CompetitionSignUpTeamVO> getCompetitionSignUpTeam(Long userId);
 }

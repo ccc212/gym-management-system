@@ -2,17 +2,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ReservationEntity } from './ReservationEntity';
-import type { VenueEntity } from './VenueEntity';
 export type UsageEntity = {
     cardNumber?: string;
     cost?: number;
+    createdAt?: string;
     endTime?: string;
     id?: number;
     paid?: boolean;
-    remark?: string;
-    reservation?: ReservationEntity;
     startTime?: string;
-    venue?: VenueEntity;
+    updatedAt?: string;
+    userId?: number;
+    venueId?: number;
 };
 

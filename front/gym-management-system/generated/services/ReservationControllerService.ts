@@ -2,35 +2,100 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Page_ReservationEntity_ } from '../models/Page_ReservationEntity_';
 import type { ReservationEntity } from '../models/ReservationEntity';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class ReservationControllerService {
     /**
-     * reserveVenue
-     * @param cardNumber cardNumber
-     * @param endTime endTime
-     * @param startTime startTime
-     * @param venueId venueId
+     * getAllReservations
+     * @param page page
+     * @param size size
+     * @returns Page_ReservationEntity_ OK
+     * @throws ApiError
+     */
+    public static getAllReservationsUsingGet(
+        page: number = 1,
+        size: number = 10,
+    ): CancelablePromise<Page_ReservationEntity_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/reservations',
+            query: {
+                'page': page,
+                'size': size,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * createReservation
+     * @param reservation reservation
      * @returns ReservationEntity OK
      * @returns any Created
      * @throws ApiError
      */
-    public static reserveVenueUsingPost(
-        cardNumber: string,
-        endTime: string,
-        startTime: string,
-        venueId: number,
+    public static createReservationUsingPost(
+        reservation: ReservationEntity,
     ): CancelablePromise<ReservationEntity | any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/reservations',
+            body: reservation,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * settleReservation
+     * @param settlementData settlementData
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static settleReservationUsingPost(
+        settlementData: any,
+    ): CancelablePromise<Record<string, any>> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/reservations/settle',
+            body: settlementData,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getReservationsByStatus
+     * @param status status
+     * @param page page
+     * @param size size
+     * @returns Page_ReservationEntity_ OK
+     * @throws ApiError
+     */
+    public static getReservationsByStatusUsingGet(
+        status: string,
+        page: number = 1,
+        size: number = 10,
+    ): CancelablePromise<Page_ReservationEntity_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/reservations/status/{status}',
+            path: {
+                'status': status,
+            },
             query: {
-                'cardNumber': cardNumber,
-                'endTime': endTime,
-                'startTime': startTime,
-                'venueId': venueId,
+                'page': page,
+                'size': size,
             },
             errors: {
                 401: `Unauthorized`,
@@ -40,56 +105,14 @@ export class ReservationControllerService {
         });
     }
     /**
-     * reserveVenueForClass
-     * @param endTime endTime
-     * @param startTime startTime
-     * @param venueId venueId
-     * @returns ReservationEntity OK
-     * @returns any Created
+     * getTodayReservations
+     * @returns any OK
      * @throws ApiError
      */
-    public static reserveVenueForClassUsingPost(
-        endTime: string,
-        startTime: string,
-        venueId: number,
-    ): CancelablePromise<ReservationEntity | any> {
+    public static getTodayReservationsUsingGet(): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/reservations/class',
-            query: {
-                'endTime': endTime,
-                'startTime': startTime,
-                'venueId': venueId,
-            },
-            errors: {
-                401: `Unauthorized`,
-                403: `Forbidden`,
-                404: `Not Found`,
-            },
-        });
-    }
-    /**
-     * reserveVenueForTeam
-     * @param endTime endTime
-     * @param startTime startTime
-     * @param venueId venueId
-     * @returns ReservationEntity OK
-     * @returns any Created
-     * @throws ApiError
-     */
-    public static reserveVenueForTeamUsingPost(
-        endTime: string,
-        startTime: string,
-        venueId: number,
-    ): CancelablePromise<ReservationEntity | any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/reservations/team',
-            query: {
-                'endTime': endTime,
-                'startTime': startTime,
-                'venueId': venueId,
-            },
+            method: 'GET',
+            url: '/api/reservations/today',
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
@@ -99,18 +122,35 @@ export class ReservationControllerService {
     }
     /**
      * getUserReservations
-     * @param cardNumber cardNumber
-     * @returns ReservationEntity OK
+     * @param userId userId
+     * @param endDate endDate
+     * @param page page
+     * @param size size
+     * @param startDate startDate
+     * @param status status
+     * @returns Page_ReservationEntity_ OK
      * @throws ApiError
      */
     public static getUserReservationsUsingGet(
-        cardNumber: string,
-    ): CancelablePromise<Array<ReservationEntity>> {
+        userId: number,
+        endDate?: string,
+        page: number = 1,
+        size: number = 10,
+        startDate?: string,
+        status?: string,
+    ): CancelablePromise<Page_ReservationEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/reservations/user/{cardNumber}',
+            url: '/api/reservations/user/{userId}',
             path: {
-                'cardNumber': cardNumber,
+                'userId': userId,
+            },
+            query: {
+                'endDate': endDate,
+                'page': page,
+                'size': size,
+                'startDate': startDate,
+                'status': status,
             },
             errors: {
                 401: `Unauthorized`,
@@ -120,20 +160,28 @@ export class ReservationControllerService {
         });
     }
     /**
-     * getVenueWeeklyReservations
+     * getReservationsByVenue
      * @param venueId venueId
-     * @returns ReservationEntity OK
+     * @param page page
+     * @param size size
+     * @returns Page_ReservationEntity_ OK
      * @throws ApiError
      */
-    public static getVenueWeeklyReservationsUsingGet(
+    public static getReservationsByVenueUsingGet(
         venueId: number,
-    ): CancelablePromise<Array<ReservationEntity>> {
+        page: number = 1,
+        size: number = 10,
+    ): CancelablePromise<Page_ReservationEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/reservations/venue/{venueId}/weekly',
+            url: '/api/reservations/venue/{venueId}',
             path: {
                 'venueId': venueId,
             },
+            query: {
+                'page': page,
+                'size': size,
+            },
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
@@ -142,12 +190,12 @@ export class ReservationControllerService {
         });
     }
     /**
-     * getReservation
+     * getReservationById
      * @param id id
      * @returns ReservationEntity OK
      * @throws ApiError
      */
-    public static getReservationUsingGet(
+    public static getReservationByIdUsingGet(
         id: number,
     ): CancelablePromise<ReservationEntity> {
         return __request(OpenAPI, {
@@ -164,58 +212,45 @@ export class ReservationControllerService {
         });
     }
     /**
-     * modifyReservation
-     * @param cardNumber cardNumber
-     * @param endTime endTime
+     * deleteReservation
      * @param id id
-     * @param startTime startTime
-     * @returns ReservationEntity OK
-     * @returns any Created
+     * @returns any OK
      * @throws ApiError
      */
-    public static modifyReservationUsingPut(
-        cardNumber: string,
-        endTime: string,
+    public static deleteReservationUsingDelete(
         id: number,
-        startTime: string,
-    ): CancelablePromise<ReservationEntity | any> {
+    ): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'PUT',
+            method: 'DELETE',
             url: '/api/reservations/{id}',
             path: {
                 'id': id,
             },
-            query: {
-                'cardNumber': cardNumber,
-                'endTime': endTime,
-                'startTime': startTime,
-            },
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
-                404: `Not Found`,
             },
         });
     }
     /**
      * cancelReservation
-     * @param cardNumber cardNumber
      * @param id id
+     * @param reason reason
      * @returns any OK
      * @throws ApiError
      */
-    public static cancelReservationUsingPost(
-        cardNumber: string,
+    public static cancelReservationUsingPut(
         id: number,
-    ): CancelablePromise<any> {
+        reason?: string,
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'PUT',
             url: '/api/reservations/{id}/cancel',
             path: {
                 'id': id,
             },
             query: {
-                'cardNumber': cardNumber,
+                'reason': reason,
             },
             errors: {
                 401: `Unauthorized`,
@@ -225,17 +260,45 @@ export class ReservationControllerService {
         });
     }
     /**
-     * handleNoShow
+     * updateReservationStatus
+     * @param id id
+     * @param status status
+     * @returns ReservationEntity OK
+     * @returns any Created
+     * @throws ApiError
+     */
+    public static updateReservationStatusUsingPut(
+        id: number,
+        status: string,
+    ): CancelablePromise<ReservationEntity | any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/reservations/{id}/status',
+            path: {
+                'id': id,
+            },
+            query: {
+                'status': status,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * getUsageDetail
      * @param id id
      * @returns any OK
      * @throws ApiError
      */
-    public static handleNoShowUsingPost(
+    public static getUsageDetailUsingGet(
         id: number,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/reservations/{id}/no-show',
+            method: 'GET',
+            url: '/api/reservations/{id}/usage',
             path: {
                 'id': id,
             },

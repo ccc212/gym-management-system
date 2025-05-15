@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { IPage_Competition_ } from './IPage_Competition_';
-export type Result_IPage_Competition_ = {
+import type { CompetitionSignUpTeamVO } from './CompetitionSignUpTeamVO';
+export type Result_List_CompetitionSignUpTeamVO_ = {
     code?: number;
-    data?: IPage_Competition_;
+    data?: Array<CompetitionSignUpTeamVO>;
     msg?: string;
 };
 

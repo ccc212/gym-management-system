@@ -3,13 +3,16 @@
 /* tslint:disable */
 /* eslint-disable */
 export type VenueEntity = {
-    available?: boolean;
     capacity?: number;
+    createdAt?: string;
     description?: string;
     id?: number;
+    isAvailable?: boolean;
     location?: string;
     name?: string;
     pricePerHour?: number;
+    status?: string;
     type?: string;
+    updatedAt?: string;
 };
 

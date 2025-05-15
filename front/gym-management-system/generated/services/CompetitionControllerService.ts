@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddCompetitionDTO } from '../models/AddCompetitionDTO';
-import type { Result_Competition_ } from '../models/Result_Competition_';
 import type { Result_CompetitionDetailVO_ } from '../models/Result_CompetitionDetailVO_';
-import type { Result_IPage_Competition_ } from '../models/Result_IPage_Competition_';
+import type { Result_CompetitionVO_ } from '../models/Result_CompetitionVO_';
+import type { Result_IPage_CompetitionVO_ } from '../models/Result_IPage_CompetitionVO_';
 import type { Result_List_CompetitionItem_ } from '../models/Result_List_CompetitionItem_';
 import type { Result_List_CompetitionItemRelation_ } from '../models/Result_List_CompetitionItemRelation_';
 import type { Result_object_ } from '../models/Result_object_';
@@ -59,12 +59,12 @@ export class CompetitionControllerService {
     /**
      * getCompetition
      * @param id id
-     * @returns Result_Competition_ OK
+     * @returns Result_CompetitionVO_ OK
      * @throws ApiError
      */
     public static getCompetitionUsingGet(
         id: number,
-    ): CancelablePromise<Result_Competition_> {
+    ): CancelablePromise<Result_CompetitionVO_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/competition/get/{id}',
@@ -103,37 +103,40 @@ export class CompetitionControllerService {
     /**
      * listCompetition
      * @param category
+     * @param endTime
      * @param hoster
      * @param isTeamCompetition
      * @param name
      * @param page
      * @param pageSize
-     * @param status
+     * @param startTime
      * @param type
-     * @returns Result_IPage_Competition_ OK
+     * @returns Result_IPage_CompetitionVO_ OK
      * @throws ApiError
      */
     public static listCompetitionUsingGet(
         category?: number,
+        endTime?: string,
         hoster?: string,
         isTeamCompetition?: number,
         name?: string,
         page?: number,
         pageSize?: number,
-        status?: number,
+        startTime?: string,
         type?: number,
-    ): CancelablePromise<Result_IPage_Competition_> {
+    ): CancelablePromise<Result_IPage_CompetitionVO_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/competition/list',
             query: {
                 'category': category,
+                'endTime': endTime,
                 'hoster': hoster,
                 'isTeamCompetition': isTeamCompetition,
                 'name': name,
                 'page': page,
                 'pageSize': pageSize,
-                'status': status,
+                'startTime': startTime,
                 'type': type,
             },
             errors: {

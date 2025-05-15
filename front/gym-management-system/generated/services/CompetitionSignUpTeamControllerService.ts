@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { AddCompetitionSignUpTeamDTO } from '../models/AddCompetitionSignUpTeamDTO';
 import type { Result_IPage_CompetitionSignUpTeam_ } from '../models/Result_IPage_CompetitionSignUpTeam_';
+import type { Result_List_CompetitionSignUpTeamVO_ } from '../models/Result_List_CompetitionSignUpTeamVO_';
 import type { Result_object_ } from '../models/Result_object_';
 import type { UpdateCompetitionSignUpTeamDTO } from '../models/UpdateCompetitionSignUpTeamDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -49,6 +50,28 @@ export class CompetitionSignUpTeamControllerService {
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
+            },
+        });
+    }
+    /**
+     * getCompetitionSignUpTeam
+     * @param userId userId
+     * @returns Result_List_CompetitionSignUpTeamVO_ OK
+     * @throws ApiError
+     */
+    public static getCompetitionSignUpTeamUsingGet(
+        userId: number,
+    ): CancelablePromise<Result_List_CompetitionSignUpTeamVO_> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/competition-sign-up-team/getByUserId/{userId}',
+            path: {
+                'userId': userId,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
             },
         });
     }

@@ -367,4 +367,54 @@ public class ReservationController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<Map<String, Object>> approveReservation(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> request) {
+        
+        ReservationEntity reservation = reservationService.getById(id);
+        if (reservation == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // 更新预约状态为已确认
+        reservation.setStatus("CONFIRMED");
+        if (request != null && request.containsKey("comment")) {
+            reservation.setRemarks(request.get("comment"));
+        }
+        reservation.setUpdatedTime(LocalDateTime.now());
+        reservationService.updateById(reservation);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "预约已成功批准");
+        response.put("reservation", reservation);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<Map<String, Object>> rejectReservation(
+            @PathVariable Long id,
+            @RequestBody(required = false) Map<String, String> request) {
+        
+        ReservationEntity reservation = reservationService.getById(id);
+        if (reservation == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // 更新预约状态为已拒绝
+        reservation.setStatus("REJECTED");
+        if (request != null && request.containsKey("comment")) {
+            reservation.setRemarks(request.get("comment"));
+        }
+        reservation.setUpdatedTime(LocalDateTime.now());
+        reservationService.updateById(reservation);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "预约已拒绝");
+        response.put("reservation", reservation);
+        
+        return ResponseEntity.ok(response);
+    }
 } 

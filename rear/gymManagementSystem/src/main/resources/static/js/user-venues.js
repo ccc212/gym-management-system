@@ -85,7 +85,7 @@ const UserVenuesComponent = {
                     
                     <div class="time-slots-container">
                         <el-row :gutter="10">
-                            <el-col :span="6" v-for="timeSlot in timeSlots" :key="timeSlot.startTime">
+                            <el-col :span="8" v-for="timeSlot in timeSlots" :key="timeSlot.startTime">
                                 <div 
                                     :class="['time-slot', {
                                         'available': timeSlot.status === 'AVAILABLE',
@@ -96,7 +96,7 @@ const UserVenuesComponent = {
                                     @click="timeSlot.status === 'AVAILABLE' && selectTimeSlot(timeSlot)">
                                     {{ timeSlot.startTime }} - {{ timeSlot.endTime }}
                                     <div class="time-slot-price" v-if="timeSlot.status === 'AVAILABLE'">
-                                        {{ timeSlot.price }}元
+                                        {{ timeSlot.price }}元/小时
                                     </div>
                                 </div>
                             </el-col>
@@ -145,17 +145,11 @@ const UserVenuesComponent = {
     `,
     data() {
         return {
-            // 搜索表单
+            venues: [],
+            loading: false,
             searchForm: {
                 venueType: '',
-                date: new Date().toISOString().split('T')[0] // 默认今天
-            },
-            // 日期选择器配置
-            datePickerOptions: {
-                disabledDate(time) {
-                    // 禁用过去的日期
-                    return time.getTime() < Date.now() - 8.64e7;
-                }
+                date: this.getTodayDate() // 默认日期为今天
             },
             // 场馆类型选项
             venueTypes: [
@@ -166,15 +160,19 @@ const UserVenuesComponent = {
                 { value: 'swimming', label: '游泳池' },
                 { value: 'table_tennis', label: '乒乓球室' }
             ],
-            // 场馆列表
-            venueList: [],
-            // 加载状态
-            loading: false,
-            // 分页信息
             pagination: {
                 currentPage: 1,
                 pageSize: 10,
                 total: 0
+            },
+            // 场馆列表
+            venueList: [],
+            // 日期选择器配置
+            datePickerOptions: {
+                disabledDate(time) {
+                    // 禁用过去的日期
+                    return time.getTime() < Date.now() - 8.64e7;
+                }
             },
             // 时间段选择弹窗
             timeSlotDialogVisible: false,
@@ -200,31 +198,48 @@ const UserVenuesComponent = {
         };
     },
     created() {
-        // 初始加载场馆数据
-        this.loadVenueData();
+        this.loadVenues();
     },
     methods: {
-        // 加载场馆数据
-        async loadVenueData() {
-            this.loading = true;
-            try {
-                const response = await axios.get(`${this.apiBaseUrl}`, {
-                    params: {
-                        page: this.pagination.currentPage,
-                        size: this.pagination.pageSize
-                    }
-                });
-                this.venueList = response.data.records;
-                this.pagination.total = response.data.total;
-            } catch (error) {
-                this.$message.error('加载场地数据失败');
-                console.error('加载场地数据失败:', error);
-            } finally {
-                this.loading = false;
-            }
+        // 获取今天的日期
+        getTodayDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
         },
-        // 搜索场馆
-        async searchVenues() {
+        // 格式化日期显示
+        formatDate(dateStr) {
+            if (!dateStr) return '';
+            
+            // 如果是字符串格式的日期，先转换为Date对象
+            const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+            
+            if (!(date instanceof Date) || isNaN(date)) {
+                return '';
+            }
+            
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        },
+        // 格式化日期显示（带年月日）
+        formatDateWithChinese(dateStr) {
+            if (!dateStr) return '';
+            
+            // 如果是字符串格式的日期，先转换为Date对象
+            const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+            
+            if (!(date instanceof Date) || isNaN(date)) {
+                return '';
+            }
+            
+            return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+        },
+        // 加载场地数据
+        async loadVenues() {
             this.loading = true;
             try {
                 const params = {
@@ -236,36 +251,60 @@ const UserVenuesComponent = {
                     params.type = this.searchForm.venueType;
                 }
                 
-                const response = await axios.get(`${this.apiBaseUrl}`, { params });
-                this.venueList = response.data.records;
-                this.pagination.total = response.data.total;
+                const response = await axios.get('/api/venues', { params });
+                if (response.data.code === 200) {
+                    const pageData = response.data.data;
+                    this.venueList = pageData.records || [];
+                    // 转换场地类型为中文显示
+                    this.venueList.forEach(venue => {
+                        if (venue.type) {
+                            const typeOption = this.venueTypes.find(t => t.value === venue.type);
+                            if (typeOption) {
+                                venue.type = typeOption.label;
+                            }
+                        }
+                    });
+                    this.pagination.total = pageData.total || 0;
+                } else {
+                    this.$message.error(response.data.message || '加载场地数据失败');
+                }
             } catch (error) {
-                this.$message.error('搜索场地失败');
-                console.error('搜索场地失败:', error);
+                console.error('加载场地数据失败:', error);
+                this.$message.error('加载场地数据失败');
             } finally {
                 this.loading = false;
             }
+        },
+        // 搜索场地
+        searchVenues() {
+            this.pagination.currentPage = 1;
+            this.loadVenues();
         },
         // 重置搜索条件
         resetSearch() {
             this.searchForm = {
                 venueType: '',
-                date: new Date().toISOString().split('T')[0]
+                date: ''
             };
             this.searchVenues();
         },
         // 分页大小变化处理
         handleSizeChange(val) {
             this.pagination.pageSize = val;
-            this.loadVenueData();
+            this.loadVenues();
         },
         // 页码变化处理
         handleCurrentChange(val) {
             this.pagination.currentPage = val;
-            this.loadVenueData();
+            this.loadVenues();
         },
         // 显示时间段选择弹窗
         showTimeSlots(venue) {
+            if (!this.searchForm.date) {
+                this.$message.warning('请先选择日期');
+                return;
+            }
+            
             this.selectedVenue = venue;
             this.selectedTimeSlot = null;
             this.bookingForm = {
@@ -281,36 +320,57 @@ const UserVenuesComponent = {
         async loadTimeSlots() {
             try {
                 const date = this.searchForm.date;
+                if (!date) {
+                    this.$message.warning('请先选择日期');
+                    return;
+                }
+                
+                console.log('加载时间段，日期:', date);
+                
                 const response = await axios.get(`${this.apiBaseUrl}/${this.selectedVenue.id}/time-slots`, {
                     params: { date: date }
                 });
                 
                 console.log('获取到的时间段数据:', response.data);
                 
-                if (response.data && Array.isArray(response.data)) {
-                    this.timeSlots = response.data.map(slot => ({
-                        ...slot,
-                        startTime: slot.startTime.format ? slot.startTime.format('HH:mm') : slot.startTime,
-                        endTime: slot.endTime.format ? slot.endTime.format('HH:mm') : slot.endTime,
-                        price: Number(slot.price).toFixed(2)
-                    }));
+                if (response.data.code === 200 && Array.isArray(response.data.data)) {
+                    this.timeSlots = response.data.data.map(slot => {
+                        // 确保时间格式正确
+                        const startTime = typeof slot.startTime === 'string' ? slot.startTime : 
+                                       (slot.startTime.format ? slot.startTime.format('HH:mm') : '00:00');
+                        const endTime = typeof slot.endTime === 'string' ? slot.endTime : 
+                                     (slot.endTime.format ? slot.endTime.format('HH:mm') : '00:00');
+                        
+                        return {
+                            ...slot,
+                            startTime: startTime,
+                            endTime: endTime,
+                            price: Number(slot.price || this.selectedVenue.pricePerHour).toFixed(2),
+                            status: slot.status || 'AVAILABLE'
+                        };
+                    });
                     console.log('处理后的时间段数据:', this.timeSlots);
                 } else {
                     this.timeSlots = [];
-                    this.$message.warning('没有可用的时间段');
+                    this.$message.warning(response.data.msg || '没有可用的时间段');
                 }
             } catch (error) {
                 console.error('加载时间段失败:', error);
-                this.$message.error('加载时间段失败: ' + error.message);
+                this.$message.error('加载时间段失败: ' + (error.response?.data?.msg || error.message));
                 this.timeSlots = [];
             }
         },
         // 选择时间段
         selectTimeSlot(timeSlot) {
             if (timeSlot.status === 'AVAILABLE') {
-                this.selectedTimeSlot = timeSlot;
-                this.bookingForm.startTime = timeSlot.startTime;
-                this.bookingForm.endTime = timeSlot.endTime;
+                console.log('选择的时间段原始数据:', timeSlot);
+                this.selectedTimeSlot = {
+                    ...timeSlot,
+                    startTime: timeSlot.startTime,
+                    endTime: timeSlot.endTime,
+                    price: Number(timeSlot.price || this.selectedVenue.pricePerHour).toFixed(2)
+                };
+                console.log('处理后的选中时间段:', this.selectedTimeSlot);
             }
         },
         // 计算预估费用
@@ -329,46 +389,54 @@ const UserVenuesComponent = {
 
             this.$refs.bookingForm.validate(valid => {
                 if (valid) {
-                    // 只取时间段的HH:mm部分
-                    const startTime = this.selectedTimeSlot.startTime;
-                    const endTime = this.selectedTimeSlot.endTime;
-
                     // 获取当前用户
                     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
                     const userId = currentUser && currentUser.id ? currentUser.id : null;
                     const cardNumber = currentUser && currentUser.cardNumber ? currentUser.cardNumber : '12345678';
 
-                    // 获取预约人数（如有输入框可用bookingForm.numberOfPeople，否则默认1）
-                    const numberOfPeople = this.bookingForm.numberOfPeople ? this.bookingForm.numberOfPeople : 1;
+                    if (!userId) {
+                        this.$message.error('请先登录');
+                        return;
+                    }
 
-                    // 调用后端预约API，使用JSON body
-                    this.loading = true;
-                    axios.post('/api/reservations', {
+                    // 计算时间差（小时）
+                    const startTime = this.selectedTimeSlot.startTime;
+                    const endTime = this.selectedTimeSlot.endTime;
+                    const [startHour, startMinute] = startTime.split(':').map(Number);
+                    const [endHour, endMinute] = endTime.split(':').map(Number);
+                    const duration = (endHour - startHour) + (endMinute - startMinute) / 60;
+
+                    // 构建预约请求数据
+                    const bookingData = {
                         venueId: this.selectedVenue.id,
                         userId: userId,
                         cardNumber: cardNumber,
-                        startTime: startTime, // 只传 "HH:mm"
-                        endTime: endTime,     // 只传 "HH:mm"
-                        numberOfPeople: numberOfPeople, // 新增预约人数
-                        remarks: this.bookingForm.remarks
-                    })
-                    .then(response => {
-                        this.timeSlotDialogVisible = false;
-                        this.$message.success('预约成功！');
-                        // 可以跳转到我的预约页面
-                        // this.$router.push('/user/myreservations');
-                    })
-                    .catch(error => {
-                        console.error('预约失败:', error);
-                        let errorMsg = '预约失败，请稍后重试';
-                        if (error.response && error.response.data && error.response.data.message) {
-                            errorMsg = error.response.data.message;
-                        }
-                        this.$message.error(errorMsg);
-                    })
-                    .finally(() => {
-                        this.loading = false;
-                    });
+                        startTime: `${this.searchForm.date}T${startTime}:00`,
+                        endTime: `${this.searchForm.date}T${endTime}:00`,
+                        numberOfPeople: 1,
+                        remarks: this.bookingForm.remarks || '',
+                        status: 'PENDING',
+                        cost: Number((this.selectedVenue.pricePerHour * duration).toFixed(2)),
+                        duration: duration
+                    };
+
+                    console.log('预约数据:', bookingData);
+
+                    // 发送预约请求
+                    axios.post(`${this.apiBaseUrl}/${this.selectedVenue.id}/reserve`, bookingData)
+                        .then(response => {
+                            if (response.data.code === 200) {
+                                this.$message.success('预约成功');
+                                this.timeSlotDialogVisible = false;
+                                this.loadVenues(); // 重新加载场馆列表
+                            } else {
+                                this.$message.error(response.data.msg || '预约失败');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('预约失败:', error);
+                            this.$message.error('预约失败，请稍后重试');
+                        });
                 }
             });
         },
@@ -377,12 +445,5 @@ const UserVenuesComponent = {
             this.selectedVenue = venue;
             this.venueDetailDialogVisible = true;
         },
-        // 格式化日期
-        formatDate(dateStr) {
-            if (!dateStr) return '';
-
-            const date = new Date(dateStr);
-            return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
-        }
     }
 };

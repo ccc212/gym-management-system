@@ -142,7 +142,12 @@ const AdminSpecialComponent = {
     `,
     data() {
         return {
-            // 搜索表单
+            venues: [], // 所有场馆列表
+            specialArrangements: [],
+            loading: false,
+            total: 0,
+            currentPage: 1,
+            pageSize: 10,
             searchForm: {
                 venueType: '',
                 venueId: '',
@@ -150,25 +155,15 @@ const AdminSpecialComponent = {
             },
             // 场馆类型选项
             venueTypes: [
-                { value: 'basketball', label: '篮球场' },
-                { value: 'football', label: '足球场' },
-                { value: 'badminton', label: '羽毛球场' },
-                { value: 'tennis', label: '网球场' },
-                { value: 'swimming', label: '游泳池' },
-                { value: 'table_tennis', label: '乒乓球室' }
+                { value: '篮球场', label: '篮球场' },
+                { value: '足球场', label: '足球场' },
+                { value: '羽毛球场', label: '羽毛球场' },
+                { value: '网球场', label: '网球场' },
+                { value: '游泳池', label: '游泳池' },
+                { value: '乒乓球室', label: '乒乓球室' }
             ],
-            // 所有场馆列表
-            venues: [],
-            // 特殊场地安排列表
-            specialArrangements: [],
-            // 加载状态
-            loading: false,
-            // 分页信息
-            pagination: {
-                currentPage: 1,
-                pageSize: 10,
-                total: 0
-            },
+            // 按类型分组的场馆
+            venueGroups: [],
             // 特殊场地弹窗可见性
             specialDialogVisible: false,
             // 弹窗类型（add/edit）
@@ -199,7 +194,9 @@ const AdminSpecialComponent = {
                 ]
             },
             // 可用时间段
-            availableTimeSlots: []
+            availableTimeSlots: [],
+            apiBaseUrl: '/api/special-arrangements',
+            venueApiUrl: '/api/venues'
         };
     },
     computed: {
@@ -208,106 +205,71 @@ const AdminSpecialComponent = {
             if (!this.searchForm.venueType) {
                 return this.venues;
             }
-
-            // 将英文类型转换为对应的中文类型名
-            const typeMap = {
-                'basketball': '篮球场',
-                'football': '足球场',
-                'badminton': '羽毛球场',
-                'tennis': '网球场',
-                'swimming': '游泳池',
-                'table_tennis': '乒乓球室'
-            };
-
-            return this.venues.filter(venue => {
-                return venue.type === typeMap[this.searchForm.venueType];
-            });
-        },
-        // 按类型分组的场馆列表（用于下拉选择）
-        venueGroups() {
-            const groups = [];
-
-            // 场馆类型分组
-            this.venueTypes.forEach(type => {
-                const venuesOfType = this.venues.filter(venue => {
-                    return venue.type === type.label;
-                });
-
-                if (venuesOfType.length > 0) {
-                    groups.push({
-                        label: type.label,
-                        venues: venuesOfType
-                    });
-                }
-            });
-
-            return groups;
+            return this.venues.filter(venue => venue.type === this.searchForm.venueType);
         }
     },
     created() {
         // 加载场馆数据
-        this.loadVenueData();
+        this.fetchVenues();
 
         // 初始加载特殊场地数据
         this.loadSpecialArrangementData();
     },
     methods: {
-        // 加载场馆数据
-        loadVenueData() {
-            this.loading = true;
-
-            // 模拟后端API请求
-            setTimeout(() => {
-                // 模拟数据，实际项目中应通过API获取
-                this.venues = [
-                    { id: 1, name: '篮球场A', type: '篮球场', location: '体育馆一楼' },
-                    { id: 2, name: '篮球场B', type: '篮球场', location: '体育馆一楼' },
-                    { id: 3, name: '足球场A', type: '足球场', location: '户外运动区' },
-                    { id: 4, name: '羽毛球场A', type: '羽毛球场', location: '体育馆二楼' },
-                    { id: 5, name: '羽毛球场B', type: '羽毛球场', location: '体育馆二楼' },
-                    { id: 6, name: '羽毛球场C', type: '羽毛球场', location: '体育馆二楼' },
-                    { id: 7, name: '网球场A', type: '网球场', location: '户外运动区' },
-                    { id: 8, name: '游泳池', type: '游泳池', location: '体育馆负一楼' },
-                    { id: 9, name: '乒乓球室A', type: '乒乓球室', location: '体育馆三楼' },
-                    { id: 10, name: '乒乓球室B', type: '乒乓球室', location: '体育馆三楼' }
-                ];
-
-                this.loading = false;
-            }, 300);
+        // 获取场地列表
+        async fetchVenues() {
+            try {
+                const response = await axios.get(this.venueApiUrl);
+                if (response.data.code === 200) {
+                    this.venues = response.data.data || [];
+                    this.processVenueData();
+                }
+            } catch (error) {
+                console.error('获取场地列表失败:', error);
+                this.venues = [];
+            }
+        },
+        
+        // 处理场地数据
+        processVenueData() {
+            // 按类型分组场地
+            this.venueGroups = this.venueTypes.map(type => {
+                const venuesOfType = this.venues.filter(venue => venue.type === type.value);
+                return {
+                    label: type.label,
+                    venues: venuesOfType
+                };
+            }).filter(group => group.venues.length > 0);
         },
         // 加载特殊场地数据
-        loadSpecialArrangementData() {
+        async loadSpecialArrangementData() {
             this.loading = true;
+            try {
+                const params = {
+                    page: this.pagination.currentPage,
+                    size: this.pagination.pageSize
+                };
 
-            // 模拟后端API请求
-            setTimeout(() => {
-                // 模拟数据，实际项目中应通过API获取
-                const now = new Date();
-                const today = this.formatDate(now);
-                const tomorrow = this.formatDate(new Date(now.getTime() + 86400000));
-                const nextWeek = this.formatDate(new Date(now.getTime() + 7 * 86400000));
+                if (this.searchForm.venueType) {
+                    params.venueType = this.searchForm.venueType;
+                }
+                if (this.searchForm.venueId) {
+                    params.venueId = this.searchForm.venueId;
+                }
+                if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
+                    params.startDate = this.searchForm.dateRange[0];
+                    params.endDate = this.searchForm.dateRange[1];
+                }
 
-                this.specialArrangements = [
-                    { id: 1, venueId: 1, venueName: '篮球场A', venueType: '篮球场', date: today, timeRange: '14:00 - 16:00', purpose: '校队训练', remarks: '校篮球队例行训练', createdBy: '管理员', createdTime: '2023-03-25 10:00:00' },
-                    { id: 2, venueId: 3, venueName: '足球场A', venueType: '足球场', date: tomorrow, timeRange: '09:00 - 12:00', purpose: '比赛活动', remarks: '院系足球联赛', createdBy: '管理员', createdTime: '2023-03-26 14:30:00' },
-                    { id: 3, venueId: 4, venueName: '羽毛球场A', venueType: '羽毛球场', date: nextWeek, timeRange: '18:00 - 20:00', purpose: '体育课程', remarks: '羽毛球选修课', createdBy: '管理员', createdTime: '2023-03-27 09:15:00' },
-                    { id: 4, venueId: 7, venueName: '网球场A', venueType: '网球场', date: tomorrow, timeRange: '16:00 - 18:00', purpose: '维护保养', remarks: '场地检修', createdBy: '管理员', createdTime: '2023-03-28 11:20:00' },
-                    { id: 5, venueId: 8, venueName: '游泳池', venueType: '游泳池', date: today, timeRange: '全天', purpose: '临时关闭', remarks: '水质检测', createdBy: '管理员', createdTime: '2023-03-29 08:00:00' }
-                ];
-
-                // 根据筛选条件过滤
-                this.filterSpecialArrangements();
-
-                this.pagination.total = this.specialArrangements.length;
+                const response = await axios.get(this.apiBaseUrl, { params });
+                this.specialArrangements = response.data.records;
+                this.pagination.total = response.data.total;
+            } catch (error) {
+                this.$message.error('加载特殊场地数据失败');
+                console.error('加载特殊场地数据失败:', error);
+            } finally {
                 this.loading = false;
-            }, 500);
-        },
-        // 格式化日期
-        formatDate(date) {
-            const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            }
         },
         // 搜索特殊场地安排
         searchSpecialArrangements() {
@@ -328,18 +290,8 @@ const AdminSpecialComponent = {
             let filteredList = [...this.specialArrangements];
 
             if (this.searchForm.venueType) {
-                // 将英文类型转换为对应的中文类型名
-                const typeMap = {
-                    'basketball': '篮球场',
-                    'football': '足球场',
-                    'badminton': '羽毛球场',
-                    'tennis': '网球场',
-                    'swimming': '游泳池',
-                    'table_tennis': '乒乓球室'
-                };
-
                 filteredList = filteredList.filter(item => {
-                    return item.venueType === typeMap[this.searchForm.venueType];
+                    return item.venueType === this.searchForm.venueType;
                 });
             }
 
@@ -398,52 +350,31 @@ const AdminSpecialComponent = {
             }
         },
         // 加载可用时间段
-        loadAvailableTimeSlots() {
+        async loadAvailableTimeSlots() {
             if (!this.specialForm.venueId || !this.specialForm.date) {
                 this.availableTimeSlots = [];
                 return;
             }
 
             this.loading = true;
-
-            // 模拟加载时间段
-            setTimeout(() => {
-                const slots = [];
-                const startHour = 8; // 早上8点开始
-                const endHour = 22;  // 晚上10点结束
-
-                for (let hour = startHour; hour < endHour; hour++) {
-                    // 创建整点和半点的时间段
-                    for (let minute of [0, 30]) {
-                        const startTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-                        const endHourMin = minute === 0 ? `${hour}:30` : `${hour + 1}:00`;
-                        const endTime = endHourMin.split(':').map(num => num.toString().padStart(2, '0')).join(':');
-                        const timeRange = `${startTime} - ${endTime}`;
-
-                        // 随机生成预约和特殊安排状态，实际应从后端获取
-                        const isBooked = Math.random() < 0.3;
-                        const isSpecial = Math.random() < 0.2;
-
-                        slots.push({
-                            id: `${hour}-${minute}`,
-                            timeRange,
-                            isBooked,
-                            isSpecial
-                        });
+            try {
+                const response = await axios.get(`${this.apiBaseUrl}/time-slots`, {
+                    params: {
+                        venueId: this.specialForm.venueId,
+                        date: this.specialForm.date
                     }
-                }
-
-                // 添加全天选项
-                slots.unshift({
-                    id: 'all-day',
-                    timeRange: '全天',
-                    isBooked: false,
-                    isSpecial: false
                 });
-
-                this.availableTimeSlots = slots;
+                if (response.data.code === 200) {
+                    this.availableTimeSlots = response.data.data || [];
+                } else {
+                    this.$message.error(response.data.message || '加载时间段数据失败');
+                }
+            } catch (error) {
+                this.$message.error('加载时间段数据失败');
+                console.error('加载时间段数据失败:', error);
+            } finally {
                 this.loading = false;
-            }, 300);
+            }
         },
         // 编辑特殊场地安排
         editSpecialArrangement(arrangement) {
@@ -484,67 +415,37 @@ const AdminSpecialComponent = {
             });
         },
         // 保存特殊场地安排
-        saveSpecialArrangement() {
-            this.$refs.specialForm.validate(valid => {
+        async saveSpecialArrangement() {
+            this.$refs.specialForm.validate(async valid => {
                 if (valid) {
                     this.loading = true;
-
-                    // 模拟保存请求
-                    setTimeout(() => {
-                        // 获取场地信息
-                        const venue = this.venues.find(v => v.id === this.specialForm.venueId);
-
-                        // 获取时间段文本
-                        let timeRange;
-                        if (this.specialForm.timeSlots.includes('all-day')) {
-                            timeRange = '全天';
-                        } else {
-                            // 获取选中的时间段并排序
-                            const selectedSlots = this.availableTimeSlots.filter(slot =>
-                                this.specialForm.timeSlots.includes(slot.id)
-                            );
-
-                            // 如果只选了一个时间段
-                            if (selectedSlots.length === 1) {
-                                timeRange = selectedSlots[0].timeRange;
-                            } else {
-                                // 对于多个时间段，合并显示
-                                // 简化处理，实际应合并连续的时间段
-                                const startTime = selectedSlots[0].timeRange.split(' - ')[0];
-                                const endTime = selectedSlots[selectedSlots.length - 1].timeRange.split(' - ')[1];
-                                timeRange = `${startTime} - ${endTime}`;
-                            }
-                        }
-
-                        const arrangement = {
-                            id: this.specialForm.id || this.specialArrangements.length + 1,
+                    try {
+                        const requestData = {
                             venueId: this.specialForm.venueId,
-                            venueName: venue.name,
-                            venueType: venue.type,
                             date: this.specialForm.date,
-                            timeRange: timeRange,
+                            timeSlots: this.specialForm.timeSlots,
                             purpose: this.specialForm.purpose,
                             remarks: this.specialForm.remarks,
-                            createdBy: '管理员',
-                            createdTime: new Date().toLocaleString()
+                            notifyUsers: this.specialForm.notifyUsers
                         };
 
                         if (this.dialogType === 'add') {
-                            // 添加新安排
-                            this.specialArrangements.unshift(arrangement);
+                            await axios.post(this.apiBaseUrl, requestData);
                             this.$message.success('添加特殊安排成功');
                         } else {
-                            // 更新现有安排
-                            const index = this.specialArrangements.findIndex(a => a.id === this.specialForm.id);
-                            if (index !== -1) {
-                                this.specialArrangements.splice(index, 1, arrangement);
-                                this.$message.success('更新特殊安排成功');
-                            }
+                            await axios.put(`${this.apiBaseUrl}/${this.specialForm.id}`, requestData);
+                            this.$message.success('更新特殊安排成功');
                         }
 
                         this.specialDialogVisible = false;
+                        this.loadSpecialArrangementData();
+                    } catch (error) {
+                        const errorMsg = error.response?.data?.message || '保存特殊安排失败';
+                        this.$message.error(errorMsg);
+                        console.error('保存特殊安排失败:', error);
+                    } finally {
                         this.loading = false;
-                    }, 500);
+                    }
                 }
             });
         },
@@ -561,18 +462,19 @@ const AdminSpecialComponent = {
             });
         },
         // 删除特殊安排
-        deleteSpecialArrangement(arrangement) {
+        async deleteSpecialArrangement(arrangement) {
             this.loading = true;
-
-            // 模拟删除请求
-            setTimeout(() => {
-                const index = this.specialArrangements.findIndex(a => a.id === arrangement.id);
-                if (index !== -1) {
-                    this.specialArrangements.splice(index, 1);
-                    this.$message.success('删除特殊安排成功');
-                }
+            try {
+                await axios.delete(`${this.apiBaseUrl}/${arrangement.id}`);
+                this.$message.success('删除特殊安排成功');
+                this.loadSpecialArrangementData();
+            } catch (error) {
+                const errorMsg = error.response?.data?.message || '删除特殊安排失败';
+                this.$message.error(errorMsg);
+                console.error('删除特殊安排失败:', error);
+            } finally {
                 this.loading = false;
-            }, 500);
+            }
         }
     }
 };

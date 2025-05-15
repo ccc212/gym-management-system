@@ -12,9 +12,12 @@ const UserReservationsComponent = {
                        <el-form-item label="预约状态">
                            <el-select v-model="searchForm.status" placeholder="选择状态" clearable @change="searchReservations">
                                <el-option label="全部" value=""></el-option>
-                               <el-option label="待使用" value="PENDING"></el-option>
-                               <el-option label="已使用" value="USED"></el-option>
+                               <el-option label="待确认" value="PENDING"></el-option>
+                               <el-option label="已确认" value="CONFIRMED"></el-option>
+                               <el-option label="使用中" value="IN_USE"></el-option>
+                               <el-option label="已完成" value="COMPLETED"></el-option>
                                <el-option label="已取消" value="CANCELED"></el-option>
+                               <el-option label="已拒绝" value="REJECTED"></el-option>
                            </el-select>
                        </el-form-item>
                        <el-form-item label="日期范围">
@@ -185,6 +188,8 @@ const UserReservationsComponent = {
                 return;
             }
 
+            console.log('当前用户ID:', userId);
+
             // 构建查询参数
             const params = new URLSearchParams({
                 page: this.pagination.currentPage,
@@ -202,17 +207,25 @@ const UserReservationsComponent = {
                 params.append('endDate', this.searchForm.dateRange[1]);
             }
             
+            console.log('查询参数:', params.toString());
+            
             // 发送请求到后端
             axios.get(`/api/reservations/user/${userId}?${params.toString()}`)
                 .then(response => {
                     console.log('获取预约列表响应:', response.data);
                     if (response.data && response.data.records) {
                         const { records, total, current, size } = response.data;
+                        console.log('预约记录数:', records.length);
                         this.reservationList = records.map(reservation => {
-                            // 确保日期是Date对象
+                            // 处理日期
                             if (typeof reservation.date === 'string') {
-                                reservation.date = new Date(reservation.date);
+                                // 如果是字符串，直接使用
+                                reservation.date = reservation.date;
+                            } else if (reservation.date instanceof Date) {
+                                // 如果是Date对象，转换为字符串
+                                reservation.date = reservation.date.toISOString().split('T')[0];
                             }
+                            console.log('处理预约记录:', reservation);
                             return reservation;
                         });
                         this.pagination.total = total;
@@ -225,6 +238,9 @@ const UserReservationsComponent = {
                 })
                 .catch(error => {
                     console.error('获取预约列表失败:', error);
+                    if (error.response) {
+                        console.error('错误响应:', error.response.data);
+                    }
                     this.$message.error('获取预约列表失败：' + (error.response?.data?.message || error.message));
                 })
                 .finally(() => {
@@ -321,12 +337,13 @@ const UserReservationsComponent = {
         // 获取状态文本
         getStatusText(status) {
             const statusMap = {
-                'PENDING': '待使用',
+                'PENDING': '待确认',
                 'CONFIRMED': '已确认',
                 'IN_USE': '使用中',
                 'COMPLETED': '已完成',
                 'CANCELED': '已取消',
-                'NO_SHOW': '未签到'
+                'NO_SHOW': '未签到',
+                'REJECTED': '已拒绝'
             };
             return statusMap[status] || '未知';
         },
@@ -338,7 +355,8 @@ const UserReservationsComponent = {
                 'IN_USE': 'success',
                 'COMPLETED': 'info',
                 'CANCELED': 'danger',
-                'NO_SHOW': 'danger'
+                'NO_SHOW': 'danger',
+                'REJECTED': 'danger'
             };
             return typeMap[status] || 'info';
         },
@@ -346,8 +364,19 @@ const UserReservationsComponent = {
         formatDate(dateStr) {
             if (!dateStr) return '';
 
-            const date = new Date(dateStr);
-            return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+            try {
+                // 如果是Date对象，转换为字符串
+                if (dateStr instanceof Date) {
+                    dateStr = dateStr.toISOString().split('T')[0];
+                }
+                
+                // 解析日期字符串
+                const [year, month, day] = dateStr.split('-');
+                return `${year}年${parseInt(month)}月${parseInt(day)}日`;
+            } catch (error) {
+                console.error('日期格式化错误:', error);
+                return dateStr;
+            }
         },
         // 格式化日期时间
         formatDateTime(dateTimeStr) {

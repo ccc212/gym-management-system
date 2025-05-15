@@ -5,35 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8a6d4dc5-691a-45b0-8f79-45a2f672f66f" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/front.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/.vscode/extensions.json" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/.vscode/extensions.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/App.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/components/HelloWorld.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/components/HelloWorld.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/header/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/header/Header.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuBar.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuItem.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuItem.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuLogo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/layout/menu/MenuLogo.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/router/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/dashboard/Index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/dashboard/Index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/system/Menu/MenuList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/system/Menu/MenuList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/system/Role/RoleList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/system/Role/RoleList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/system/Staff/StaffList.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/system/Student/StudentList.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/tsconfig.app.json" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/tsconfig.app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/tsconfig.node.json" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/tsconfig.node.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/vite.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vue.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/controller/SpecialArrangementController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/entity/SpecialArrangement.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/mapper/SpecialArrangementMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/SpecialArrangementService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/impl/SpecialArrangementServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/VenueController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/VenueController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/dto/ReservationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/dto/ReservationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/reservation/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/reservation/ReservationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/admin-special.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/admin-special.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-schedule.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-schedule.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-venues.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-venues.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,24 +47,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Code/作业/软综作业/gym-management-system/rear/gymManagementSystem&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.build.executor&quot;: &quot;Run&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;npm.preview.executor&quot;: &quot;Run&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;D:\\Code\\作业\\软综作业\\gym-management-system\\front\\gym-management-system\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Code/作业/软综作业/gym-management-system/front",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.build.executor": "Run",
+    "npm.dev.executor": "Run",
+    "npm.preview.executor": "Run",
+    "ts.external.directory.path": "D:\\Code\\作业\\软综作业\\gym-management-system\\front\\gym-management-system\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="npm.dev">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/gym-management-system/package.json" />
@@ -139,7 +122,8 @@
       <updated>1746869697725</updated>
       <workItem from="1746869698816" duration="2800000" />
       <workItem from="1747041691921" duration="609000" />
-      <workItem from="1747043043162" duration="3892000" />
+      <workItem from="1747043043162" duration="3947000" />
+      <workItem from="1747286104523" duration="1332000" />
     </task>
     <servers />
   </component>

@@ -4,6 +4,7 @@ CREATE TABLE `reservations` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `venue_id` bigint NOT NULL,
   `user_id` bigint NOT NULL,
+  `card_number` varchar(50) NOT NULL,
   `date` date NOT NULL,
   `start_time` varchar(10) NOT NULL,
   `end_time` varchar(10) NOT NULL,

@@ -35,6 +35,11 @@ public class ReservationEntity {
     private Long userId;
     
     /**
+     * 会员卡号
+     */
+    private String cardNumber;
+    
+    /**
      * 预约日期
      */
     private LocalDate date;

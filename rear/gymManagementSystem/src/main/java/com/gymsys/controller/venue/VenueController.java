@@ -2,6 +2,7 @@ package com.gymsys.controller.venue;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gymsys.common.Result;
 import com.gymsys.entity.venue.VenueEntity;
 import com.gymsys.entity.venue.TimeSlot;
 import com.gymsys.entity.reservation.ReservationEntity;
@@ -10,12 +11,12 @@ import com.gymsys.repository.venue.VenueRepository;
 import com.gymsys.service.reservation.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/venues")
@@ -28,128 +29,171 @@ public class VenueController {
     private ReservationService reservationService;
     
     @GetMapping("/types")
-    public ResponseEntity<List<String>> getVenueTypes() {
-        return ResponseEntity.ok(Arrays.asList(
-            "basketball",
-            "football",
-            "badminton",
-            "tennis",
-            "swimming",
-            "table_tennis"
-        ));
+    public Result<List<String>> getVenueTypes() {
+        List<String> types = Arrays.asList(
+            "篮球场",
+            "足球场",
+            "羽毛球场",
+            "网球场",
+            "游泳池",
+            "乒乓球室"
+        );
+        return Result.success(types);
     }
     
     @GetMapping
-    public ResponseEntity<Page<VenueEntity>> getAllVenues(
+    public Result<Page<VenueEntity>> getAllVenues(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String type) {
         Page<VenueEntity> venuePage = new Page<>(page, size);
+        LambdaQueryWrapper<VenueEntity> wrapper = new LambdaQueryWrapper<>();
+        
         if (type != null && !type.isEmpty()) {
-            return ResponseEntity.ok(venueRepository.findByTypeWithPage(type, venuePage));
+            // 将中文类型转换为英文类型
+            String englishType = convertToEnglishType(type);
+            wrapper.eq(VenueEntity::getType, englishType);
         }
-        return ResponseEntity.ok(venueRepository.selectPage(venuePage, null));
+        
+        Page<VenueEntity> result = venueRepository.selectPage(venuePage, wrapper);
+        
+        // 转换场地类型为中文
+        result.getRecords().forEach(venue -> {
+            if (venue.getType() != null) {
+                venue.setType(convertToChineseType(venue.getType()));
+            }
+        });
+        
+        return Result.success(result);
+    }
+    
+    private String convertToEnglishType(String chineseType) {
+        switch (chineseType) {
+            case "篮球场":
+                return "basketball";
+            case "足球场":
+                return "football";
+            case "羽毛球场":
+                return "badminton";
+            case "网球场":
+                return "tennis";
+            case "游泳池":
+                return "swimming";
+            case "乒乓球室":
+                return "table_tennis";
+            default:
+                return chineseType;
+        }
+    }
+    
+    private String convertToChineseType(String englishType) {
+        switch (englishType) {
+            case "basketball":
+                return "篮球场";
+            case "football":
+                return "足球场";
+            case "badminton":
+                return "羽毛球场";
+            case "tennis":
+                return "网球场";
+            case "swimming":
+                return "游泳池";
+            case "table_tennis":
+                return "乒乓球室";
+            default:
+                return englishType;
+        }
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<VenueEntity> getVenueById(@PathVariable Long id) {
+    public Result<VenueEntity> getVenueById(@PathVariable Long id) {
         VenueEntity venue = venueRepository.selectById(id);
         if (venue == null) {
-            return ResponseEntity.notFound().build();
+            return Result.error("场地不存在");
         }
-        return ResponseEntity.ok(venue);
+        return Result.success(venue);
     }
     
     @GetMapping("/type/{type}")
-    public ResponseEntity<Page<VenueEntity>> getVenuesByType(
+    public Result<List<VenueEntity>> getVenuesByType(
             @PathVariable String type,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
         Page<VenueEntity> venuePage = new Page<>(page, size);
-        return ResponseEntity.ok(venueRepository.findByTypeWithPage(type, venuePage));
+        List<VenueEntity> venues = venueRepository.findByTypeWithPage(type, venuePage).getRecords();
+        return Result.success(venues);
     }
     
     @GetMapping("/available")
-    public ResponseEntity<List<VenueEntity>> getAvailableVenues() {
-        return ResponseEntity.ok(venueRepository.selectList(null));
+    public Result<List<VenueEntity>> getAvailableVenues() {
+        List<VenueEntity> venues = venueRepository.selectList(null);
+        return Result.success(venues);
     }
     
     @GetMapping("/{venueId}/time-slots")
-    public ResponseEntity<List<TimeSlot>> getTimeSlots(
+    public Result<List<TimeSlot>> getTimeSlots(
             @PathVariable Long venueId,
             @RequestParam String date) {
         String formattedDate = date.replace("年", "-")
                                  .replace("月", "-")
                                  .replace("日", "");
         List<TimeSlot> timeSlots = reservationService.getAvailableTimeSlots(venueId, formattedDate);
-        return ResponseEntity.ok(timeSlots);
+        return Result.success(timeSlots);
     }
     
     @PostMapping("/{venueId}/reserve")
-    public ResponseEntity<ReservationEntity> createReservation(
+    public Result<ReservationEntity> createReservation(
             @PathVariable Long venueId,
             @RequestBody ReservationRequest request) {
-        String startTimeStr;
-        String endTimeStr;
-        if (request.getStartTime() instanceof LocalDateTime) {
-            startTimeStr = ((LocalDateTime)request.getStartTime()).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        } else {
-            startTimeStr = String.valueOf(request.getStartTime());
-        }
-        if (request.getEndTime() instanceof LocalDateTime) {
-            endTimeStr = ((LocalDateTime)request.getEndTime()).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        } else {
-            endTimeStr = String.valueOf(request.getEndTime());
-        }
         ReservationEntity reservation = reservationService.createReservation(
                 venueId,
                 request.getUserId(),
-                startTimeStr,
-                endTimeStr,
+                request.getStartTime().toString(),
+                request.getEndTime().toString(),
                 request.getNumberOfPeople(),
                 request.getRemarks()
         );
-        return ResponseEntity.ok(reservation);
+        return Result.success(reservation);
     }
     
     @PostMapping
-    public ResponseEntity<VenueEntity> createVenue(@RequestBody VenueEntity venue) {
+    public Result<VenueEntity> createVenue(@RequestBody VenueEntity venue) {
         venueRepository.insert(venue);
-        return ResponseEntity.ok(venue);
+        return Result.success(venue);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<VenueEntity> updateVenue(@PathVariable Long id, @RequestBody VenueEntity venue) {
+    public Result<VenueEntity> updateVenue(@PathVariable Long id, @RequestBody VenueEntity venue) {
         VenueEntity existingVenue = venueRepository.selectById(id);
         if (existingVenue == null) {
-            return ResponseEntity.notFound().build();
+            return Result.error("场地不存在");
         }
         venue.setId(id);
         venueRepository.updateById(venue);
-        return ResponseEntity.ok(venue);
+        return Result.success(venue);
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVenue(@PathVariable Long id) {
+    public Result<Void> deleteVenue(@PathVariable Long id) {
         VenueEntity venue = venueRepository.selectById(id);
         if (venue == null) {
-            return ResponseEntity.notFound().build();
+            return Result.error("场地不存在");
         }
         venueRepository.deleteById(id);
-        return ResponseEntity.ok().build();
+        return Result.success(null);
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<VenueEntity> updateVenueStatus(
+    public Result<VenueEntity> updateVenueStatus(
             @PathVariable Long id,
             @RequestParam String status) {
         VenueEntity venue = venueRepository.selectById(id);
         if (venue == null) {
-            return ResponseEntity.notFound().build();
+            return Result.error("场地不存在");
         }
         venue.setStatus(status);
         venue.setUpdatedAt(LocalDateTime.now());
         venueRepository.updateById(venue);
-        return ResponseEntity.ok(venue);
+        return Result.success(venue);
     }
 }

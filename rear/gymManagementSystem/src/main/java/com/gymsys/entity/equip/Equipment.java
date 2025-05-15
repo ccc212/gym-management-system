@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class Equipment {
     private Integer id; // 器材编号
-    private String EquipmentName; // 器材名称
+    private String equipmentName; // 器材名称
     private String type; // 器材类型
     private Integer remainingQuantity; // 仓库剩余数量
     private String administrator; // 负责的器材管理员

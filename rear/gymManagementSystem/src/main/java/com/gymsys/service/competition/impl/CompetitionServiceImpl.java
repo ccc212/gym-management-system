@@ -10,6 +10,7 @@ import com.gymsys.entity.competition.dto.competition.AddCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.ListCompetitionDTO;
 import com.gymsys.entity.competition.dto.competition.UpdateCompetitionDTO;
 import com.gymsys.entity.competition.vo.CompetitionDetailVO;
+import com.gymsys.entity.competition.vo.CompetitionEquipmentRelationVO;
 import com.gymsys.entity.competition.vo.CompetitionVO;
 import com.gymsys.enums.CompetitionStatusEnum;
 import com.gymsys.enums.StatusCodeEnum;
@@ -157,7 +158,7 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
                 .and(listCompetitionDTO.getStartTime() != null && listCompetitionDTO.getEndTime() != null,
                         wrapper -> wrapper.le(Competition::getStartTime, listCompetitionDTO.getEndTime())
                                 .ge(Competition::getEndTime, listCompetitionDTO.getStartTime()))
-                .orderByDesc(Competition::getCreateTime);
+                .orderByDesc(Competition::getSignUpDeadline);
 
         // 分页查询
         IPage<Competition> competitionPage = page(new Page<>(listCompetitionDTO.getPage(), listCompetitionDTO.getPageSize()), queryWrapper);
@@ -192,8 +193,7 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
 
         List<CompetitionVenueRelation> competitionVenueRelations = competitionVenueRelationRepository.findByCompetitionId(id);
 
-        List<CompetitionEquipmentRelation> competitionEquipmentRelations = competitionEquipmentRelationMapper.selectList(new LambdaQueryWrapper<CompetitionEquipmentRelation>()
-                .eq(CompetitionEquipmentRelation::getCompetitionId, id));
+        List<CompetitionEquipmentRelationVO> competitionEquipmentRelations = competitionEquipmentRelationMapper.getCompetitionEquipmentRelation(id);
 
         // 动态计算赛事状态
         Integer status = CompetitionStatusEnum.getStatusByTime(

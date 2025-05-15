@@ -8,6 +8,7 @@ export type ReservationEntity = {
     actualEndTime?: string;
     actualStartTime?: string;
     cancelReason?: string;
+    cardNumber?: string;
     cost?: number;
     createdTime?: string;
     date?: string;

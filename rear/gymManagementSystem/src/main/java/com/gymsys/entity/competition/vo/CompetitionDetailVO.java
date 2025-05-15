@@ -98,7 +98,7 @@ public class CompetitionDetailVO {
     /**
      * 器材
      */
-    private List<CompetitionEquipmentRelation> equipmentRelations;
+    private List<CompetitionEquipmentRelationVO> equipmentRelations;
 
     /**
      * 参赛要求

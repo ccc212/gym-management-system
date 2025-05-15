@@ -72,11 +72,11 @@
       </el-table-column>
     </el-table>
 
-    <!-- 设备信息 - 使用equipmentRelations字段 -->
-    <el-divider v-if="competition.equipmentRelations && competition.equipmentRelations.length > 0">设备信息</el-divider>
+    <!-- 器材信息 - 使用equipmentRelations字段 -->
+    <el-divider v-if="competition.equipmentRelations && competition.equipmentRelations.length > 0">器材信息</el-divider>
     <el-table v-if="competition.equipmentRelations && competition.equipmentRelations.length > 0" :data="competition.equipmentRelations" border>
-      <el-table-column prop="equipmentName" label="设备名称" width="150px"></el-table-column>
-      <el-table-column prop="count" label="数量" width="80px"></el-table-column>
+      <el-table-column prop="equipmentName" label="器材名称" width="150px"></el-table-column>
+      <el-table-column prop="num" label="数量" width="80px"></el-table-column>
       <el-table-column prop="startTime" label="开始时间" width="160px"></el-table-column>
       <el-table-column prop="endTime" label="结束时间" width="160px"></el-table-column>
       <el-table-column prop="status" label="状态" width="100px">

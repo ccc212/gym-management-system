@@ -2,4 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gymsys.mapper.competition.CompetitionEquipmentRelationMapper">
 
+    <select id="getCompetitionEquipmentRelation"
+            resultType="com.gymsys.entity.competition.vo.CompetitionEquipmentRelationVO">
+        select
+            cre.id,
+            cre.competition_id,
+            cre.equipment_id,
+            cre.num,
+            cre.start_time,
+            cre.end_time,
+            cre.status,
+            e.equipment_name
+        from competition_equipment_relation as cre
+        left join equipment as e on cre.equipment_id = e.id
+        where competition_id = #{competitionId}
+    </select>
 </mapper>

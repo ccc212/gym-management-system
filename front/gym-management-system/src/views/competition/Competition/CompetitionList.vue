@@ -1,4 +1,3 @@
-
 <template>
   <el-main>
     <!-- 搜索区域 -->
@@ -39,9 +38,10 @@
       <el-table-column prop="endTime" label="比赛结束时间" width="160px"></el-table-column>
       <el-table-column prop="hoster" label="举办方" width="120px"></el-table-column>
       <el-table-column prop="createTime" label="创建时间" width="160px"></el-table-column>
-      <el-table-column label="操作" width="280px">
+      <el-table-column label="操作">
         <template #default="scope">
           <el-button type="primary" icon="View" size="small" @click="viewBtn(scope.row)">查看详情</el-button>
+          <el-button type="success" icon="Goods" size="small" @click="reserveEquipment(scope.row)">器材预约</el-button>
           <el-button type="warning" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
           <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
         </template>
@@ -152,6 +152,14 @@
 
     <!-- 详情对话框 -->
     <competition-details v-model="openDetailDialog" :competition="detailData" />
+
+    <!-- 器材预约对话框 -->
+    <equipment-reservation
+      v-model="openEquipmentDialog"
+      :competition-id="currentCompetition?.id"
+      :competition-name="currentCompetition?.name"
+      @success="handleEquipmentReservationSuccess"
+    />
   </el-main>
 </template>
 
@@ -163,6 +171,7 @@ import {CompetitionItemControllerService} from '../../../../generated/services/C
 import type {CompetitionDetailVO} from "../../../../generated";
 import {CompetitionVO} from "../../../../generated";
 import CompetitionDetails from "../../../components/competition/CompetitionDetails.vue";
+import EquipmentReservation from "../../../components/competition/EquipmentReservation.vue";
 
 // 表格高度
 const tableHeight = ref(0);
@@ -228,6 +237,10 @@ const formData = reactive({
 // 详情对话框相关
 const openDetailDialog = ref(false);
 const detailData = ref<CompetitionDetailVO>({});
+
+// 器材预约对话框相关
+const openEquipmentDialog = ref(false);
+const currentCompetition = ref<CompetitionVO | null>(null);
 
 // 表单校验规则
 const rules = {
@@ -519,6 +532,18 @@ const handleSizeChange = (val: number) => {
 // 当前页改变
 const handleCurrentChange = (val: number) => {
   searchParm.page = val;
+};
+
+// 器材预约按钮
+const reserveEquipment = (row: any) => {
+  currentCompetition.value = row;
+  openEquipmentDialog.value = true;
+};
+
+// 器材预约成功回调
+const handleEquipmentReservationSuccess = () => {
+  // 如果需要，可以在此刷新数据
+  loadData();
 };
 </script>
 

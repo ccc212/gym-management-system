@@ -42,6 +42,7 @@
         <template #default="scope">
           <el-button type="primary" icon="View" size="small" @click="viewBtn(scope.row)">查看详情</el-button>
           <el-button type="success" icon="Goods" size="small" @click="reserveEquipment(scope.row)">器材预约</el-button>
+          <el-button type="info" icon="Location" size="small" @click="reserveVenue(scope.row)">场地预约</el-button>
           <el-button type="warning" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
           <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
         </template>
@@ -155,10 +156,18 @@
 
     <!-- 器材预约对话框 -->
     <equipment-reservation
-      v-model="openEquipmentDialog"
+        v-model="openEquipmentDialog"
+        :competition-id="currentCompetition?.id"
+        :competition-name="currentCompetition?.name"
+        @success="handleEquipmentReservationSuccess"
+    />
+
+    <!-- 场地预约对话框 -->
+    <venue-reservation
+      v-model="openVenueDialog"
       :competition-id="currentCompetition?.id"
       :competition-name="currentCompetition?.name"
-      @success="handleEquipmentReservationSuccess"
+      @success="handleVenueReservationSuccess"
     />
   </el-main>
 </template>
@@ -172,6 +181,8 @@ import type {CompetitionDetailVO} from "../../../../generated";
 import {CompetitionVO} from "../../../../generated";
 import CompetitionDetails from "../../../components/competition/CompetitionDetails.vue";
 import EquipmentReservation from "../../../components/competition/EquipmentReservation.vue";
+import VenueReservation from "../../../components/competition/VenueReservation.vue";
+import moment from 'moment';
 
 // 表格高度
 const tableHeight = ref(0);
@@ -240,6 +251,10 @@ const detailData = ref<CompetitionDetailVO>({});
 
 // 器材预约对话框相关
 const openEquipmentDialog = ref(false);
+
+// 场地预约对话框相关
+const openVenueDialog = ref(false);
+
 const currentCompetition = ref<CompetitionVO | null>(null);
 
 // 表单校验规则
@@ -469,22 +484,15 @@ const submitForm = async () => {
 
       // 处理时间范围
       if (data.competitionTimeRange && data.competitionTimeRange.length === 2) {
-        // 确保开始和结束时间包含时分秒
-        data.startTime = data.competitionTimeRange[0];
-        if (typeof data.startTime === 'string' && !data.startTime.includes(':')) {
-          data.startTime += ' 00:00:00';
-        }
-        
-        data.endTime = data.competitionTimeRange[1];
-        if (typeof data.endTime === 'string' && !data.endTime.includes(':')) {
-          data.endTime += ' 23:59:59';
-        }
+        // 使用moment统一处理时间格式
+        data.startTime = moment(data.competitionTimeRange[0]).format('YYYY-MM-DD HH:mm:ss');
+        data.endTime = moment(data.competitionTimeRange[1]).format('YYYY-MM-DD HH:mm:ss');
       }
       delete data.competitionTimeRange;
 
-      // 确保报名截止时间包含时分秒
-      if (data.signUpDeadline && typeof data.signUpDeadline === 'string' && !data.signUpDeadline.includes(':')) {
-        data.signUpDeadline += ' 23:59:59';
+      // 使用moment处理报名截止时间
+      if (data.signUpDeadline) {
+        data.signUpDeadline = moment(data.signUpDeadline).format('YYYY-MM-DD HH:mm:ss');
       }
 
       // 移除status字段，因为状态由系统根据时间自动计算
@@ -495,8 +503,6 @@ const submitForm = async () => {
         data.teamMaxNum = 0;
         data.teamMinNum = 0;
       }
-
-      console.log('提交数据:', data); // 调试日志
 
       try {
         if (dialogTitle.value.includes('新增')) {
@@ -542,9 +548,20 @@ const reserveEquipment = (row: any) => {
 
 // 器材预约成功回调
 const handleEquipmentReservationSuccess = () => {
-  // 如果需要，可以在此刷新数据
   loadData();
 };
+
+// 场地预约按钮
+const reserveVenue = (row: any) => {
+  currentCompetition.value = row;
+  openVenueDialog.value = true;
+};
+
+// 场地预约成功回调
+const handleVenueReservationSuccess = () => {
+  loadData();
+};
+
 </script>
 
 <style scoped>

@@ -30,6 +30,7 @@ public enum StatusCodeEnum {
 
     // 场地管理相关
     VENUE_ALREADY_OCCUPIED(-10301, "场地已被占用"),
+    VENUE_NOT_EXIST(-10302, "场地不存在"),
 
     // 赛事管理相关
     COMPETITION_NOT_EXIST(-10401, "赛事不存在"),

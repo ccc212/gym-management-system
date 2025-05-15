@@ -6,6 +6,7 @@ export type UpdateCompetitionVenueRelationDTO = {
     competitionId?: number;
     endTime?: string;
     id?: number;
+    num?: number;
     phone?: string;
     responsibleName?: string;
     startTime?: string;

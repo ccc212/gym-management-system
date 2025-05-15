@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddCompetitionVenueRelationDTO } from '../models/AddCompetitionVenueRelationDTO';
-import type { Result_CompetitionVenueRelation_ } from '../models/Result_CompetitionVenueRelation_';
 import type { Result_IPage_CompetitionVenueRelation_ } from '../models/Result_IPage_CompetitionVenueRelation_';
 import type { Result_List_CompetitionVenueRelation_ } from '../models/Result_List_CompetitionVenueRelation_';
+import type { Result_List_CompetitionVenueRelationVO_ } from '../models/Result_List_CompetitionVenueRelationVO_';
 import type { Result_object_ } from '../models/Result_object_';
 import type { UpdateCompetitionVenueRelationDTO } from '../models/UpdateCompetitionVenueRelationDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -56,18 +56,18 @@ export class CompetitionVenueRelationControllerService {
     }
     /**
      * getCompetitionVenueRelation
-     * @param id id
-     * @returns Result_CompetitionVenueRelation_ OK
+     * @param competitionId competitionId
+     * @returns Result_List_CompetitionVenueRelationVO_ OK
      * @throws ApiError
      */
     public static getCompetitionVenueRelationUsingGet(
-        id: number,
-    ): CancelablePromise<Result_CompetitionVenueRelation_> {
+        competitionId: number,
+    ): CancelablePromise<Result_List_CompetitionVenueRelationVO_> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/competition-venue-relation/get/{id}',
+            url: '/competition-venue-relation/getByCompetitionId/{competitionId}',
             path: {
-                'id': id,
+                'competitionId': competitionId,
             },
             errors: {
                 401: `Unauthorized`,

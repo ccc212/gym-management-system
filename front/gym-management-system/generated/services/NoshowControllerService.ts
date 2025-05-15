@@ -2,36 +2,35 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Result_Page_SpecialArrangement_ } from '../models/Result_Page_SpecialArrangement_';
-import type { Result_SpecialArrangement_ } from '../models/Result_SpecialArrangement_';
-import type { Result_Void_ } from '../models/Result_Void_';
-import type { SpecialArrangementDTO } from '../models/SpecialArrangementDTO';
+import type { NoshowDTO } from '../models/NoshowDTO';
+import type { NoshowEntity } from '../models/NoshowEntity';
+import type { Page_NoshowEntity_ } from '../models/Page_NoshowEntity_';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-export class SpecialArrangementControllerService {
+export class NoshowControllerService {
     /**
-     * getSpecialArrangements
+     * getNoshows
      * @param endDate endDate
      * @param page page
      * @param size size
      * @param startDate startDate
      * @param venueId venueId
      * @param venueType venueType
-     * @returns Result_Page_SpecialArrangement_ OK
+     * @returns Page_NoshowEntity_ OK
      * @throws ApiError
      */
-    public static getSpecialArrangementsUsingGet(
+    public static getNoshowsUsingGet(
         endDate?: string,
         page: number = 1,
         size: number = 10,
         startDate?: string,
         venueId?: number,
         venueType?: string,
-    ): CancelablePromise<Result_Page_SpecialArrangement_> {
+    ): CancelablePromise<Page_NoshowEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/special-arrangements',
+            url: '/api/noshows',
             query: {
                 'endDate': endDate,
                 'page': page,
@@ -48,19 +47,15 @@ export class SpecialArrangementControllerService {
         });
     }
     /**
-     * createSpecialArrangement
-     * @param dto dto
-     * @returns Result_SpecialArrangement_ OK
+     * createTestNoshows
+     * @returns NoshowEntity OK
      * @returns any Created
      * @throws ApiError
      */
-    public static createSpecialArrangementUsingPost(
-        dto: SpecialArrangementDTO,
-    ): CancelablePromise<Result_SpecialArrangement_ | any> {
+    public static createTestNoshowsUsingPost(): CancelablePromise<Array<NoshowEntity> | any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/special-arrangements',
-            body: dto,
+            url: '/api/noshows/test/create',
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,
@@ -69,20 +64,42 @@ export class SpecialArrangementControllerService {
         });
     }
     /**
-     * updateSpecialArrangement
+     * getNoshowDetail
+     * @param id id
+     * @returns NoshowEntity OK
+     * @throws ApiError
+     */
+    public static getNoshowDetailUsingGet(
+        id: number,
+    ): CancelablePromise<NoshowEntity> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/noshows/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * handleNoshow
      * @param dto dto
      * @param id id
-     * @returns Result_SpecialArrangement_ OK
+     * @returns NoshowEntity OK
      * @returns any Created
      * @throws ApiError
      */
-    public static updateSpecialArrangementUsingPut(
-        dto: SpecialArrangementDTO,
+    public static handleNoshowUsingPost(
+        dto: NoshowDTO,
         id: number,
-    ): CancelablePromise<Result_SpecialArrangement_ | any> {
+    ): CancelablePromise<NoshowEntity | any> {
         return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/api/special-arrangements/{id}',
+            method: 'POST',
+            url: '/api/noshows/{id}/handle',
             path: {
                 'id': id,
             },
@@ -91,27 +108,6 @@ export class SpecialArrangementControllerService {
                 401: `Unauthorized`,
                 403: `Forbidden`,
                 404: `Not Found`,
-            },
-        });
-    }
-    /**
-     * deleteSpecialArrangement
-     * @param id id
-     * @returns Result_Void_ OK
-     * @throws ApiError
-     */
-    public static deleteSpecialArrangementUsingDelete(
-        id: number,
-    ): CancelablePromise<Result_Void_> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/api/special-arrangements/{id}',
-            path: {
-                'id': id,
-            },
-            errors: {
-                401: `Unauthorized`,
-                403: `Forbidden`,
             },
         });
     }

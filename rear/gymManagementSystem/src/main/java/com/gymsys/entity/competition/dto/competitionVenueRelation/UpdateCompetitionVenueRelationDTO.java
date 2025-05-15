@@ -26,6 +26,11 @@ public class UpdateCompetitionVenueRelationDTO extends BaseDTO {
     private Long venueId;
 
     /**
+     * 数量
+     */
+    private Integer num;
+
+    /**
      * 负责人姓名
      */
     private String responsibleName;

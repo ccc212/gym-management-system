@@ -2,4 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gymsys.mapper.competition.CompetitionVenueRelationMapper">
 
+    <select id="getCompetitionVenueRelation" resultType="com.gymsys.entity.competition.vo.CompetitionVenueRelationVO"
+            parameterType="java.lang.Long">
+        select
+        cvr.id,
+        cvr.competition_id,
+        cvr.venue_id,
+        cvr.num,
+        cvr.responsible_name,
+        cvr.phone,
+        cvr.start_time,
+        cvr.end_time,
+        cvr.status,
+        v.name as venueName
+        from competition_venue_relation cvr
+        left join venues v on cvr.venue_id = v.id
+        where cvr.competition_id = #{competitionId}
+    </select>
 </mapper>

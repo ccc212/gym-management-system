@@ -2,14 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CompetitionEquipmentRelation } from './CompetitionEquipmentRelation';
+import type { CompetitionEquipmentRelationVO } from './CompetitionEquipmentRelationVO';
 import type { CompetitionItem } from './CompetitionItem';
 import type { CompetitionVenueRelation } from './CompetitionVenueRelation';
 export type CompetitionDetailVO = {
     category?: number;
     description?: string;
     endTime?: string;
-    equipmentRelations?: Array<CompetitionEquipmentRelation>;
+    equipmentRelations?: Array<CompetitionEquipmentRelationVO>;
     hoster?: string;
     id?: number;
     isTeamCompetition?: number;

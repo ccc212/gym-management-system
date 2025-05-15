@@ -37,10 +37,16 @@
           <el-tag v-else-if="scope.row.isTeamCompetition === 1" type="warning">团队赛</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="signUpNum" label="报名人数" width="150">
+        <template #default="scope">
+          {{ scope.row.signUpNum || 0 }}/{{ scope.row.maxSignUpNum || 0 }}
+          ({{ calculatePercentage(scope.row.signUpNum, scope.row.maxSignUpNum) }}%)
+        </template>
+      </el-table-column>
       <el-table-column prop="signUpDeadline" label="报名截止时间" width="180"></el-table-column>
       <el-table-column prop="startTime" label="开始时间" width="180"></el-table-column>
       <el-table-column prop="endTime" label="结束时间" width="180"></el-table-column>
-      <el-table-column prop="status" label="状态" width="100">
+      <el-table-column prop="status" label="状态" width="120">
         <template #default="scope">
           <el-tag v-if="scope.row.status === 0" type="info">未开始</el-tag>
           <el-tag v-if="scope.row.status === 1" type="success">正在进行</el-tag>
@@ -369,37 +375,54 @@ const viewDetails = async (row: any) => {
 
 // 报名
 const signUp = async (row: any) => {
-  selectedCompetition.value = row;
-
-  // 如果是团队赛事，先检查用户是否在团队中
-  if (row.isTeamCompetition === 1) {
-    try {
-      // 查询用户参与的团队
-      const userTeams = await getUserTeams();
-
-      if (userTeams.length === 0) {
-        // 用户没有团队，打开团队选择对话框，显示创建团队选项
-        teamOptions.value = [];
-        showTeamSelect.value = true;
-      } else if (userTeams.length === 1) {
-        // 用户只有一个团队，直接使用
-        selectedTeam.value = userTeams[0];
-        showSignUp.value = true;
-      } else {
-        // 用户有多个团队，显示选择团队对话框
-        teamOptions.value = userTeams.map((team: any) => ({
-          value: team.id,
-          label: team.teamName
-        }));
-        showTeamSelect.value = true;
+  try {
+    // 获取完整的比赛详情，包括赛事项目
+    const res = await CompetitionControllerService.getDetailUsingGet(row.id);
+    if (res && res.data) {
+      selectedCompetition.value = res.data;
+      
+      // 如果没有赛事项目，提示用户
+      if (!res.data.itemRelations || res.data.itemRelations.length === 0) {
+        ElMessage.warning('该赛事未设置比赛项目，无法报名');
+        return;
       }
-    } catch (error) {
-      console.error('获取团队信息失败:', error);
-      ElMessage.error('获取团队信息失败，请稍后再试');
+      
+      // 如果是团队赛事，先检查用户是否在团队中
+      if (selectedCompetition.value.isTeamCompetition === 1) {
+        try {
+          // 查询用户参与的团队
+          const userTeams = await getUserTeams();
+
+          if (userTeams.length === 0) {
+            // 用户没有团队，打开团队选择对话框，显示创建团队选项
+            teamOptions.value = [];
+            showTeamSelect.value = true;
+          } else if (userTeams.length === 1) {
+            // 用户只有一个团队，直接使用
+            selectedTeam.value = userTeams[0];
+            showSignUp.value = true;
+          } else {
+            // 用户有多个团队，显示选择团队对话框
+            teamOptions.value = userTeams.map((team: any) => ({
+              value: team.id,
+              label: team.teamName
+            }));
+            showTeamSelect.value = true;
+          }
+        } catch (error) {
+          console.error('获取团队信息失败:', error);
+          ElMessage.error('获取团队信息失败，请稍后再试');
+        }
+      } else {
+        // 个人赛事直接显示报名对话框
+        showSignUp.value = true;
+      }
+    } else {
+      ElMessage.error(res?.msg || '获取赛事详情失败');
     }
-  } else {
-    // 个人赛事直接显示报名对话框
-    showSignUp.value = true;
+  } catch (error) {
+    console.error('获取赛事详情失败:', error);
+    ElMessage.error('获取赛事详情失败');
   }
 };
 
@@ -567,6 +590,12 @@ const handleTeamCreated = (newTeam: any) => {
   // 添加新团队到选项中
   teamOptions.value.push(newTeam);
   selectedTeamId.value = newTeam.value;
+};
+
+// 计算报名百分比
+const calculatePercentage = (signUpNum: number = 0, maxSignUpNum: number = 0) => {
+  if (maxSignUpNum === 0) return 0;
+  return Math.round((signUpNum / maxSignUpNum) * 100);
 };
 
 // 初始化

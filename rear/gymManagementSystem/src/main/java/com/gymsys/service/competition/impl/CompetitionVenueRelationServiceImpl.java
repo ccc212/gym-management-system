@@ -1,26 +1,29 @@
 package com.gymsys.service.competition.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gymsys.entity.Venue;
+import com.gymsys.entity.competition.Competition;
 import com.gymsys.entity.competition.CompetitionVenueRelation;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.AddCompetitionVenueRelationDTO;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.ListCompetitionVenueRelationDTO;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.UpdateCompetitionVenueRelationDTO;
+import com.gymsys.entity.competition.vo.CompetitionVenueRelationVO;
+import com.gymsys.enums.BookingStatusEnum;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
-import com.gymsys.repository.competition.CompetitionVenueRelationRepository;
+import com.gymsys.mapper.VenueMapper;
+import com.gymsys.mapper.competition.CompetitionMapper;
+import com.gymsys.mapper.competition.CompetitionVenueRelationMapper;
 import com.gymsys.service.competition.ICompetitionVenueRelationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <p>
@@ -32,144 +35,156 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class CompetitionVenueRelationServiceImpl implements ICompetitionVenueRelationService {
+public class CompetitionVenueRelationServiceImpl extends ServiceImpl<CompetitionVenueRelationMapper, CompetitionVenueRelation> implements ICompetitionVenueRelationService {
 
-    private final CompetitionVenueRelationRepository competitionVenueRelationRepository;
+    private final CompetitionMapper competitionMapper;
+    private final VenueMapper venueMapper;
+    private final CompetitionVenueRelationMapper competitionVenueRelationMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addCompetitionVenueRelation(AddCompetitionVenueRelationDTO addCompetitionVenueRelationDTO) {
-        // 检查时间冲突
-        List<CompetitionVenueRelation> conflicts = competitionVenueRelationRepository.findConflictReservations(
-            addCompetitionVenueRelationDTO.getVenueId(), 
-            addCompetitionVenueRelationDTO.getStartTime(), 
-            addCompetitionVenueRelationDTO.getEndTime(), 
-            1 // 只检查预约成功的记录
-        );
-        
-        if (!conflicts.isEmpty()) {
-            throw new BizException(StatusCodeEnum.VENUE_ALREADY_OCCUPIED);
+        // 检查赛事是否存在
+        Competition competition = competitionMapper.selectById(addCompetitionVenueRelationDTO.getCompetitionId());
+        if (competition == null) {
+            throw new BizException(StatusCodeEnum.COMPETITION_NOT_EXIST);
         }
 
+        // 检查场地是否存在
+        Venue venue = venueMapper.selectById(addCompetitionVenueRelationDTO.getVenueId());
+        if (venue == null) {
+            throw new BizException(StatusCodeEnum.VENUE_NOT_EXIST);
+        }
+
+        // TODO 检查场地数量是否足够
+
+        // 检查时间冲突和场地总量
+        int alreadyUsedNum = 0;
+        LambdaQueryWrapper<CompetitionVenueRelation> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CompetitionVenueRelation::getVenueId, addCompetitionVenueRelationDTO.getVenueId())
+                .and(i -> i.between(CompetitionVenueRelation::getStartTime, addCompetitionVenueRelationDTO.getStartTime(), addCompetitionVenueRelationDTO.getEndTime())
+                        .or()
+                        .between(CompetitionVenueRelation::getEndTime, addCompetitionVenueRelationDTO.getStartTime(), addCompetitionVenueRelationDTO.getEndTime()))
+                .eq(CompetitionVenueRelation::getStatus, BookingStatusEnum.SUCCESS); // 只检查预约成功的记录
+
+        List<CompetitionVenueRelation> conflictRelations = baseMapper.selectList(queryWrapper);
+        for (CompetitionVenueRelation relation : conflictRelations) {
+            alreadyUsedNum += relation.getNum();
+        }
+
+        // TODO 检查场地总量是否超过总共的数量
+
         // 保存场地关联信息
-        CompetitionVenueRelation competitionVenueRelation = BeanUtil.copyProperties(addCompetitionVenueRelationDTO, CompetitionVenueRelation.class);
-        // 设置初始状态：预约中(0)
-        competitionVenueRelation.setStatus(0);
-        competitionVenueRelationRepository.save(competitionVenueRelation);
+        save(BeanUtil.copyProperties(addCompetitionVenueRelationDTO, CompetitionVenueRelation.class));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteCompetitionVenueRelation(Long id) {
         // 检查关联记录是否存在
-        Optional<CompetitionVenueRelation> optionalRelation = competitionVenueRelationRepository.findById(id);
-        if (optionalRelation.isEmpty()) {
+        CompetitionVenueRelation competitionVenueRelation = getById(id);
+        if (competitionVenueRelation == null) {
             throw new BizException(StatusCodeEnum.COMPETITION_VENUE_RELATION_NOT_EXIST);
         }
 
         // 删除关联记录
-        competitionVenueRelationRepository.deleteById(id);
+        removeById(id);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCompetitionVenueRelation(UpdateCompetitionVenueRelationDTO updateCompetitionVenueRelationDTO) {
         // 检查关联记录是否存在
-        Optional<CompetitionVenueRelation> optionalRelation = competitionVenueRelationRepository.findById(updateCompetitionVenueRelationDTO.getId());
-        if (optionalRelation.isEmpty()) {
+        CompetitionVenueRelation competitionVenueRelation = getById(updateCompetitionVenueRelationDTO.getId());
+        if (competitionVenueRelation == null) {
             throw new BizException(StatusCodeEnum.COMPETITION_VENUE_RELATION_NOT_EXIST);
         }
 
-        CompetitionVenueRelation competitionVenueRelation = optionalRelation.get();
+        // 如果更新了场地ID、数量或时间，需要检查
+        if (updateCompetitionVenueRelationDTO.getVenueId() != null &&
+                !updateCompetitionVenueRelationDTO.getVenueId().equals(competitionVenueRelation.getVenueId()) ||
+                updateCompetitionVenueRelationDTO.getNum() != null ||
+                updateCompetitionVenueRelationDTO.getStartTime() != null ||
+                updateCompetitionVenueRelationDTO.getEndTime() != null) {
 
-        // 如果更新了场地或时间，需要检查时间冲突
-        if (updateCompetitionVenueRelationDTO.getVenueId() != null && 
-            !updateCompetitionVenueRelationDTO.getVenueId().equals(competitionVenueRelation.getVenueId()) || 
-            updateCompetitionVenueRelationDTO.getStartTime() != null || 
-            updateCompetitionVenueRelationDTO.getEndTime() != null) {
-            
-            Long venueId = updateCompetitionVenueRelationDTO.getVenueId() != null ? 
-                          updateCompetitionVenueRelationDTO.getVenueId() : competitionVenueRelation.getVenueId();
-            
-            LocalDateTime startTime = updateCompetitionVenueRelationDTO.getStartTime() != null ? 
-                                    updateCompetitionVenueRelationDTO.getStartTime() : competitionVenueRelation.getStartTime();
-            
-            LocalDateTime endTime = updateCompetitionVenueRelationDTO.getEndTime() != null ? 
-                                  updateCompetitionVenueRelationDTO.getEndTime() : competitionVenueRelation.getEndTime();
-            
-            // 使用JPA查询冲突
-            List<CompetitionVenueRelation> conflicts = competitionVenueRelationRepository.findConflictReservations(
-                venueId, startTime, endTime, 1
-            );
-            
-            // 排除当前记录自身
-            conflicts.removeIf(relation -> relation.getId().equals(updateCompetitionVenueRelationDTO.getId()));
-            
-            if (!conflicts.isEmpty()) {
-                throw new BizException(StatusCodeEnum.VENUE_ALREADY_OCCUPIED);
+            Long equipmentId = updateCompetitionVenueRelationDTO.getVenueId() != null ?
+                    updateCompetitionVenueRelationDTO.getVenueId() : competitionVenueRelation.getVenueId();
+
+            // 检查场地是否存在
+            Venue venue = venueMapper.selectById(equipmentId);
+            if (venue == null) {
+                throw new BizException(StatusCodeEnum.EQUIPMENT_NOT_EXIST);
+            }
+
+            // 检查更新后的数量
+            Integer newNum = updateCompetitionVenueRelationDTO.getNum() != null ?
+                    updateCompetitionVenueRelationDTO.getNum() : competitionVenueRelation.getNum();
+
+            // 如果数量增加或者更换了场地，检查场地可用量
+            if ((updateCompetitionVenueRelationDTO.getNum() != null &&
+                    newNum > competitionVenueRelation.getNum()) ||
+                    (updateCompetitionVenueRelationDTO.getVenueId() != null &&
+                            !updateCompetitionVenueRelationDTO.getVenueId().equals(competitionVenueRelation.getVenueId()))) {
+
+                // TODO 检查场地可用量是否充足
+
+                // 检查时间冲突和场地总量
+                int alreadyUsedNum = 0;
+                LambdaQueryWrapper<CompetitionVenueRelation> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.eq(CompetitionVenueRelation::getVenueId, equipmentId)
+                        .ne(CompetitionVenueRelation::getId, updateCompetitionVenueRelationDTO.getId())
+                        .and(i -> i.between(CompetitionVenueRelation::getStartTime,
+                                        updateCompetitionVenueRelationDTO.getStartTime() != null ?
+                                                updateCompetitionVenueRelationDTO.getStartTime() : competitionVenueRelation.getStartTime(),
+                                        updateCompetitionVenueRelationDTO.getEndTime() != null ?
+                                                updateCompetitionVenueRelationDTO.getEndTime() : competitionVenueRelation.getEndTime())
+                                .or()
+                                .between(CompetitionVenueRelation::getEndTime,
+                                        updateCompetitionVenueRelationDTO.getStartTime() != null ?
+                                                updateCompetitionVenueRelationDTO.getStartTime() : competitionVenueRelation.getStartTime(),
+                                        updateCompetitionVenueRelationDTO.getEndTime() != null ?
+                                                updateCompetitionVenueRelationDTO.getEndTime() : competitionVenueRelation.getEndTime()))
+                        .eq(CompetitionVenueRelation::getStatus, BookingStatusEnum.SUCCESS); // 只检查预约成功的记录
+
+                List<CompetitionVenueRelation> conflictRelations = baseMapper.selectList(queryWrapper);
+                for (CompetitionVenueRelation relation : conflictRelations) {
+                    alreadyUsedNum += relation.getNum();
+                }
+
+                // TODO 检查场地总量是否超过总共的数量
             }
         }
 
         // 更新关联记录
-        BeanUtil.copyProperties(updateCompetitionVenueRelationDTO, competitionVenueRelation);
-        competitionVenueRelationRepository.save(competitionVenueRelation);
+        CompetitionVenueRelation updateEntity = BeanUtil.copyProperties(updateCompetitionVenueRelationDTO, CompetitionVenueRelation.class);
+        updateById(updateEntity);
     }
 
     @Override
     public IPage<CompetitionVenueRelation> listCompetitionVenueRelation(ListCompetitionVenueRelationDTO listCompetitionVenueRelationDTO) {
-        // 使用JPA分页查询
-        Integer page = listCompetitionVenueRelationDTO.getPage();
-        Integer pageSize = listCompetitionVenueRelationDTO.getPageSize();
-        
-        // 创建分页和排序条件
-        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
-        
-        // 根据条件查询
-        org.springframework.data.domain.Page<CompetitionVenueRelation> jpaPage;
-        Long competitionId = listCompetitionVenueRelationDTO.getCompetitionId();
-        Long venueId = listCompetitionVenueRelationDTO.getVenueId();
-        Integer status = listCompetitionVenueRelationDTO.getStatus();
-        
-        // 简化处理: 根据查询条件选择不同的查询方法
-        if (competitionId != null && venueId != null && status != null) {
-            // 最复杂的查询条件，这里简化处理，实际应该在Repository中添加对应的方法
-            // 这里需要根据你实际的查询需求添加更多的Repository方法
-            jpaPage = org.springframework.data.domain.Page.empty(pageable);
-        } else if (competitionId != null && status != null) {
-            List<CompetitionVenueRelation> list = competitionVenueRelationRepository.findByCompetitionIdAndStatus(competitionId, status);
-            jpaPage = new org.springframework.data.domain.PageImpl<>(list, pageable, list.size());
-        } else if (venueId != null && status != null) {
-            List<CompetitionVenueRelation> list = competitionVenueRelationRepository.findByVenueIdAndStatus(venueId, status);
-            jpaPage = new org.springframework.data.domain.PageImpl<>(list, pageable, list.size());
-        } else if (competitionId != null) {
-            List<CompetitionVenueRelation> list = competitionVenueRelationRepository.findByCompetitionId(competitionId);
-            jpaPage = new org.springframework.data.domain.PageImpl<>(list, pageable, list.size());
-        } else if (venueId != null) {
-            List<CompetitionVenueRelation> list = competitionVenueRelationRepository.findByVenueId(venueId);
-            jpaPage = new org.springframework.data.domain.PageImpl<>(list, pageable, list.size());
-        } else if (status != null) {
-            List<CompetitionVenueRelation> list = competitionVenueRelationRepository.findByStatus(status);
-            jpaPage = new org.springframework.data.domain.PageImpl<>(list, pageable, list.size());
-        } else {
-            jpaPage = competitionVenueRelationRepository.findAll(pageable);
-        }
-        
-        // 将JPA的Page转换为MyBatis-Plus的IPage
-        IPage<CompetitionVenueRelation> mbpPage = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(
-            page, pageSize, jpaPage.getTotalElements()
-        );
-        mbpPage.setRecords(jpaPage.getContent());
-        
-        return mbpPage;
+        LambdaQueryWrapper<CompetitionVenueRelation> queryWrapper = new LambdaQueryWrapper<>();
+
+        // 添加查询条件
+        queryWrapper.eq(listCompetitionVenueRelationDTO.getCompetitionId() != null,
+                        CompetitionVenueRelation::getCompetitionId, listCompetitionVenueRelationDTO.getCompetitionId())
+                .eq(listCompetitionVenueRelationDTO.getVenueId() != null,
+                        CompetitionVenueRelation::getVenueId, listCompetitionVenueRelationDTO.getVenueId())
+                .eq(listCompetitionVenueRelationDTO.getStatus() != null,
+                        CompetitionVenueRelation::getStatus, listCompetitionVenueRelationDTO.getStatus());
+
+        // 分页查询
+        return page(new Page<>(listCompetitionVenueRelationDTO.getPage(), listCompetitionVenueRelationDTO.getPageSize()), queryWrapper);
     }
 
     @Override
     public List<CompetitionVenueRelation> listByCompetitionId(Long competitionId) {
-        return competitionVenueRelationRepository.findByCompetitionIdOrderByVenueIdAscStartTimeAsc(competitionId);
+        LambdaQueryWrapper<CompetitionVenueRelation> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(CompetitionVenueRelation::getCompetitionId, competitionId);
+        return list(queryWrapper);
     }
-    
+
     @Override
-    public CompetitionVenueRelation getById(Long id) {
-        return competitionVenueRelationRepository.findById(id).orElse(null);
+    public List<CompetitionVenueRelationVO> getCompetitionVenueRelation(Long competitionId) {
+        return competitionVenueRelationMapper.getCompetitionVenueRelation(competitionId);
     }
 }

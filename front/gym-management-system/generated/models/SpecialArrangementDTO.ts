@@ -4,11 +4,11 @@
 /* eslint-disable */
 export type SpecialArrangementDTO = {
     date?: string;
+    endTime?: string;
     id?: number;
-    notifyUsers?: boolean;
-    purpose?: string;
     remarks?: string;
-    timeSlots?: Array<string>;
+    startTime?: string;
+    status?: string;
     venueId?: number;
 };
 

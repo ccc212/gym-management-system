@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { UserEntity } from './UserEntity';
 import type { VenueEntity } from './VenueEntity';
 export type ReservationEntity = {
     actualCost?: number;
@@ -24,6 +25,7 @@ export type ReservationEntity = {
     status?: string;
     updatedTime?: string;
     userId?: number;
+    userInfo?: UserEntity;
     venueId?: number;
     venueInfo?: VenueEntity;
 };

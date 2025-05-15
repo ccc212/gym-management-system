@@ -12,6 +12,7 @@ import com.gymsys.entity.competition.dto.competitionEquipmentRelation.ListCompet
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.UpdateCompetitionEquipmentRelationDTO;
 import com.gymsys.entity.competition.vo.CompetitionEquipmentRelationVO;
 import com.gymsys.entity.equip.Equipment;
+import com.gymsys.enums.BookingStatusEnum;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
 import com.gymsys.mapper.competition.CompetitionEquipmentRelationMapper;
@@ -64,7 +65,7 @@ public class CompetitionEquipmentRelationServiceImpl extends ServiceImpl<Competi
                   .and(i -> i.between(CompetitionEquipmentRelation::getStartTime, addCompetitionEquipmentRelationDTO.getStartTime(), addCompetitionEquipmentRelationDTO.getEndTime())
                        .or()
                        .between(CompetitionEquipmentRelation::getEndTime, addCompetitionEquipmentRelationDTO.getStartTime(), addCompetitionEquipmentRelationDTO.getEndTime()))
-                  .eq(CompetitionEquipmentRelation::getStatus, 1); // 只检查预约成功的记录
+                  .eq(CompetitionEquipmentRelation::getStatus, BookingStatusEnum.SUCCESS); // 只检查预约成功的记录
         
         List<CompetitionEquipmentRelation> conflictRelations = baseMapper.selectList(queryWrapper);
         for (CompetitionEquipmentRelation relation : conflictRelations) {
@@ -74,10 +75,7 @@ public class CompetitionEquipmentRelationServiceImpl extends ServiceImpl<Competi
         // TODO 检查器材总量是否超过总共的数量
         
         // 保存器材关联信息
-        CompetitionEquipmentRelation competitionEquipmentRelation = BeanUtil.copyProperties(addCompetitionEquipmentRelationDTO, CompetitionEquipmentRelation.class);
-        // 设置初始状态：预约中(0)
-        competitionEquipmentRelation.setStatus(0);
-        save(competitionEquipmentRelation);
+        save(BeanUtil.copyProperties(addCompetitionEquipmentRelationDTO, CompetitionEquipmentRelation.class));
     }
 
     @Override
@@ -103,13 +101,13 @@ public class CompetitionEquipmentRelationServiceImpl extends ServiceImpl<Competi
         }
 
         // 如果更新了器材ID、数量或时间，需要检查
-        if (updateCompetitionEquipmentRelationDTO.getEquipmentId() != null && 
-            !updateCompetitionEquipmentRelationDTO.getEquipmentId().equals(competitionEquipmentRelation.getEquipmentId()) || 
+        if (updateCompetitionEquipmentRelationDTO.getEquipmentId() != null &&
+            !updateCompetitionEquipmentRelationDTO.getEquipmentId().equals(competitionEquipmentRelation.getEquipmentId()) ||
             updateCompetitionEquipmentRelationDTO.getNum() != null ||
             updateCompetitionEquipmentRelationDTO.getStartTime() != null || 
             updateCompetitionEquipmentRelationDTO.getEndTime() != null) {
             
-            Long equipmentId = updateCompetitionEquipmentRelationDTO.getEquipmentId() != null ? 
+            Long equipmentId = updateCompetitionEquipmentRelationDTO.getEquipmentId() != null ?
                             updateCompetitionEquipmentRelationDTO.getEquipmentId() : competitionEquipmentRelation.getEquipmentId();
             
             // 检查器材是否存在
@@ -125,7 +123,7 @@ public class CompetitionEquipmentRelationServiceImpl extends ServiceImpl<Competi
             // 如果数量增加或者更换了器材，检查器材可用量
             if ((updateCompetitionEquipmentRelationDTO.getNum() != null && 
                 newNum > competitionEquipmentRelation.getNum()) ||
-                (updateCompetitionEquipmentRelationDTO.getEquipmentId() != null && 
+                (updateCompetitionEquipmentRelationDTO.getEquipmentId() != null &&
                 !updateCompetitionEquipmentRelationDTO.getEquipmentId().equals(competitionEquipmentRelation.getEquipmentId()))) {
 
                 // TODO 检查器材可用量是否充足
@@ -146,7 +144,7 @@ public class CompetitionEquipmentRelationServiceImpl extends ServiceImpl<Competi
                                       updateCompetitionEquipmentRelationDTO.getStartTime() : competitionEquipmentRelation.getStartTime(), 
                                       updateCompetitionEquipmentRelationDTO.getEndTime() != null ? 
                                       updateCompetitionEquipmentRelationDTO.getEndTime() : competitionEquipmentRelation.getEndTime()))
-                          .eq(CompetitionEquipmentRelation::getStatus, 1); // 只检查预约成功的记录
+                          .eq(CompetitionEquipmentRelation::getStatus, BookingStatusEnum.SUCCESS); // 只检查预约成功的记录
                 
                 List<CompetitionEquipmentRelation> conflictRelations = baseMapper.selectList(queryWrapper);
                 for (CompetitionEquipmentRelation relation : conflictRelations) {

@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type CompetitionSignUpUserVO = {
+    competitionItem?: string;
     competitionName?: string;
     competitionStatus?: number;
     competitionType?: string;

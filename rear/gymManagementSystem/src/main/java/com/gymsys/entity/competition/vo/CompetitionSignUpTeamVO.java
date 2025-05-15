@@ -18,6 +18,11 @@ public class CompetitionSignUpTeamVO {
     private String competitionName;
 
     /**
+     * 赛事项目
+     */
+    private String competitionItem;
+
+    /**
      * 赛事类型
      */
     private String competitionType;

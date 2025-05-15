@@ -11,6 +11,7 @@
           <el-empty v-if="individualRecords.length === 0 && !loading" description="暂无个人报名记录"></el-empty>
           <el-table v-else :data="individualRecords" border style="width: 100%">
             <el-table-column prop="competitionName" label="赛事名称" width="150"></el-table-column>
+            <el-table-column prop="competitionItem" label="赛事项目" width="150"></el-table-column>
             <el-table-column prop="competitionType" label="赛事类型" width="100">
               <template #default="scope">
                 <el-tag v-if="scope.row.competitionType === '0'" type="success">乒乓球赛</el-tag>
@@ -70,6 +71,7 @@
           <el-empty v-if="teamRecords.length === 0 && !loading" description="暂无团队报名记录"></el-empty>
           <el-table v-else :data="teamRecords" border style="width: 100%">
             <el-table-column prop="competitionName" label="赛事名称" width="150"></el-table-column>
+            <el-table-column prop="competitionItem" label="赛事项目" width="150"></el-table-column>
             <el-table-column prop="teamName" label="团队名称" width="120"></el-table-column>
             <el-table-column prop="competitionType" label="赛事类型" width="100">
               <template #default="scope">
@@ -197,10 +199,7 @@ const loadIndividualRecords = async () => {
   loading.value = true;
   try {
     const userId = store.getId;
-    const res = await CompetitionSignUpUserControllerService.getCompetitionSignUpUserUsingGet(
-        Number(userId)
-    );
-
+    const res = await CompetitionSignUpUserControllerService.getCompetitionSignUpUserUsingGet(userId);
     if (res && res.code === 0 && res.data) {
       individualRecords.value = res.data;
     } else {
@@ -220,9 +219,7 @@ const loadTeamRecords = async () => {
   loading.value = true;
   try {
     const userId = store.getId;
-    const res = await CompetitionSignUpTeamControllerService.getCompetitionSignUpTeamUsingGet(
-        Number(userId)
-    );
+    const res = await CompetitionSignUpTeamControllerService.getCompetitionSignUpTeamUsingGet(userId);
 
     if (res && res.code === 0 && res.data) {
       teamRecords.value = res.data;

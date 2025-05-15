@@ -71,7 +71,6 @@ public class CompetitionSignUpUserServiceImpl extends ServiceImpl<CompetitionSig
         // 保存报名信息
         CompetitionSignUpUser competitionSignUpUser = BeanUtil.copyProperties(addCompetitionSignUpUserDTO, CompetitionSignUpUser.class);
         // 设置初始化状态：报名中
-        competitionSignUpUser.setStatus(0);
         save(competitionSignUpUser);
 
         // 更新赛事已报人数
@@ -98,10 +97,10 @@ public class CompetitionSignUpUserServiceImpl extends ServiceImpl<CompetitionSig
         removeById(id);
 
         // 更新赛事已报人数
-        if (competitionSignUpUser.getStatus() == 1) { // 只有当报名状态为成功时才需要减少已报人数
+//        if (competitionSignUpUser.getStatus() == 1) { // 只有当报名状态为成功时才需要减少已报人数
             competition.setSignUpNum(competition.getSignUpNum() - 1);
             competitionMapper.updateById(competition);
-        }
+//        }
     }
 
     @Override

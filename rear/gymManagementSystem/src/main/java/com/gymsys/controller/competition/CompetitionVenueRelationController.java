@@ -7,6 +7,7 @@ import com.gymsys.entity.competition.CompetitionVenueRelation;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.AddCompetitionVenueRelationDTO;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.ListCompetitionVenueRelationDTO;
 import com.gymsys.entity.competition.dto.competitionVenueRelation.UpdateCompetitionVenueRelationDTO;
+import com.gymsys.entity.competition.vo.CompetitionVenueRelationVO;
 import com.gymsys.service.competition.ICompetitionVenueRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -52,9 +53,9 @@ public class CompetitionVenueRelationController {
         return Result.success(competitionVenueRelationService.listCompetitionVenueRelation(listCompetitionVenueRelationDTO));
     }
 
-    @GetMapping("/get/{id}")
-    public Result<CompetitionVenueRelation> getCompetitionVenueRelation(@PathVariable Long id) {
-        return Result.success(competitionVenueRelationService.getById(id));
+    @GetMapping("/getByCompetitionId/{competitionId}")
+    public Result<List<CompetitionVenueRelationVO>> getCompetitionVenueRelation(@PathVariable Long competitionId) {
+        return Result.success(competitionVenueRelationService.getCompetitionVenueRelation(competitionId));
     }
     
     @GetMapping("/listByCompetitionId/{competitionId}")

@@ -217,9 +217,9 @@ const AdminVenuesComponent = {
                     }
                 });
 
-                if (response.data && response.data.records) {
-                    this.venueList = response.data.records;
-                    this.pagination.total = response.data.total;
+                if (response.data && response.data.code === 200) {
+                    this.venueList = response.data.data.records || [];
+                    this.pagination.total = response.data.data.total || 0;
                 } else {
                     this.venueList = [];
                     this.pagination.total = 0;
@@ -319,7 +319,20 @@ const AdminVenuesComponent = {
         // 编辑场地
         editVenue(venue) {
             this.dialogType = 'edit';
-            this.venueForm = JSON.parse(JSON.stringify(venue)); // 深拷贝，避免直接修改列表数据
+            // 修改深拷贝方式
+            this.venueForm = {
+                id: venue.id,
+                name: venue.name,
+                type: venue.type,
+                location: venue.location,
+                capacity: venue.capacity,
+                pricePerHour: venue.pricePerHour,
+                peakHourPrice: venue.peakHourPrice || 0,
+                facilities: venue.facilities || '',
+                description: venue.description || '',
+                imageUrl: venue.imageUrl || '',
+                status: venue.status
+            };
             this.venueDialogVisible = true;
 
             // 在下一个事件循环中重置表单校验结果
@@ -333,25 +346,36 @@ const AdminVenuesComponent = {
                 if (valid) {
                     this.loading = true;
                     try {
+                        const venueData = {
+                            ...this.venueForm,
+                            pricePerHour: Number(this.venueForm.pricePerHour),
+                            peakHourPrice: Number(this.venueForm.peakHourPrice),
+                            capacity: Number(this.venueForm.capacity)
+                        };
+
                         if (this.dialogType === 'add') {
                             // 新增场地
-                            const response = await axios.post('/api/venues', this.venueForm);
-                            if (response.data) {
+                            const response = await axios.post('/api/venues', venueData);
+                            if (response.data && response.data.code === 200) {
                                 this.$message.success('添加场地成功');
                                 this.loadVenueData(); // 重新加载数据
+                            } else {
+                                this.$message.error(response.data.message || '添加场地失败');
                             }
                         } else {
                             // 编辑场地
-                            const response = await axios.put(`/api/venues/${this.venueForm.id}`, this.venueForm);
-                            if (response.data) {
+                            const response = await axios.put(`/api/venues/${this.venueForm.id}`, venueData);
+                            if (response.data && response.data.code === 200) {
                                 this.$message.success('更新场地成功');
                                 this.loadVenueData(); // 重新加载数据
+                            } else {
+                                this.$message.error(response.data.message || '更新场地失败');
                             }
                         }
                         this.venueDialogVisible = false;
                     } catch (error) {
                         console.error('保存场地失败:', error);
-                        this.$message.error('保存场地失败');
+                        this.$message.error(error.response?.data?.message || '保存场地失败');
                     } finally {
                         this.loading = false;
                     }
@@ -390,16 +414,16 @@ const AdminVenuesComponent = {
         async setVenueStatus(venue, status) {
             this.loading = true;
             try {
-                const response = await axios.put(`/api/venues/${venue.id}/status`, null, {
-                    params: { status }
-                });
-                if (response.data) {
+                const response = await axios.put(`/api/venues/${venue.id}/status`, { status });
+                if (response.data && response.data.code === 200) {
                     this.$message.success(`更新场地状态为${this.getStatusText(status)}成功`);
                     this.loadVenueData(); // 重新加载数据
+                } else {
+                    this.$message.error(response.data.message || '更新场地状态失败');
                 }
             } catch (error) {
                 console.error('更新场地状态失败:', error);
-                this.$message.error('更新场地状态失败');
+                this.$message.error(error.response?.data?.message || '更新场地状态失败');
             } finally {
                 this.loading = false;
             }

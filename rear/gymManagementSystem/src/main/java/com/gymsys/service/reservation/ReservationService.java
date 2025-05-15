@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gymsys.entity.reservation.ReservationEntity;
+import com.gymsys.entity.specialarrangement.SpecialArrangement;
 import com.gymsys.entity.venue.TimeSlot;
 import com.gymsys.entity.venue.VenueEntity;
+import com.gymsys.mapper.specialarrangement.SpecialArrangementMapper;
 import com.gymsys.repository.reservation.ReservationRepository;
 import com.gymsys.repository.venue.VenueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
     
     @Autowired
     private VenueRepository venueRepository;
+    
+    @Autowired
+    private SpecialArrangementMapper specialArrangementMapper;
     
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     
@@ -110,12 +115,17 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
                     continue;
                 }
                 
-                // 检查是否是特殊场地时间（周六 14:00-18:00）
-                if (localDate.getDayOfWeek().getValue() == 6 && 
-                    startTime.getHour() >= 14 && startTime.getHour() < 18) {
+                // 检查是否是特殊场地时间
+                LambdaQueryWrapper<SpecialArrangement> specialWrapper = new LambdaQueryWrapper<>();
+                specialWrapper.eq(SpecialArrangement::getVenueId, venueId)
+                            .eq(SpecialArrangement::getDate, localDate)
+                            .le(SpecialArrangement::getStartTime, startTime.format(TIME_FORMATTER))
+                            .ge(SpecialArrangement::getEndTime, slotEndTime.format(TIME_FORMATTER));
+                
+                if (specialArrangementMapper.selectCount(specialWrapper) > 0) {
                     TimeSlot timeSlot = new TimeSlot();
                     timeSlot.setStartTime(startTime.format(TIME_FORMATTER));
-                    timeSlot.setEndTime(startTime.plusHours(1).format(TIME_FORMATTER));
+                    timeSlot.setEndTime(slotEndTime.format(TIME_FORMATTER));
                     timeSlot.setStatus("SPECIAL");
                     timeSlot.setPrice(venue.getPricePerHour());
                     timeSlots.add(timeSlot);
@@ -293,16 +303,9 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
         return reservationRepository.selectById(id);
     }
     
+
     public Page<ReservationEntity> page(Page<ReservationEntity> page, LambdaQueryWrapper<ReservationEntity> wrapper) {
-        Page<ReservationEntity> result = super.page(page, wrapper);
-        
-        // 填充场馆信息
-        result.getRecords().forEach(reservation -> {
-            VenueEntity venue = venueRepository.selectById(reservation.getVenueId());
-            reservation.setVenueInfo(venue);
-        });
-        
-        return result;
+        return baseMapper.selectPage(page, wrapper);
     }
 
     public List<TimeSlot> getVenueTimeSlots(Long venueId, String date) {

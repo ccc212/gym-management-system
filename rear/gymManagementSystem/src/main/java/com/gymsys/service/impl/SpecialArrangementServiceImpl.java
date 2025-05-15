@@ -2,11 +2,12 @@ package com.gymsys.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gymsys.dto.SpecialArrangementDTO;
-import com.gymsys.entity.SpecialArrangement;
-import com.gymsys.entity.Venue;
-import com.gymsys.mapper.SpecialArrangementMapper;
-import com.gymsys.mapper.VenueMapper;
+import com.gymsys.entity.specialarrangement.SpecialArrangement;
+import com.gymsys.entity.venue.VenueEntity;
+import com.gymsys.mapper.specialarrangement.SpecialArrangementMapper;
+import com.gymsys.repository.venue.VenueRepository;
 import com.gymsys.service.SpecialArrangementService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class SpecialArrangementServiceImpl implements SpecialArrangementService 
     private SpecialArrangementMapper specialArrangementMapper;
 
     @Resource
-    private VenueMapper venueMapper;
+    private VenueRepository venueRepository;
 
     @Override
     public Page<SpecialArrangement> getSpecialArrangements(Integer page, Integer size, String venueType, Long venueId, LocalDate startDate, LocalDate endDate) {
@@ -48,78 +49,27 @@ public class SpecialArrangementServiceImpl implements SpecialArrangementService 
             wrapper.le(SpecialArrangement::getDate, endDate);
         }
         
-        wrapper.orderByDesc(SpecialArrangement::getCreatedTime);
+        wrapper.orderByDesc(SpecialArrangement::getCreatedAt);
         
         return specialArrangementMapper.selectPage(new Page<>(page, size), wrapper);
     }
 
     @Override
-    public List<Map<String, Object>> getAvailableTimeSlots(Long venueId, LocalDate date) {
-        List<Map<String, Object>> timeSlots = new ArrayList<>();
-        
-        // 生成时间段（8:00-22:00，每30分钟一个时间段）
-        LocalTime startTime = LocalTime.of(8, 0);
-        LocalTime endTime = LocalTime.of(22, 0);
-        
-        while (startTime.isBefore(endTime)) {
-            LocalTime slotEndTime = startTime.plusMinutes(30);
-            String timeRange = String.format("%02d:%02d - %02d:%02d", 
-                startTime.getHour(), startTime.getMinute(),
-                slotEndTime.getHour(), slotEndTime.getMinute());
-            
-            Map<String, Object> slot = new HashMap<>();
-            slot.put("id", String.format("%d-%d", startTime.getHour(), startTime.getMinute()));
-            slot.put("timeRange", timeRange);
-            
-            // 检查该时间段是否已被预约或设为特殊安排
-            boolean isBooked = checkTimeSlotBooked(venueId, date, timeRange);
-            boolean isSpecial = checkTimeSlotSpecial(venueId, date, timeRange);
-            
-            slot.put("isBooked", isBooked);
-            slot.put("isSpecial", isSpecial);
-            
-            timeSlots.add(slot);
-            startTime = slotEndTime;
-        }
-        
-        // 添加全天选项
-        Map<String, Object> allDaySlot = new HashMap<>();
-        allDaySlot.put("id", "all-day");
-        allDaySlot.put("timeRange", "全天");
-        allDaySlot.put("isBooked", false);
-        allDaySlot.put("isSpecial", false);
-        timeSlots.add(0, allDaySlot);
-        
-        return timeSlots;
-    }
-
-    @Override
     @Transactional
     public SpecialArrangement createSpecialArrangement(SpecialArrangementDTO dto) {
-        Venue venue = venueMapper.selectById(dto.getVenueId());
+        VenueEntity venue = venueRepository.selectById(dto.getVenueId());
         if (venue == null) {
             throw new RuntimeException("场地不存在");
         }
 
         SpecialArrangement arrangement = new SpecialArrangement();
         BeanUtils.copyProperties(dto, arrangement);
-        
+     
         // 设置场地信息
         arrangement.setVenueName(venue.getName());
         arrangement.setVenueType(venue.getType());
         
-        // 设置时间段
-        if (dto.getTimeSlots().contains("all-day")) {
-            arrangement.setTimeRange("全天");
-        } else {
-            // 合并连续的时间段
-            arrangement.setTimeRange(mergeTimeSlots(dto.getTimeSlots()));
-        }
-        
-        // 设置创建信息
-        arrangement.setCreatedBy("管理员"); // 实际应该从当前登录用户获取
-        arrangement.setCreatedTime(LocalDateTime.now());
-        arrangement.setStatus("ACTIVE");
+        // 设置创建和更新时间
         arrangement.setCreatedAt(LocalDateTime.now());
         arrangement.setUpdatedAt(LocalDateTime.now());
         
@@ -135,23 +85,17 @@ public class SpecialArrangementServiceImpl implements SpecialArrangementService 
             throw new RuntimeException("特殊安排不存在");
         }
 
-        Venue venue = venueMapper.selectById(dto.getVenueId());
+        VenueEntity venue = venueRepository.selectById(dto.getVenueId());
         if (venue == null) {
             throw new RuntimeException("场地不存在");
         }
 
+        // 更新基本信息
         BeanUtils.copyProperties(dto, existing);
         
         // 更新场地信息
         existing.setVenueName(venue.getName());
         existing.setVenueType(venue.getType());
-        
-        // 更新时间段
-        if (dto.getTimeSlots().contains("all-day")) {
-            existing.setTimeRange("全天");
-        } else {
-            existing.setTimeRange(mergeTimeSlots(dto.getTimeSlots()));
-        }
         
         // 更新时间戳
         existing.setUpdatedAt(LocalDateTime.now());
@@ -166,16 +110,12 @@ public class SpecialArrangementServiceImpl implements SpecialArrangementService 
         specialArrangementMapper.deleteById(id);
     }
 
-    private boolean checkTimeSlotBooked(Long venueId, LocalDate date, String timeRange) {
-        // TODO: 实现检查时间段是否已被预约的逻辑
-        return false;
-    }
-
     private boolean checkTimeSlotSpecial(Long venueId, LocalDate date, String timeRange) {
         LambdaQueryWrapper<SpecialArrangement> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SpecialArrangement::getVenueId, venueId)
                .eq(SpecialArrangement::getDate, date)
-               .eq(SpecialArrangement::getTimeRange, timeRange);
+               .and(w -> w.le(SpecialArrangement::getStartTime, timeRange.split(" - ")[0])
+                         .ge(SpecialArrangement::getEndTime, timeRange.split(" - ")[1]));
         
         return specialArrangementMapper.selectCount(wrapper) > 0;
     }

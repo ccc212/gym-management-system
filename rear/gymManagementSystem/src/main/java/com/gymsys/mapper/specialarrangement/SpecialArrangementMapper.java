@@ -1,7 +1,7 @@
-package com.gymsys.mapper;
+package com.gymsys.mapper.specialarrangement;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gymsys.entity.SpecialArrangement;
+import com.gymsys.entity.specialarrangement.SpecialArrangement;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

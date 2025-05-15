@@ -7,6 +7,7 @@ import com.gymsys.entity.competition.CompetitionEquipmentRelation;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.AddCompetitionEquipmentRelationDTO;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.ListCompetitionEquipmentRelationDTO;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.UpdateCompetitionEquipmentRelationDTO;
+import com.gymsys.entity.competition.vo.CompetitionEquipmentRelationVO;
 import com.gymsys.service.competition.ICompetitionEquipmentRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -52,9 +53,9 @@ public class CompetitionEquipmentRelationController {
         return Result.success(competitionEquipmentRelationService.listCompetitionEquipmentRelation(listCompetitionEquipmentRelationDTO));
     }
 
-    @GetMapping("/get/{id}")
-    public Result<CompetitionEquipmentRelation> getCompetitionEquipmentRelation(@PathVariable Long id) {
-        return Result.success(competitionEquipmentRelationService.getById(id));
+    @GetMapping("/getByCompetitionId/{competitionId}")
+    public Result<List<CompetitionEquipmentRelationVO>> getCompetitionEquipmentRelation(@PathVariable Long competitionId) {
+        return Result.success(competitionEquipmentRelationService.getCompetitionEquipmentRelation(competitionId));
     }
     
     @GetMapping("/listByCompetitionId/{competitionId}")

@@ -233,6 +233,31 @@ export class ReservationControllerService {
         });
     }
     /**
+     * approveReservation
+     * @param id id
+     * @param request request
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static approveReservationUsingPut(
+        id: number,
+        request?: Record<string, string>,
+    ): CancelablePromise<Record<string, any>> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/reservations/{id}/approve',
+            path: {
+                'id': id,
+            },
+            body: request,
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
      * cancelReservation
      * @param id id
      * @param reason reason
@@ -252,6 +277,31 @@ export class ReservationControllerService {
             query: {
                 'reason': reason,
             },
+            errors: {
+                401: `Unauthorized`,
+                403: `Forbidden`,
+                404: `Not Found`,
+            },
+        });
+    }
+    /**
+     * rejectReservation
+     * @param id id
+     * @param request request
+     * @returns any OK
+     * @throws ApiError
+     */
+    public static rejectReservationUsingPut(
+        id: number,
+        request?: Record<string, string>,
+    ): CancelablePromise<Record<string, any>> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/reservations/{id}/reject',
+            path: {
+                'id': id,
+            },
+            body: request,
             errors: {
                 401: `Unauthorized`,
                 403: `Forbidden`,

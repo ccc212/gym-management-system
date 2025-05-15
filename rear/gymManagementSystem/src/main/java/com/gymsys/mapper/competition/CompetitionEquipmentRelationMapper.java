@@ -2,6 +2,9 @@ package com.gymsys.mapper.competition;
 
 import com.gymsys.entity.competition.CompetitionEquipmentRelation;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gymsys.entity.competition.vo.CompetitionEquipmentRelationVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface CompetitionEquipmentRelationMapper extends BaseMapper<CompetitionEquipmentRelation> {
 
+    List<CompetitionEquipmentRelationVO> getCompetitionEquipmentRelation(Long competitionId);
 }

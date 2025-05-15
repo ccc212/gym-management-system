@@ -2,10 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Page_VenueEntity_ } from '../models/Page_VenueEntity_';
-import type { ReservationEntity } from '../models/ReservationEntity';
 import type { ReservationRequest } from '../models/ReservationRequest';
-import type { TimeSlot } from '../models/TimeSlot';
+import type { Result_List_string_ } from '../models/Result_List_string_';
+import type { Result_List_TimeSlot_ } from '../models/Result_List_TimeSlot_';
+import type { Result_List_VenueEntity_ } from '../models/Result_List_VenueEntity_';
+import type { Result_Page_VenueEntity_ } from '../models/Result_Page_VenueEntity_';
+import type { Result_ReservationEntity_ } from '../models/Result_ReservationEntity_';
+import type { Result_VenueEntity_ } from '../models/Result_VenueEntity_';
+import type { Result_Void_ } from '../models/Result_Void_';
 import type { VenueEntity } from '../models/VenueEntity';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -16,14 +20,14 @@ export class VenueControllerService {
      * @param page page
      * @param size size
      * @param type type
-     * @returns Page_VenueEntity_ OK
+     * @returns Result_Page_VenueEntity_ OK
      * @throws ApiError
      */
     public static getAllVenuesUsingGet(
         page: number = 1,
         size: number = 10,
         type?: string,
-    ): CancelablePromise<Page_VenueEntity_> {
+    ): CancelablePromise<Result_Page_VenueEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/venues',
@@ -42,13 +46,13 @@ export class VenueControllerService {
     /**
      * createVenue
      * @param venue venue
-     * @returns VenueEntity OK
+     * @returns Result_VenueEntity_ OK
      * @returns any Created
      * @throws ApiError
      */
     public static createVenueUsingPost(
         venue: VenueEntity,
-    ): CancelablePromise<VenueEntity | any> {
+    ): CancelablePromise<Result_VenueEntity_ | any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/venues',
@@ -62,10 +66,10 @@ export class VenueControllerService {
     }
     /**
      * getAvailableVenues
-     * @returns VenueEntity OK
+     * @returns Result_List_VenueEntity_ OK
      * @throws ApiError
      */
-    public static getAvailableVenuesUsingGet(): CancelablePromise<Array<VenueEntity>> {
+    public static getAvailableVenuesUsingGet(): CancelablePromise<Result_List_VenueEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/venues/available',
@@ -81,14 +85,14 @@ export class VenueControllerService {
      * @param type type
      * @param page page
      * @param size size
-     * @returns Page_VenueEntity_ OK
+     * @returns Result_List_VenueEntity_ OK
      * @throws ApiError
      */
     public static getVenuesByTypeUsingGet(
         type: string,
         page: number = 1,
         size: number = 10,
-    ): CancelablePromise<Page_VenueEntity_> {
+    ): CancelablePromise<Result_List_VenueEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/venues/type/{type}',
@@ -108,10 +112,10 @@ export class VenueControllerService {
     }
     /**
      * getVenueTypes
-     * @returns string OK
+     * @returns Result_List_string_ OK
      * @throws ApiError
      */
-    public static getVenueTypesUsingGet(): CancelablePromise<Array<string>> {
+    public static getVenueTypesUsingGet(): CancelablePromise<Result_List_string_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/venues/types',
@@ -125,12 +129,12 @@ export class VenueControllerService {
     /**
      * getVenueById
      * @param id id
-     * @returns VenueEntity OK
+     * @returns Result_VenueEntity_ OK
      * @throws ApiError
      */
     public static getVenueByIdUsingGet(
         id: number,
-    ): CancelablePromise<VenueEntity> {
+    ): CancelablePromise<Result_VenueEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/venues/{id}',
@@ -148,14 +152,14 @@ export class VenueControllerService {
      * updateVenue
      * @param id id
      * @param venue venue
-     * @returns VenueEntity OK
+     * @returns Result_VenueEntity_ OK
      * @returns any Created
      * @throws ApiError
      */
     public static updateVenueUsingPut(
         id: number,
         venue: VenueEntity,
-    ): CancelablePromise<VenueEntity | any> {
+    ): CancelablePromise<Result_VenueEntity_ | any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/venues/{id}',
@@ -173,12 +177,12 @@ export class VenueControllerService {
     /**
      * deleteVenue
      * @param id id
-     * @returns any OK
+     * @returns Result_Void_ OK
      * @throws ApiError
      */
     public static deleteVenueUsingDelete(
         id: number,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Result_Void_> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/venues/{id}',
@@ -195,14 +199,14 @@ export class VenueControllerService {
      * updateVenueStatus
      * @param id id
      * @param status status
-     * @returns VenueEntity OK
+     * @returns Result_VenueEntity_ OK
      * @returns any Created
      * @throws ApiError
      */
     public static updateVenueStatusUsingPut(
         id: number,
         status: string,
-    ): CancelablePromise<VenueEntity | any> {
+    ): CancelablePromise<Result_VenueEntity_ | any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/venues/{id}/status',
@@ -223,14 +227,14 @@ export class VenueControllerService {
      * createReservation
      * @param request request
      * @param venueId venueId
-     * @returns ReservationEntity OK
+     * @returns Result_ReservationEntity_ OK
      * @returns any Created
      * @throws ApiError
      */
     public static createReservationUsingPost1(
         request: ReservationRequest,
         venueId: number,
-    ): CancelablePromise<ReservationEntity | any> {
+    ): CancelablePromise<Result_ReservationEntity_ | any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/venues/{venueId}/reserve',
@@ -249,13 +253,13 @@ export class VenueControllerService {
      * getTimeSlots
      * @param date date
      * @param venueId venueId
-     * @returns TimeSlot OK
+     * @returns Result_List_TimeSlot_ OK
      * @throws ApiError
      */
     public static getTimeSlotsUsingGet(
         date: string,
         venueId: number,
-    ): CancelablePromise<Array<TimeSlot>> {
+    ): CancelablePromise<Result_List_TimeSlot_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/venues/{venueId}/time-slots',

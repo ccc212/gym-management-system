@@ -10,6 +10,7 @@ import com.gymsys.entity.competition.CompetitionEquipmentRelation;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.AddCompetitionEquipmentRelationDTO;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.ListCompetitionEquipmentRelationDTO;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.UpdateCompetitionEquipmentRelationDTO;
+import com.gymsys.entity.competition.vo.CompetitionEquipmentRelationVO;
 import com.gymsys.entity.equip.Equipment;
 import com.gymsys.enums.StatusCodeEnum;
 import com.gymsys.exception.BizException;
@@ -37,6 +38,7 @@ public class CompetitionEquipmentRelationServiceImpl extends ServiceImpl<Competi
 
     private final CompetitionMapper competitionMapper;
     private final EquipmentMapper equipmentMapper;
+    private final CompetitionEquipmentRelationMapper competitionEquipmentRelationMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -181,5 +183,10 @@ public class CompetitionEquipmentRelationServiceImpl extends ServiceImpl<Competi
         LambdaQueryWrapper<CompetitionEquipmentRelation> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(CompetitionEquipmentRelation::getCompetitionId, competitionId);
         return list(queryWrapper);
+    }
+
+    @Override
+    public List<CompetitionEquipmentRelationVO> getCompetitionEquipmentRelation(Long competitionId) {
+        return competitionEquipmentRelationMapper.getCompetitionEquipmentRelation(competitionId);
     }
 }

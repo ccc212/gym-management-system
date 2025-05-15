@@ -6,6 +6,7 @@ import com.gymsys.entity.competition.CompetitionEquipmentRelation;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.AddCompetitionEquipmentRelationDTO;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.ListCompetitionEquipmentRelationDTO;
 import com.gymsys.entity.competition.dto.competitionEquipmentRelation.UpdateCompetitionEquipmentRelationDTO;
+import com.gymsys.entity.competition.vo.CompetitionEquipmentRelationVO;
 
 import java.util.List;
 
@@ -54,4 +55,6 @@ public interface ICompetitionEquipmentRelationService extends IService<Competiti
      * @return 器材关联列表
      */
     List<CompetitionEquipmentRelation> listByCompetitionId(Long competitionId);
+
+    List<CompetitionEquipmentRelationVO> getCompetitionEquipmentRelation(Long competitionId);
 }

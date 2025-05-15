@@ -168,23 +168,25 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
         reservation.setVenueId(venueId);
         reservation.setUserId(userId);
         reservation.setCardNumber("12345678"); // 设置默认卡号
-        reservation.setStartTime(startTime);
-        reservation.setEndTime(endTime);
+        
+        // 解析日期时间
+        LocalDateTime startDateTime = LocalDateTime.parse(startTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        LocalDateTime endDateTime = LocalDateTime.parse(endTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        
+        // 设置日期和时间
+        reservation.setDate(startDateTime.toLocalDate());
+        reservation.setStartTime(startDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        reservation.setEndTime(endDateTime.format(DateTimeFormatter.ofPattern("HH:mm")));
+        
         reservation.setNumberOfPeople(numberOfPeople);
         reservation.setRemarks(remarks);
         reservation.setStatus("PENDING");
         reservation.setCreatedTime(LocalDateTime.now());
         reservation.setUpdatedTime(LocalDateTime.now());
 
-        // 计算预约日期
-        LocalDate reservationDate = LocalDate.now();
-        reservation.setDate(reservationDate);
-
-        // 获取场馆信息计算费用
+        // 计算费用
         if (venue != null) {
-            LocalTime start = LocalTime.parse(startTime, TIME_FORMATTER);
-            LocalTime end = LocalTime.parse(endTime, TIME_FORMATTER);
-            double hours = (end.toSecondOfDay() - start.toSecondOfDay()) / 3600.0;
+            double hours = java.time.Duration.between(startDateTime, endDateTime).toMinutes() / 60.0;
             reservation.setCost(venue.getPricePerHour().multiply(BigDecimal.valueOf(hours)));
         }
 

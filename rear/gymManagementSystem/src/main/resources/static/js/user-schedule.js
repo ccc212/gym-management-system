@@ -132,7 +132,14 @@ const UserScheduleComponent = {
                 venueId: ''
             },
             // 场馆类型选项
-            venueTypes: [],
+            venueTypes: [
+                { value: 'basketball', label: '篮球场' },
+                { value: 'football', label: '足球场' },
+                { value: 'badminton', label: '羽毛球场' },
+                { value: 'tennis', label: '网球场' },
+                { value: 'swimming', label: '游泳池' },
+                { value: 'table_tennis', label: '乒乓球室' }
+            ],
             // 场馆列表
             venues: [],
             // 当前周的开始日期
@@ -209,28 +216,22 @@ const UserScheduleComponent = {
             this.loading = true;
             console.log('开始加载场馆数据...');
             
-            // 先获取场地类型
-            axios.get('/api/venues/types')
-                .then(response => {
-                    console.log('获取到场地类型:', response.data);
-                    if (Array.isArray(response.data)) {
-                        this.venueTypes = response.data.map(type => ({
-                            value: type,
-                            label: this.getVenueTypeLabel(type)
-                        }));
-                        console.log('处理后的场地类型:', this.venueTypes);
-                    } else {
-                        console.error('场地类型数据格式错误');
-                        this.$message.error('场地类型数据格式错误');
-                    }
-                    
-                    // 获取场馆列表
-                    return axios.get('/api/venues');
-                })
+            // 获取场馆列表
+            axios.get('/api/venues')
                 .then(response => {
                     console.log('获取到场馆列表:', response.data);
-                    if (response.data && response.data.records) {
-                        this.venues = response.data.records;
+                    if (response.data.code === 200 && response.data.data) {
+                        const pageData = response.data.data;
+                        this.venues = pageData.records || [];
+                        // 转换场地类型为中文显示
+                        this.venues.forEach(venue => {
+                            if (venue.type) {
+                                const typeOption = this.venueTypes.find(t => t.value === venue.type);
+                                if (typeOption) {
+                                    venue.type = typeOption.label;
+                                }
+                            }
+                        });
                         console.log('处理后的场馆列表:', this.venues);
                     } else {
                         this.venues = [];
@@ -452,16 +453,8 @@ const UserScheduleComponent = {
         },
         // 获取场地类型标签
         getVenueTypeLabel(type) {
-            const typeMap = {
-                'basketball': '篮球场',
-                'football': '足球场',
-                'badminton': '羽毛球场',
-                'tennis': '网球场',
-                'swimming': '游泳池',
-                'table_tennis': '乒乓球室'
-            };
-            console.log('转换场地类型:', { type, result: typeMap[type] || type });
-            return typeMap[type] || type;
+            const typeOption = this.venueTypes.find(t => t.value === type);
+            return typeOption ? typeOption.label : type;
         },
         // 获取状态文本
         getStatusText(status) {

@@ -339,10 +339,8 @@ const UserReservationsComponent = {
             const statusMap = {
                 'PENDING': '待确认',
                 'CONFIRMED': '已确认',
-                'IN_USE': '使用中',
-                'COMPLETED': '已完成',
                 'CANCELED': '已取消',
-                'NO_SHOW': '未签到',
+                'COMPLETED': '已完成',
                 'REJECTED': '已拒绝'
             };
             return statusMap[status] || '未知';
@@ -352,10 +350,8 @@ const UserReservationsComponent = {
             const typeMap = {
                 'PENDING': 'warning',
                 'CONFIRMED': 'primary',
-                'IN_USE': 'success',
-                'COMPLETED': 'info',
                 'CANCELED': 'danger',
-                'NO_SHOW': 'danger',
+                'COMPLETED': 'info',
                 'REJECTED': 'danger'
             };
             return typeMap[status] || 'info';

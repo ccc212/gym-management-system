@@ -156,11 +156,10 @@ const AdminReservationsComponent = {
             // 预约状态选项
             statusOptions: [
                 { value: 'PENDING', label: '待审核' },
-                { value: 'APPROVED', label: '已批准' },
-                { value: 'REJECTED', label: '已拒绝' },
-                { value: 'CANCELLED', label: '已取消' },
+                { value: 'CONFIRMED', label: '已确认' },
+                { value: 'CANCELED', label: '已取消' },
                 { value: 'COMPLETED', label: '已完成' },
-                { value: 'NO_SHOW', label: '未签到' }
+                { value: 'REJECTED', label: '已拒绝' }
             ],
             // 预约列表
             reservationList: [],
@@ -188,53 +187,66 @@ const AdminReservationsComponent = {
     },
     methods: {
         // 加载预约数据
-        async loadReservationData() {
+        loadReservationData() {
             this.loading = true;
-            try {
-                const response = await axios.get('/api/reservations', {
-                    params: {
-                        page: this.pagination.currentPage,
-                        size: this.pagination.pageSize,
-                        type: this.searchForm.venueType,
-                        status: this.searchForm.status,
-                        startDate: this.searchForm.dateRange ? this.searchForm.dateRange[0] : null,
-                        endDate: this.searchForm.dateRange ? this.searchForm.dateRange[1] : null
-                    }
-                });
-
-                if (response.data && response.data.records) {
-                    // 场地类型映射
-                    const typeMap = {
-                        'basketball': '篮球场',
-                        'football': '足球场',
-                        'badminton': '羽毛球场',
-                        'tennis': '网球场',
-                        'swimming': '游泳池',
-                        'table_tennis': '乒乓球室'
-                    };
-
-                    // 处理预约数据，确保所有字段都正确显示
-                    this.reservationList = response.data.records.map(reservation => ({
-                        ...reservation,
-                        venueName: reservation.venueInfo ? reservation.venueInfo.name : '未知',
-                        venueType: reservation.venueInfo ? typeMap[reservation.venueInfo.type] || '未知' : '未知',
-                        userName: reservation.userInfo ? reservation.userInfo.name : '未知',
-                        timeRange: `${reservation.startTime} - ${reservation.endTime}`,
-                        createTime: reservation.createdTime ? new Date(reservation.createdTime).toLocaleString() : '未知'
-                    }));
-                    this.pagination.total = response.data.total;
-                } else {
-                    this.reservationList = [];
-                    this.pagination.total = 0;
-                }
-            } catch (error) {
-                console.error('加载预约数据失败:', error);
-                this.$message.error('加载预约数据失败');
-                this.reservationList = [];
-                this.pagination.total = 0;
-            } finally {
-                this.loading = false;
+            
+            // 构建查询参数
+            const params = new URLSearchParams({
+                page: this.pagination.currentPage,
+                size: this.pagination.pageSize
+            });
+            
+            // 添加场地类型过滤
+            if (this.searchForm.venueType) {
+                params.append('venueType', this.searchForm.venueType);
             }
+            
+            // 添加状态过滤
+            if (this.searchForm.status) {
+                params.append('status', this.searchForm.status);
+            }
+            
+            // 添加日期范围过滤
+            if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
+                params.append('startDate', this.searchForm.dateRange[0]);
+                params.append('endDate', this.searchForm.dateRange[1]);
+            }
+            
+            console.log('查询参数:', params.toString());
+            
+            // 发送请求到后端
+            axios.get(`/api/reservations?${params.toString()}`)
+                .then(response => {
+                    console.log('API Response:', response.data);
+                    if (response.data && response.data.records) {
+                        this.reservationList = response.data.records.map(reservation => {
+                            console.log('Processing reservation:', reservation);
+                            console.log('User info:', reservation.userInfo);
+                            return {
+                                id: reservation.id,
+                                venueName: reservation.venueInfo ? reservation.venueInfo.name : '未知',
+                                venueType: reservation.venueInfo ? reservation.venueInfo.type : '未知',
+                                userName: reservation.userInfo ? reservation.userInfo.username : '未知',
+                                date: reservation.date || '未知',
+                                timeRange: `${reservation.startTime} - ${reservation.endTime}`,
+                                numberOfPeople: reservation.numberOfPeople,
+                                status: reservation.status,
+                                createTime: reservation.createdTime,
+                                cost: reservation.cost,
+                                remarks: reservation.remarks
+                            };
+                        });
+                        this.pagination.total = response.data.total;
+                        console.log('Processed List:', this.reservationList);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading reservations:', error);
+                    this.$message.error('加载预约数据失败');
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
         // 搜索预约
         searchReservations() {
@@ -302,11 +314,10 @@ const AdminReservationsComponent = {
         getStatusText(status) {
             const statusMap = {
                 'PENDING': '待审核',
-                'APPROVED': '已批准',
-                'REJECTED': '已拒绝',
-                'CANCELLED': '已取消',
+                'CONFIRMED': '已确认',
+                'CANCELED': '已取消',
                 'COMPLETED': '已完成',
-                'NO_SHOW': '未签到'
+                'REJECTED': '已拒绝'
             };
             return statusMap[status] || '未知';
         },
@@ -314,11 +325,10 @@ const AdminReservationsComponent = {
         getStatusType(status) {
             const typeMap = {
                 'PENDING': 'warning',
-                'APPROVED': 'success',
-                'REJECTED': 'danger',
-                'CANCELLED': 'info',
+                'CONFIRMED': 'success',
+                'CANCELED': 'info',
                 'COMPLETED': 'success',
-                'NO_SHOW': 'danger'
+                'REJECTED': 'danger'
             };
             return typeMap[status] || 'info';
         },

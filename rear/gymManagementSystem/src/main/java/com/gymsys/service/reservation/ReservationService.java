@@ -293,16 +293,9 @@ public class ReservationService extends ServiceImpl<ReservationRepository, Reser
         return reservationRepository.selectById(id);
     }
     
+
     public Page<ReservationEntity> page(Page<ReservationEntity> page, LambdaQueryWrapper<ReservationEntity> wrapper) {
-        Page<ReservationEntity> result = super.page(page, wrapper);
-        
-        // 填充场馆信息
-        result.getRecords().forEach(reservation -> {
-            VenueEntity venue = venueRepository.selectById(reservation.getVenueId());
-            reservation.setVenueInfo(venue);
-        });
-        
-        return result;
+        return baseMapper.selectPage(page, wrapper);
     }
 
     public List<TimeSlot> getVenueTimeSlots(Long venueId, String date) {

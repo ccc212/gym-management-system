@@ -3,8 +3,12 @@ package com.gymsys.controller.reservation;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.entity.reservation.ReservationEntity;
+import com.gymsys.entity.venue.UserEntity;
 import com.gymsys.entity.venue.VenueEntity;
-import com.gymsys.repository.reservation.ReservationRepository;
+import com.gymsys.entity.system.User;
+import com.gymsys.entity.system.SysUser;
+import com.gymsys.mapper.system.UserMapper;
+import com.gymsys.mapper.system.SysUserMapper;
 import com.gymsys.repository.venue.VenueRepository;
 import com.gymsys.service.reservation.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,21 +35,76 @@ public class ReservationController {
     @Autowired
     private VenueRepository venueRepository;
     
+    @Autowired
+    private UserMapper userMapper;
+    
+    @Autowired
+    private SysUserMapper sysUserMapper;
+    
     @GetMapping
     public ResponseEntity<Page<ReservationEntity>> getAllReservations(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
-        Page<ReservationEntity> reservationPage = reservationService.page(new Page<>(page, size), new LambdaQueryWrapper<>());
-
-        // 填充场馆信息
-        for (ReservationEntity reservation : reservationPage.getRecords()) {
-            VenueEntity venue = venueRepository.selectById(reservation.getVenueId());
-            if (venue != null) {
-                reservation.setVenueInfo(venue);
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String venueType,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        
+        try {
+            System.out.println("获取预约列表 - 查询参数: " +
+                "page=" + page + ", size=" + size +
+                ", venueType=" + venueType + ", status=" + status +
+                ", startDate=" + startDate + ", endDate=" + endDate);
+            
+            Page<ReservationEntity> pageRequest = new Page<>(page, size);
+            LambdaQueryWrapper<ReservationEntity> wrapper = new LambdaQueryWrapper<>();
+            
+            // 添加状态条件
+            if (status != null && !status.isEmpty()) {
+                wrapper.eq(ReservationEntity::getStatus, status);
             }
+            
+            // 添加日期范围条件
+            if (startDate != null && endDate != null) {
+                wrapper.ge(ReservationEntity::getDate, startDate)
+                      .le(ReservationEntity::getDate, endDate);
+            }
+            
+            // 按创建时间倒序排序
+            wrapper.orderByDesc(ReservationEntity::getCreatedTime);
+            
+            // 查询预约
+            Page<ReservationEntity> result = reservationService.getBaseMapper().selectPage(pageRequest, wrapper);
+            System.out.println("查询到 " + result.getTotal() + " 条预约记录");
+            
+            // 填充场馆信息和用户信息
+            for (ReservationEntity reservation : result.getRecords()) {
+                // 填充场馆信息
+                VenueEntity venue = venueRepository.selectById(reservation.getVenueId());
+                if (venue != null) {
+                    // 如果指定了场地类型，进行过滤
+                    if (venueType != null && !venueType.isEmpty() && !venueType.equals(venue.getType())) {
+                        continue;
+                    }
+                    reservation.setVenueInfo(venue);
+                }
+                
+                // 填充用户信息
+                User user = userMapper.selectById(reservation.getUserId());
+                if (user != null) {
+                    UserEntity userEntity = new UserEntity();
+                    userEntity.setId(user.getId().longValue());
+                    userEntity.setUsername(user.getName());
+                    reservation.setUserInfo(userEntity);
+                }
+            }
+            
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            System.err.println("获取预约列表失败: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
         }
-
-        return ResponseEntity.ok(reservationPage);
     }
     
     @GetMapping("/{id}")
@@ -106,7 +165,7 @@ public class ReservationController {
             wrapper.orderByDesc(ReservationEntity::getCreatedTime);
             
             // 查询预约
-            Page<ReservationEntity> result = reservationService.page(pageRequest, wrapper);
+            Page<ReservationEntity> result = reservationService.getBaseMapper().selectPage(pageRequest, wrapper);
             System.out.println("查询到 " + result.getTotal() + " 条预约记录");
             
             // 填充场馆信息
@@ -114,6 +173,15 @@ public class ReservationController {
                 VenueEntity venue = venueRepository.selectById(reservation.getVenueId());
                 if (venue != null) {
                     reservation.setVenueInfo(venue);
+                }
+                
+                // 填充用户信息
+                User user = userMapper.selectById(reservation.getUserId());
+                if (user != null) {
+                    UserEntity userEntity = new UserEntity();
+                    userEntity.setId(user.getId().longValue());
+                    userEntity.setUsername(user.getName());
+                    reservation.setUserInfo(userEntity);
                 }
             }
             

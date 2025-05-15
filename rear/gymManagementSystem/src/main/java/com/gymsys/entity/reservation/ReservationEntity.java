@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gymsys.entity.venue.VenueEntity;
+import com.gymsys.entity.venue.UserEntity;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -126,4 +127,7 @@ public class ReservationEntity {
 
     @TableField(exist = false)
     private VenueEntity venueInfo;
+
+    @TableField(exist = false)
+    private UserEntity userInfo;
 } 

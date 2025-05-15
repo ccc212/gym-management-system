@@ -5,18 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8a6d4dc5-691a-45b0-8f79-45a2f672f66f" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/controller/SpecialArrangementController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/entity/SpecialArrangement.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/mapper/SpecialArrangementMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/SpecialArrangementService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/impl/SpecialArrangementServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/VenueController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/controller/venue/VenueController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/dto/ReservationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/dto/ReservationRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/controller/reservation/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/controller/reservation/ReservationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/entity/reservation/ReservationEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/entity/reservation/ReservationEntity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/reservation/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/reservation/ReservationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/admin-special.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/admin-special.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-schedule.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-schedule.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-venues.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-venues.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/admin-reservations.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/admin-reservations.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/admin-venues.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/admin-venues.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-reservations.js" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/resources/static/js/user-reservations.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

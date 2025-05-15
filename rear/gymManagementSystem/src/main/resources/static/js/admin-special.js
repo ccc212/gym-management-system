@@ -40,22 +40,24 @@ const AdminSpecialComponent = {
                 <!-- 特殊场地列表 -->
                 <el-table 
                     v-loading="loading" 
-                    :data="specialArrangements" 
+                    :data="specialArrangementList" 
                     style="width: 100%"
                     :header-cell-style="{background:'#f5f7fa', color:'#606266'}"
                     border>
-                    <el-table-column prop="id" label="ID" width="80"></el-table-column>
                     <el-table-column prop="venueName" label="场地名称" width="150"></el-table-column>
                     <el-table-column prop="venueType" label="场地类型" width="120"></el-table-column>
                     <el-table-column prop="date" label="日期" width="120"></el-table-column>
-                    <el-table-column prop="timeRange" label="时间段" width="160"></el-table-column>
-                    <el-table-column prop="purpose" label="用途"></el-table-column>
-                    <el-table-column prop="createdBy" label="创建人" width="120"></el-table-column>
-                    <el-table-column prop="createdTime" label="创建时间" width="180"></el-table-column>
+                    <el-table-column prop="timeSlot" label="时间段" width="150"></el-table-column>
+                    <el-table-column prop="status" label="状态" width="100">
+                        <template slot-scope="scope">
+                            <el-tag :type="getStatusType(scope.row.status)">{{ getStatusText(scope.row.status) }}</el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="remarks" label="备注" min-width="200"></el-table-column>
                     <el-table-column label="操作" width="150">
                         <template slot-scope="scope">
                             <el-button type="primary" size="mini" @click="editSpecialArrangement(scope.row)">编辑</el-button>
-                            <el-button type="danger" size="mini" @click="confirmDeleteSpecial(scope.row)">删除</el-button>
+                            <el-button type="danger" size="mini" @click="deleteSpecialArrangement(scope.row)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -75,24 +77,19 @@ const AdminSpecialComponent = {
             </el-card>
             
             <!-- 添加/编辑特殊场地弹窗 -->
-            <el-dialog :title="dialogType === 'add' ? '添加特殊安排' : '编辑特殊安排'" :visible.sync="specialDialogVisible" width="600px">
-                <el-form :model="specialForm" :rules="specialRules" ref="specialForm" label-width="100px">
-                    <el-form-item label="场地" prop="venueId">
-                        <el-select v-model="specialForm.venueId" placeholder="请选择场地" style="width: 100%" @change="handleVenueChange">
-                            <el-option-group
-                                v-for="venueGroup in venueGroups"
-                                :key="venueGroup.label"
-                                :label="venueGroup.label">
-                                <el-option
-                                    v-for="venue in venueGroup.venues"
-                                    :key="venue.id"
-                                    :label="venue.name"
-                                    :value="venue.id">
-                                </el-option>
-                            </el-option-group>
+            <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="500px">
+                <el-form :model="specialForm" ref="specialForm" label-width="100px">
+                    <el-form-item label="场地" prop="venueId" required>
+                        <el-select v-model="specialForm.venueId" placeholder="选择场地" style="width: 100%">
+                            <el-option
+                                v-for="venue in filteredVenues"
+                                :key="venue.id"
+                                :label="venue.name"
+                                :value="venue.id">
+                            </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="日期" prop="date">
+                    <el-form-item label="日期" prop="date" required>
                         <el-date-picker
                             v-model="specialForm.date"
                             type="date"
@@ -101,40 +98,35 @@ const AdminSpecialComponent = {
                             style="width: 100%">
                         </el-date-picker>
                     </el-form-item>
-                    <el-form-item label="时间段" prop="timeSlots">
-                        <el-select v-model="specialForm.timeSlots" multiple placeholder="请选择时间段" style="width: 100%">
-                            <el-option
-                                v-for="timeSlot in availableTimeSlots"
-                                :key="timeSlot.id"
-                                :label="timeSlot.timeRange"
-                                :value="timeSlot.id"
-                                :disabled="timeSlot.isBooked">
-                                <span style="float: left">{{ timeSlot.timeRange }}</span>
-                                <span v-if="timeSlot.isBooked" style="float: right; color: #F56C6C; font-size: 13px">已预约</span>
-                                <span v-else-if="timeSlot.isSpecial" style="float: right; color: #E6A23C; font-size: 13px">特殊安排</span>
-                            </el-option>
-                        </el-select>
+                    <el-form-item label="时间段" required>
+                        <el-time-picker
+                            v-model="specialForm.startTime"
+                            placeholder="开始时间"
+                            format="HH:mm"
+                            value-format="HH:mm"
+                            style="width: 45%">
+                        </el-time-picker>
+                        <span style="margin: 0 10px">至</span>
+                        <el-time-picker
+                            v-model="specialForm.endTime"
+                            placeholder="结束时间"
+                            format="HH:mm"
+                            value-format="HH:mm"
+                            style="width: 45%">
+                        </el-time-picker>
                     </el-form-item>
-                    <el-form-item label="用途" prop="purpose">
-                        <el-select v-model="specialForm.purpose" placeholder="请选择用途" style="width: 100%">
-                            <el-option label="校队训练" value="校队训练"></el-option>
-                            <el-option label="体育课程" value="体育课程"></el-option>
-                            <el-option label="比赛活动" value="比赛活动"></el-option>
-                            <el-option label="维护保养" value="维护保养"></el-option>
-                            <el-option label="临时关闭" value="临时关闭"></el-option>
-                            <el-option label="其他" value="其他"></el-option>
+                    <el-form-item label="状态" prop="status" required>
+                        <el-select v-model="specialForm.status" placeholder="选择状态" style="width: 100%">
+                            <el-option label="特殊场地" value="SPECIAL"></el-option>
+                            <el-option label="维护中" value="MAINTENANCE"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="备注" prop="remarks">
-                        <el-input v-model="specialForm.remarks" type="textarea" placeholder="请输入备注说明"></el-input>
-                    </el-form-item>
-                    <el-form-item label="通知用户" prop="notifyUsers">
-                        <el-switch v-model="specialForm.notifyUsers"></el-switch>
-                        <span class="form-tip">设置为特殊场地后，是否通知已预约的用户</span>
+                        <el-input type="textarea" v-model="specialForm.remarks" rows="3"></el-input>
                     </el-form-item>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
-                    <el-button @click="specialDialogVisible = false">取消</el-button>
+                    <el-button @click="dialogVisible = false">取消</el-button>
                     <el-button type="primary" @click="saveSpecialArrangement">确定</el-button>
                 </span>
             </el-dialog>
@@ -143,11 +135,13 @@ const AdminSpecialComponent = {
     data() {
         return {
             venues: [], // 所有场馆列表
-            specialArrangements: [],
+            specialArrangementList: [],
             loading: false,
-            total: 0,
-            currentPage: 1,
-            pageSize: 10,
+            pagination: {
+                currentPage: 1,
+                pageSize: 10,
+                total: 0
+            },
             searchForm: {
                 venueType: '',
                 venueId: '',
@@ -155,46 +149,27 @@ const AdminSpecialComponent = {
             },
             // 场馆类型选项
             venueTypes: [
-                { value: '篮球场', label: '篮球场' },
-                { value: '足球场', label: '足球场' },
-                { value: '羽毛球场', label: '羽毛球场' },
-                { value: '网球场', label: '网球场' },
-                { value: '游泳池', label: '游泳池' },
-                { value: '乒乓球室', label: '乒乓球室' }
+                { value: 'basketball', label: '篮球场' },
+                { value: 'football', label: '足球场' },
+                { value: 'badminton', label: '羽毛球场' },
+                { value: 'tennis', label: '网球场' },
+                { value: 'swimming', label: '游泳池' },
+                { value: 'table_tennis', label: '乒乓球室' }
             ],
-            // 按类型分组的场馆
-            venueGroups: [],
             // 特殊场地弹窗可见性
-            specialDialogVisible: false,
+            dialogVisible: false,
             // 弹窗类型（add/edit）
-            dialogType: 'add',
+            dialogTitle: '',
             // 特殊场地表单
             specialForm: {
                 id: null,
-                venueId: '',
+                venueId: null,
                 date: '',
-                timeSlots: [],
-                purpose: '',
-                remarks: '',
-                notifyUsers: true
+                startTime: '',
+                endTime: '',
+                status: 'SPECIAL',
+                remarks: ''
             },
-            // 表单验证规则
-            specialRules: {
-                venueId: [
-                    { required: true, message: '请选择场地', trigger: 'change' }
-                ],
-                date: [
-                    { required: true, message: '请选择日期', trigger: 'change' }
-                ],
-                timeSlots: [
-                    { required: true, message: '请选择至少一个时间段', trigger: 'change' }
-                ],
-                purpose: [
-                    { required: true, message: '请选择用途', trigger: 'change' }
-                ]
-            },
-            // 可用时间段
-            availableTimeSlots: [],
             apiBaseUrl: '/api/special-arrangements',
             venueApiUrl: '/api/venues'
         };
@@ -221,57 +196,70 @@ const AdminSpecialComponent = {
             try {
                 const response = await axios.get(this.venueApiUrl);
                 if (response.data.code === 200) {
-                    this.venues = response.data.data || [];
-                    this.processVenueData();
+                    this.venues = response.data.data.records || [];
+                    // 转换场地类型为中文显示
+                    this.venues.forEach(venue => {
+                        if (venue.type) {
+                            const typeOption = this.venueTypes.find(t => t.value === venue.type);
+                            if (typeOption) {
+                                venue.type = typeOption.label;
+                            }
+                        }
+                    });
+                    console.log('获取到的场地列表:', this.venues);
+                } else {
+                    console.error('获取场地列表失败:', response.data.msg);
+                    this.$message.error('获取场地列表失败');
                 }
             } catch (error) {
                 console.error('获取场地列表失败:', error);
+                this.$message.error('获取场地列表失败');
                 this.venues = [];
             }
         },
-        
-        // 处理场地数据
-        processVenueData() {
-            // 按类型分组场地
-            this.venueGroups = this.venueTypes.map(type => {
-                const venuesOfType = this.venues.filter(venue => venue.type === type.value);
-                return {
-                    label: type.label,
-                    venues: venuesOfType
-                };
-            }).filter(group => group.venues.length > 0);
-        },
         // 加载特殊场地数据
-        async loadSpecialArrangementData() {
+        loadSpecialArrangementData() {
             this.loading = true;
-            try {
-                const params = {
-                    page: this.pagination.currentPage,
-                    size: this.pagination.pageSize
-                };
 
-                if (this.searchForm.venueType) {
-                    params.venueType = this.searchForm.venueType;
-                }
-                if (this.searchForm.venueId) {
-                    params.venueId = this.searchForm.venueId;
-                }
-                if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
-                    params.startDate = this.searchForm.dateRange[0];
-                    params.endDate = this.searchForm.dateRange[1];
-                }
-
-                const response = await axios.get(this.apiBaseUrl, { params });
-                this.specialArrangements = response.data.records;
-                this.pagination.total = response.data.total;
-            } catch (error) {
-                this.$message.error('加载特殊场地数据失败');
-                console.error('加载特殊场地数据失败:', error);
-            } finally {
-                this.loading = false;
+            // 构建查询参数
+            const params = new URLSearchParams({
+                page: this.pagination.currentPage,
+                size: this.pagination.pageSize
+            });
+            
+            // 添加场地类型过滤
+            if (this.searchForm.venueType) {
+                params.append('venueType', this.searchForm.venueType);
             }
+            
+            // 添加场地ID过滤
+            if (this.searchForm.venueId) {
+                params.append('venueId', this.searchForm.venueId);
+            }
+            
+            // 添加日期范围过滤
+            if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
+                params.append('startDate', this.searchForm.dateRange[0]);
+                params.append('endDate', this.searchForm.dateRange[1]);
+            }
+            
+            // 发送请求到后端
+            axios.get(`${this.apiBaseUrl}?${params.toString()}`)
+                .then(response => {
+                    if (response.data && response.data.data) {
+                        this.specialArrangementList = response.data.data.records || [];
+                        this.pagination.total = response.data.data.total || 0;
+                    }
+                })
+                .catch(error => {
+                    console.error('加载特殊场地数据失败:', error);
+                    this.$message.error('加载特殊场地数据失败');
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
-        // 搜索特殊场地安排
+        // 搜索特殊场地
         searchSpecialArrangements() {
             this.pagination.currentPage = 1;
             this.loadSpecialArrangementData();
@@ -285,196 +273,109 @@ const AdminSpecialComponent = {
             };
             this.searchSpecialArrangements();
         },
-        // 根据条件过滤特殊场地安排
-        filterSpecialArrangements() {
-            let filteredList = [...this.specialArrangements];
-
-            if (this.searchForm.venueType) {
-                filteredList = filteredList.filter(item => {
-                    return item.venueType === this.searchForm.venueType;
-                });
-            }
-
-            if (this.searchForm.venueId) {
-                filteredList = filteredList.filter(item => {
-                    return item.venueId === this.searchForm.venueId;
-                });
-            }
-
-            if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
-                const startDate = this.searchForm.dateRange[0];
-                const endDate = this.searchForm.dateRange[1];
-
-                filteredList = filteredList.filter(item => {
-                    return item.date >= startDate && item.date <= endDate;
-                });
-            }
-
-            this.specialArrangements = filteredList;
-            this.pagination.total = filteredList.length;
-        },
-        // 分页大小变化处理
-        handleSizeChange(val) {
-            this.pagination.pageSize = val;
-            this.loadSpecialArrangementData();
-        },
-        // 页码变化处理
-        handleCurrentChange(val) {
-            this.pagination.currentPage = val;
-            this.loadSpecialArrangementData();
-        },
-        // 显示添加特殊场地弹窗
-        showAddSpecialDialog() {
-            this.dialogType = 'add';
-            this.specialForm = {
-                id: null,
-                venueId: '',
-                date: '',
-                timeSlots: [],
-                purpose: '',
-                remarks: '',
-                notifyUsers: true
+        // 获取状态文本
+        getStatusText(status) {
+            const statusMap = {
+                'SPECIAL': '特殊场地',
+                'MAINTENANCE': '维护中'
             };
-            this.availableTimeSlots = [];
-            this.specialDialogVisible = true;
-
-            // 在下一个事件循环中重置表单校验结果
-            this.$nextTick(() => {
-                this.$refs.specialForm && this.$refs.specialForm.clearValidate();
-            });
+            return statusMap[status] || '未知';
         },
-        // 处理场地变化
-        handleVenueChange() {
-            if (this.specialForm.venueId && this.specialForm.date) {
-                this.loadAvailableTimeSlots();
-            }
-        },
-        // 加载可用时间段
-        async loadAvailableTimeSlots() {
-            if (!this.specialForm.venueId || !this.specialForm.date) {
-                this.availableTimeSlots = [];
-                return;
-            }
-
-            this.loading = true;
-            try {
-                const response = await axios.get(`${this.apiBaseUrl}/time-slots`, {
-                    params: {
-                        venueId: this.specialForm.venueId,
-                        date: this.specialForm.date
-                    }
-                });
-                if (response.data.code === 200) {
-                    this.availableTimeSlots = response.data.data || [];
-                } else {
-                    this.$message.error(response.data.message || '加载时间段数据失败');
-                }
-            } catch (error) {
-                this.$message.error('加载时间段数据失败');
-                console.error('加载时间段数据失败:', error);
-            } finally {
-                this.loading = false;
-            }
-        },
-        // 编辑特殊场地安排
-        editSpecialArrangement(arrangement) {
-            this.dialogType = 'edit';
-
-            // 将时间段转换为id数组
-            let timeSlots = [];
-            if (arrangement.timeRange === '全天') {
-                timeSlots = ['all-day'];
-            } else {
-                // 这里简化处理，实际应该根据时间范围找到对应的时间段id
-                const parts = arrangement.timeRange.split(' - ');
-                if (parts.length === 2) {
-                    const startTime = parts[0];
-                    const [hours, minutes] = startTime.split(':').map(Number);
-                    timeSlots = [`${hours}-${minutes}`];
-                }
-            }
-
-            this.specialForm = {
-                id: arrangement.id,
-                venueId: arrangement.venueId,
-                date: arrangement.date,
-                timeSlots: timeSlots,
-                purpose: arrangement.purpose,
-                remarks: arrangement.remarks || '',
-                notifyUsers: true
+        // 获取状态类型
+        getStatusType(status) {
+            const typeMap = {
+                'SPECIAL': 'warning',
+                'MAINTENANCE': 'danger'
             };
-
-            // 加载可用时间段
-            this.loadAvailableTimeSlots();
-
-            this.specialDialogVisible = true;
-
-            // 在下一个事件循环中重置表单校验结果
-            this.$nextTick(() => {
-                this.$refs.specialForm && this.$refs.specialForm.clearValidate();
-            });
+            return typeMap[status] || 'info';
         },
-        // 保存特殊场地安排
-        async saveSpecialArrangement() {
-            this.$refs.specialForm.validate(async valid => {
-                if (valid) {
-                    this.loading = true;
-                    try {
-                        const requestData = {
-                            venueId: this.specialForm.venueId,
-                            date: this.specialForm.date,
-                            timeSlots: this.specialForm.timeSlots,
-                            purpose: this.specialForm.purpose,
-                            remarks: this.specialForm.remarks,
-                            notifyUsers: this.specialForm.notifyUsers
-                        };
-
-                        if (this.dialogType === 'add') {
-                            await axios.post(this.apiBaseUrl, requestData);
-                            this.$message.success('添加特殊安排成功');
-                        } else {
-                            await axios.put(`${this.apiBaseUrl}/${this.specialForm.id}`, requestData);
-                            this.$message.success('更新特殊安排成功');
-                        }
-
-                        this.specialDialogVisible = false;
-                        this.loadSpecialArrangementData();
-                    } catch (error) {
-                        const errorMsg = error.response?.data?.message || '保存特殊安排失败';
-                        this.$message.error(errorMsg);
-                        console.error('保存特殊安排失败:', error);
-                    } finally {
-                        this.loading = false;
-                    }
-                }
-            });
+        // 编辑特殊场地
+        editSpecialArrangement(row) {
+            this.dialogTitle = '编辑特殊场地';
+            this.specialForm = {
+                id: row.id,
+                venueId: row.venueId,
+                date: row.date,
+                startTime: row.startTime,
+                endTime: row.endTime,
+                status: row.status,
+                remarks: row.remarks
+            };
+            this.dialogVisible = true;
         },
-        // 确认删除特殊安排
-        confirmDeleteSpecial(arrangement) {
-            this.$confirm(`确定要删除"${arrangement.venueName}"在"${arrangement.date}"的特殊安排吗？`, '提示', {
+        // 删除特殊场地
+        deleteSpecialArrangement(row) {
+            this.$confirm('确定要删除这个特殊场地安排吗？', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.deleteSpecialArrangement(arrangement);
-            }).catch(() => {
-                // 取消删除操作
+                axios.delete(`${this.apiBaseUrl}/${row.id}`)
+                    .then(() => {
+                        this.$message.success('删除成功');
+                        this.loadSpecialArrangementData();
+                    })
+                    .catch(error => {
+                        console.error('删除特殊场地失败:', error);
+                        this.$message.error('删除失败');
+                    });
+            }).catch(() => {});
+        },
+        // 保存特殊场地
+        saveSpecialArrangement() {
+            if (!this.specialForm.venueId || !this.specialForm.date || 
+                !this.specialForm.startTime || !this.specialForm.endTime || 
+                !this.specialForm.status) {
+                this.$message.warning('请填写完整信息');
+                return;
+            }
+            
+            const data = {
+                venueId: this.specialForm.venueId,
+                date: this.specialForm.date,
+                startTime: this.specialForm.startTime,
+                endTime: this.specialForm.endTime,
+                status: this.specialForm.status,
+                remarks: this.specialForm.remarks
+            };
+            
+            const request = this.specialForm.id
+                ? axios.put(`${this.apiBaseUrl}/${this.specialForm.id}`, data)
+                : axios.post(this.apiBaseUrl, data);
+            
+            request.then(() => {
+                this.$message.success(this.specialForm.id ? '更新成功' : '创建成功');
+                this.dialogVisible = false;
+                this.loadSpecialArrangementData();
+            }).catch(error => {
+                console.error('保存特殊场地失败:', error);
+                this.$message.error('保存失败');
             });
         },
-        // 删除特殊安排
-        async deleteSpecialArrangement(arrangement) {
-            this.loading = true;
-            try {
-                await axios.delete(`${this.apiBaseUrl}/${arrangement.id}`);
-                this.$message.success('删除特殊安排成功');
-                this.loadSpecialArrangementData();
-            } catch (error) {
-                const errorMsg = error.response?.data?.message || '删除特殊安排失败';
-                this.$message.error(errorMsg);
-                console.error('删除特殊安排失败:', error);
-            } finally {
-                this.loading = false;
-            }
+        // 显示添加特殊场地弹窗
+        showAddSpecialDialog() {
+            this.dialogTitle = '添加特殊场地';
+            this.specialForm = {
+                id: null,
+                venueId: null,
+                date: '',
+                startTime: '',
+                endTime: '',
+                status: 'SPECIAL',
+                remarks: ''
+            };
+            this.dialogVisible = true;
+        },
+        // 处理页码改变
+        handleCurrentChange(val) {
+            this.pagination.currentPage = val;
+            this.loadSpecialArrangementData();
+        },
+        // 处理每页条数改变
+        handleSizeChange(val) {
+            this.pagination.pageSize = val;
+            this.pagination.currentPage = 1;
+            this.loadSpecialArrangementData();
         }
     }
 };

@@ -3,15 +3,13 @@ package com.gymsys.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gymsys.common.Result;
 import com.gymsys.dto.SpecialArrangementDTO;
-import com.gymsys.entity.SpecialArrangement;
+import com.gymsys.entity.specialarrangement.SpecialArrangement;
 import com.gymsys.service.SpecialArrangementService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/special-arrangements")
@@ -31,14 +29,6 @@ public class SpecialArrangementController {
         Page<SpecialArrangement> arrangements = specialArrangementService.getSpecialArrangements(
             page, size, venueType, venueId, startDate, endDate);
         return Result.success(arrangements);
-    }
-
-    @GetMapping("/time-slots")
-    public Result<List<Map<String, Object>>> getAvailableTimeSlots(
-            @RequestParam Long venueId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        List<Map<String, Object>> timeSlots = specialArrangementService.getAvailableTimeSlots(venueId, date);
-        return Result.success(timeSlots);
     }
 
     @PostMapping

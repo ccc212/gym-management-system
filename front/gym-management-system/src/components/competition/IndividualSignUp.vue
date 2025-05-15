@@ -75,7 +75,6 @@ import type { FormInstance } from 'element-plus';
 import { DepartmentControllerService } from '../../../generated/services/DepartmentControllerService';
 import { CompetitionSignUpUserControllerService } from '../../../generated/services/CompetitionSignUpUserControllerService';
 import { UserControllerService } from '../../../generated/services/UserControllerService';
-import { competitionItemStore } from '@/store/competition';
 import { userStore } from '@/store/user';
 import type { AddCompetitionSignUpUserDTO } from '../../../generated/models/AddCompetitionSignUpUserDTO';
 import router from "@/router";
@@ -96,20 +95,11 @@ const emit = defineEmits(['update:modelValue', 'success']);
 const dialogVisible = ref(props.modelValue);
 const formRef = ref<FormInstance>();
 const departmentOptions = ref([]);
-const compItemStore = competitionItemStore();
 const store = userStore();
 const loading = ref(false);
 
 // 获取当前比赛的比赛项目
-const competitionItems = computed(() => {
-  // 如果store中有数据且类型匹配，则直接使用
-  const storeItems = compItemStore.getItemsByType(props.competition.type);
-  if (storeItems && storeItems.length > 0) {
-    return storeItems;
-  }
-  // 否则返回competition中的items
-  return props.competition.items || [];
-});
+const competitionItems = computed(() => props.competition.itemRelations?.length ? props.competition.itemRelations : []);
 
 // 表单数据
 const form = reactive<AddCompetitionSignUpUserDTO>({
@@ -194,20 +184,6 @@ const loadDepartments = async () => {
   }
 };
 
-// 获取赛事项目列表
-const loadCompetitionItems = async () => {
-  if (compItemStore.getItemsByType(props.competition.type).length === 0) {
-    try {
-      await compItemStore.fetchCompetitionItems({
-        type: props.competition.type,
-        isTeamCompetition: props.competition.isTeamCompetition
-      });
-    } catch (error) {
-      console.error('获取赛事项目列表失败:', error);
-    }
-  }
-};
-
 // 提交表单
 const submitForm = async () => {
   if (!formRef.value) return;
@@ -243,7 +219,6 @@ const handleClose = () => {
 onMounted(() => {
   loadUserInfo();
   loadDepartments();
-  loadCompetitionItems();
 });
 </script>
 

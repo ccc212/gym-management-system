@@ -40,7 +40,6 @@ export type { IPage_TeamMemberRelation_ } from './models/IPage_TeamMemberRelatio
 export type { LoginParm } from './models/LoginParm';
 export type { LoginRequest } from './models/LoginRequest';
 export type { LoginResponse } from './models/LoginResponse';
-export type { Map_string_object_ } from './models/Map_string_object_';
 export type { Menu } from './models/Menu';
 export { ModelAndView } from './models/ModelAndView';
 export type { Page_AnnouncementEntity_ } from './models/Page_AnnouncementEntity_';
@@ -71,7 +70,6 @@ export type { Result_List_CompetitionItemRelation_ } from './models/Result_List_
 export type { Result_List_CompetitionSignUpTeamVO_ } from './models/Result_List_CompetitionSignUpTeamVO_';
 export type { Result_List_CompetitionSignUpUserVO_ } from './models/Result_List_CompetitionSignUpUserVO_';
 export type { Result_List_CompetitionVenueRelation_ } from './models/Result_List_CompetitionVenueRelation_';
-export type { Result_List_Map_string_object_ } from './models/Result_List_Map_string_object_';
 export type { Result_List_string_ } from './models/Result_List_string_';
 export type { Result_List_Team_ } from './models/Result_List_Team_';
 export type { Result_List_TeamMemberRelationVO_ } from './models/Result_List_TeamMemberRelationVO_';

@@ -10,21 +10,33 @@ import { request as __request } from '../core/request';
 export class ReservationControllerService {
     /**
      * getAllReservations
+     * @param endDate endDate
      * @param page page
      * @param size size
+     * @param startDate startDate
+     * @param status status
+     * @param venueType venueType
      * @returns Page_ReservationEntity_ OK
      * @throws ApiError
      */
     public static getAllReservationsUsingGet(
+        endDate?: string,
         page: number = 1,
         size: number = 10,
+        startDate?: string,
+        status?: string,
+        venueType?: string,
     ): CancelablePromise<Page_ReservationEntity_> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/reservations',
             query: {
+                'endDate': endDate,
                 'page': page,
                 'size': size,
+                'startDate': startDate,
+                'status': status,
+                'venueType': venueType,
             },
             errors: {
                 401: `Unauthorized`,

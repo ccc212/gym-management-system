@@ -172,6 +172,7 @@ import type {CompetitionDetailVO} from "../../../../generated";
 import {CompetitionVO} from "../../../../generated";
 import CompetitionDetails from "../../../components/competition/CompetitionDetails.vue";
 import EquipmentReservation from "../../../components/competition/EquipmentReservation.vue";
+import moment from 'moment';
 
 // 表格高度
 const tableHeight = ref(0);
@@ -469,22 +470,15 @@ const submitForm = async () => {
 
       // 处理时间范围
       if (data.competitionTimeRange && data.competitionTimeRange.length === 2) {
-        // 确保开始和结束时间包含时分秒
-        data.startTime = data.competitionTimeRange[0];
-        if (typeof data.startTime === 'string' && !data.startTime.includes(':')) {
-          data.startTime += ' 00:00:00';
-        }
-        
-        data.endTime = data.competitionTimeRange[1];
-        if (typeof data.endTime === 'string' && !data.endTime.includes(':')) {
-          data.endTime += ' 23:59:59';
-        }
+        // 使用moment统一处理时间格式
+        data.startTime = moment(data.competitionTimeRange[0]).format('YYYY-MM-DD HH:mm:ss');
+        data.endTime = moment(data.competitionTimeRange[1]).format('YYYY-MM-DD HH:mm:ss');
       }
       delete data.competitionTimeRange;
 
-      // 确保报名截止时间包含时分秒
-      if (data.signUpDeadline && typeof data.signUpDeadline === 'string' && !data.signUpDeadline.includes(':')) {
-        data.signUpDeadline += ' 23:59:59';
+      // 使用moment处理报名截止时间
+      if (data.signUpDeadline) {
+        data.signUpDeadline = moment(data.signUpDeadline).format('YYYY-MM-DD HH:mm:ss');
       }
 
       // 移除status字段，因为状态由系统根据时间自动计算

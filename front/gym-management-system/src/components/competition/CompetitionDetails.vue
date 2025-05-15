@@ -27,6 +27,13 @@
       <el-descriptions-item label="比赛时间">
         {{ competition.startTime }} 至 {{ competition.endTime }}
       </el-descriptions-item>
+      <el-descriptions-item label="报名人数">
+        {{ competition.signUpNum || 0 }}/{{ competition.maxSignUpNum || 0 }}
+        ({{ calculatePercentage(competition.signUpNum, competition.maxSignUpNum) }}%)
+      </el-descriptions-item>
+      <el-descriptions-item v-if="competition.isTeamCompetition === 1" label="每队人数">
+        最少 {{ competition.teamMinNum }} 人 / 最多 {{ competition.teamMaxNum }} 人
+      </el-descriptions-item>
       <el-descriptions-item label="参赛要求" :span="2">{{ competition.requirement }}</el-descriptions-item>
       <el-descriptions-item label="赛事描述" :span="2">{{ competition.description }}</el-descriptions-item>
     </el-descriptions>
@@ -122,6 +129,12 @@ watch(() => props.modelValue, (val) => {
 watch(dialogVisible, (val) => {
   emit('update:modelValue', val);
 });
+
+// 计算报名百分比
+const calculatePercentage = (signUpNum: number = 0, maxSignUpNum: number = 0) => {
+  if (maxSignUpNum === 0) return 0;
+  return Math.round((signUpNum / maxSignUpNum) * 100);
+};
 
 const handleClose = () => {
   dialogVisible.value = false;

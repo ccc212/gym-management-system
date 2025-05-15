@@ -4,15 +4,12 @@
 /* eslint-disable */
 export type SpecialArrangement = {
     createdAt?: string;
-    createdBy?: string;
-    createdTime?: string;
     date?: string;
+    endTime?: string;
     id?: number;
-    notifyUsers?: boolean;
-    purpose?: string;
     remarks?: string;
+    startTime?: string;
     status?: string;
-    timeRange?: string;
     updatedAt?: string;
     venueId?: number;
     venueName?: string;

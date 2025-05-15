@@ -351,9 +351,20 @@ const cancelSignUp = (row: any) => {
 };
 
 // 查看详情
-const viewDetails = (row: any) => {
-  selectedCompetition.value = row;
-  showDetails.value = true;
+const viewDetails = async (row: any) => {
+  try {
+    // 获取完整的比赛详情
+    const res = await CompetitionControllerService.getDetailUsingGet(row.id);
+    if (res && res.data) {
+      selectedCompetition.value = res.data;
+      showDetails.value = true;
+    } else {
+      ElMessage.error(res?.msg || '获取详情失败');
+    }
+  } catch (error) {
+    console.error('获取详情失败:', error);
+    ElMessage.error('获取详情失败');
+  }
 };
 
 // 报名

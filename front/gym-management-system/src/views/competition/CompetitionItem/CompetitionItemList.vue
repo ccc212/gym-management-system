@@ -24,7 +24,6 @@
 
         <!-- 表格 -->
         <el-table :height="tableHeight" :data="tableList" border stripe>
-            <el-table-column prop="id" label="ID" width="80px"></el-table-column>
             <el-table-column prop="name" label="项目名称" width="150px"></el-table-column>
             <el-table-column prop="type" label="项目类型" width="120px">
                 <template #default="scope">

@@ -24,9 +24,7 @@
 
     <!-- 表格 -->
     <el-table :height="tableHeight" :data="tableList" border stripe>
-      <el-table-column prop="id" label="ID" width="80px"></el-table-column>
       <el-table-column prop="name" label="赛事名称" width="150px"></el-table-column>
-      <el-table-column prop="description" label="描述" width="180px" show-overflow-tooltip></el-table-column>
       <el-table-column prop="status" label="状态" width="100px">
         <template #default="scope">
           <el-tag v-if="scope.row.status === 0" type="info">未开始</el-tag>
@@ -152,53 +150,7 @@
     </el-dialog>
 
     <!-- 详情对话框 -->
-    <el-dialog title="赛事详情" v-model="openDetailDialog" width="800px" append-to-body>
-      <el-descriptions :column="2" border>
-        <el-descriptions-item label="赛事名称">{{ detailData.name }}</el-descriptions-item>
-        <el-descriptions-item label="举办方">{{ detailData.hoster }}</el-descriptions-item>
-        <el-descriptions-item label="赛事状态">
-          <el-tag v-if="detailData.status === 0" type="info">未开始</el-tag>
-          <el-tag v-else-if="detailData.status === 1" type="success">报名已截止</el-tag>
-          <el-tag v-else-if="detailData.status === 2" type="warning">正在进行</el-tag>
-          <el-tag v-else-if="detailData.status === 3" type="danger">已结束</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="报名截止时间">{{ detailData.signUpDeadline }}</el-descriptions-item>
-        <el-descriptions-item label="比赛时间">{{ detailData.startTime }} 至 {{
-            detailData.endTime
-          }}
-        </el-descriptions-item>
-        <el-descriptions-item label="赛事描述" :span="2">{{ detailData.description }}</el-descriptions-item>
-      </el-descriptions>
-
-      <el-divider>赛事项目</el-divider>
-      <el-table :data="detailItems" border>
-        <el-table-column prop="id" label="ID" width="80px"></el-table-column>
-        <el-table-column prop="name" label="项目名称" width="150px"></el-table-column>
-        <el-table-column prop="type" label="项目类型" width="120px">
-          <template #default="scope">
-            <el-tag v-if="scope.row.type === 0" type="success">乒乓球项目</el-tag>
-            <el-tag v-else-if="scope.row.type === 1" type="primary">篮球项目</el-tag>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <el-divider>场地信息</el-divider>
-      <el-table :data="detailVenues" border>
-        <el-table-column prop="id" label="ID" width="80px"></el-table-column>
-        <el-table-column prop="venueName" label="场地名称" width="150px"></el-table-column>
-        <el-table-column prop="responsibleName" label="负责人" width="120px"></el-table-column>
-        <el-table-column prop="phone" label="联系电话" width="120px"></el-table-column>
-        <el-table-column prop="startTime" label="开始时间" width="160px"></el-table-column>
-        <el-table-column prop="endTime" label="结束时间" width="160px"></el-table-column>
-        <el-table-column prop="status" label="状态" width="100px">
-          <template #default="scope">
-            <el-tag v-if="scope.row.status === 0" type="info">预约中</el-tag>
-            <el-tag v-else-if="scope.row.status === 1" type="success">预约成功</el-tag>
-            <el-tag v-else-if="scope.row.status === 2" type="danger">预约失败</el-tag>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-dialog>
+    <competition-details v-model="openDetailDialog" :competition="detailData" />
   </el-main>
 </template>
 
@@ -209,6 +161,7 @@ import {CompetitionControllerService} from '../../../../generated/services/Compe
 import {CompetitionItemControllerService} from '../../../../generated/services/CompetitionItemControllerService';
 import type {CompetitionDetailVO} from "../../../../generated";
 import {CompetitionVO} from "../../../../generated";
+import CompetitionDetails from "../../../components/competition/CompetitionDetails.vue";
 
 // 表格高度
 const tableHeight = ref(0);
@@ -274,8 +227,6 @@ const formData = reactive({
 // 详情对话框相关
 const openDetailDialog = ref(false);
 const detailData = ref<CompetitionDetailVO>({});
-const detailItems = ref([]);
-const detailVenues = ref([]);
 
 // 表单校验规则
 const rules = {
@@ -419,6 +370,8 @@ const editBtn = async (row: any) => {
     const res = await CompetitionControllerService.getDetailUsingGet(Number(row.id));
     if (res && res.data) {
       const detail = res.data;
+      
+      // 设置基本信息
       formData.id = detail.id;
       formData.name = detail.name;
       formData.description = detail.description;
@@ -433,7 +386,13 @@ const editBtn = async (row: any) => {
       formData.signUpDeadline = detail.signUpDeadline;
       formData.competitionTimeRange = [detail.startTime, detail.endTime];
       formData.requirement = detail.requirement;
-      formData.competitionItemIds = detail.competitionItemIds || [];
+      
+      // 设置赛事项目ID
+      if (detail.itemRelations && detail.itemRelations.length > 0) {
+        formData.competitionItemIds = detail.itemRelations.map(item => item.id);
+      } else {
+        formData.competitionItemIds = [];
+      }
 
       openDialog.value = true;
     }
@@ -449,8 +408,6 @@ const viewBtn = async (row: any) => {
     const res = await CompetitionControllerService.getDetailUsingGet(row.id);
     if (res && res.data) {
       detailData.value = res.data;
-      detailItems.value = res.data.items || [];
-      detailVenues.value = res.data.venues || [];
       openDetailDialog.value = true;
     }
   } catch (error) {
@@ -491,6 +448,11 @@ const submitForm = async () => {
     if (valid) {
       const data = {...formData};
 
+      // 确保id是数字类型
+      if (data.id) {
+        data.id = Number(data.id);
+      }
+
       // 处理时间范围
       if (data.competitionTimeRange && data.competitionTimeRange.length === 2) {
         // 确保开始和结束时间包含时分秒
@@ -513,6 +475,14 @@ const submitForm = async () => {
 
       // 移除status字段，因为状态由系统根据时间自动计算
       delete data.status;
+
+      // 如果不是团体赛，设置默认的团队人数值
+      if (data.isTeamCompetition === 0) {
+        data.teamMaxNum = 0;
+        data.teamMinNum = 0;
+      }
+
+      console.log('提交数据:', data); // 调试日志
 
       try {
         if (dialogTitle.value.includes('新增')) {

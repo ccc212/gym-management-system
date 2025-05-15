@@ -27,7 +27,6 @@
 
     <!-- 表格 -->
     <el-table :height="tableHeight" :data="tableList" border stripe>
-      <el-table-column prop="id" label="ID" width="80px"></el-table-column>
       <el-table-column prop="teamName" label="团队名称" width="150px"></el-table-column>
       <el-table-column prop="leaderName" label="领队姓名" width="120px"></el-table-column>
       <el-table-column prop="leaderPhone" label="联系电话" width="120px"></el-table-column>
@@ -101,7 +100,6 @@
     <!-- 成员详情对话框 -->
     <el-dialog title="团队成员" v-model="openMemberDialog" width="800px" append-to-body>
       <el-table :data="memberList" border>
-        <el-table-column prop="id" label="ID" width="80px"></el-table-column>
         <el-table-column prop="name" label="姓名" width="120px"></el-table-column>
         <el-table-column prop="userNumber" label="学号/工号" width="150px"></el-table-column>
         <el-table-column prop="sex" label="性别" width="80px"></el-table-column>

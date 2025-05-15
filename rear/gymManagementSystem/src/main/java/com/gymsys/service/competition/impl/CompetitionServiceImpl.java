@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -180,6 +181,15 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
     public CompetitionDetailVO getDetail(Long id) {
         Competition competition = lambdaQuery().eq(Competition::getId, id).one();
 
+        List<Long> competitionItemIds = competitionItemRelationMapper.selectList(new LambdaQueryWrapper<CompetitionItemRelation>()
+                .eq(CompetitionItemRelation::getCompetitionId, id))
+                .stream().map(CompetitionItemRelation::getCompetitionItemId)
+                .toList();
+        List<CompetitionItem> competitionItemRelations = Collections.emptyList();
+        if (!competitionItemIds.isEmpty()) {
+            competitionItemRelations = competitionItemMapper.selectBatchIds(competitionItemIds);
+        }
+
         List<CompetitionVenueRelation> competitionVenueRelations = competitionVenueRelationRepository.findByCompetitionId(id);
 
         List<CompetitionEquipmentRelation> competitionEquipmentRelations = competitionEquipmentRelationMapper.selectList(new LambdaQueryWrapper<CompetitionEquipmentRelation>()
@@ -192,21 +202,12 @@ public class CompetitionServiceImpl extends ServiceImpl<CompetitionMapper, Compe
                 competition.getEndTime()
         );
 
-        return new CompetitionDetailVO()
-                .setId(competition.getId())
-                .setName(competition.getName())
-                .setType(competition.getType())
-                .setCategory(competition.getCategory())
-                .setHoster(competition.getHoster())
-                .setStartTime(competition.getStartTime())
-                .setEndTime(competition.getEndTime())
-                .setSignUpDeadline(competition.getSignUpDeadline())
-                .setIsTeamCompetition(competition.getIsTeamCompetition())
+        CompetitionDetailVO competitionDetailVO = BeanUtil.copyProperties(competition, CompetitionDetailVO.class);
+        return competitionDetailVO
                 .setStatus(status)
+                .setItemRelations(competitionItemRelations)
                 .setVenueRelations(competitionVenueRelations)
-                .setEquipmentRelations(competitionEquipmentRelations)
-                .setRequirement(competition.getRequirement())
-                .setDescription(competition.getDescription());
+                .setEquipmentRelations(competitionEquipmentRelations);
     }
 
     @Override

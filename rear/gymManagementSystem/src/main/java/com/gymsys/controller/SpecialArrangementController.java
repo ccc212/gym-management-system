@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/special-arrangements")
+@RequestMapping({"/api/special-arrangements", "/special-arrangements", "/special"})
 public class SpecialArrangementController {
 
     @Resource

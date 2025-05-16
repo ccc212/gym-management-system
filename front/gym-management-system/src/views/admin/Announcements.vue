@@ -79,7 +79,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance } from 'element-plus'
-import { getAnnouncements, addAnnouncement, updateAnnouncement, deleteAnnouncement } from '@/api/system/announcement'
+import { getAnnouncements, addAnnouncement, updateAnnouncement, deleteAnnouncement } from '@/api/venue/announcement'
+import axios from 'axios'
 
 // 表格数据
 const announcements = ref([])
@@ -114,14 +115,32 @@ const rules = {
     ]
 }
 
+// 搜索表单
+const searchForm = reactive({
+    type: '',
+    status: '',
+    keyword: '',
+    dateRange: []
+})
+
 // 加载公告列表
 const loadAnnouncements = async () => {
     loading.value = true
     try {
-        const res = await getAnnouncements({
+        const params = {
             page: currentPage.value,
-            size: pageSize.value
-        })
+            size: pageSize.value,
+            type: searchForm.type,
+            status: searchForm.status,
+            keyword: searchForm.keyword
+        }
+        
+        if (searchForm.dateRange && searchForm.dateRange.length === 2) {
+            params.startDate = searchForm.dateRange[0]
+            params.endDate = searchForm.dateRange[1]
+        }
+        
+        const res = await getAnnouncements(params)
         announcements.value = res.data.list
         total.value = res.data.total
     } catch (error) {
@@ -223,10 +242,34 @@ onMounted(() => {
         align-items: center;
     }
 
+    .search-form {
+        margin-bottom: 20px;
+    }
+
     .pagination-container {
         margin-top: 20px;
-        display: flex;
-        justify-content: flex-end;
+        text-align: right;
+    }
+
+    .announcement-detail {
+        .announcement-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .announcement-meta {
+            color: #666;
+            margin-bottom: 20px;
+            
+            span {
+                margin-right: 20px;
+            }
+        }
+        
+        .announcement-content {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
     }
 }
 </style>

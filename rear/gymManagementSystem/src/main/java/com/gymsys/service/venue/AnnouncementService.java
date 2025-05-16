@@ -1,64 +1,48 @@
 package com.gymsys.service.venue;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.gymsys.entity.venue.AnnouncementEntity;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gymsys.entity.Announcement;
 import com.gymsys.repository.venue.AnnouncementRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class AnnouncementService {
-    
-    private final AnnouncementRepository announcementRepository;
-    
-    /**
-     * 创建公告
-     */
-    @Transactional
-    public AnnouncementEntity createAnnouncement(AnnouncementEntity announcement) {
-        announcement.setPublishTime(LocalDateTime.now());
-        announcement.setActive(true);
-        announcementRepository.insert(announcement);
-        return announcement;
+
+    @Resource
+    private AnnouncementRepository announcementRepository;
+
+    public Page<Announcement> getAnnouncements(
+            Integer page,
+            Integer size,
+            String type,
+            String status,
+            LocalDate startDate,
+            LocalDate endDate,
+            String keyword) {
+        return announcementRepository.getAnnouncements(page, size, type, status, startDate, endDate, keyword);
     }
-    
-    /**
-     * 获取所有有效公告
-     */
-    public List<AnnouncementEntity> getActiveAnnouncements() {
-        LocalDateTime now = LocalDateTime.now();
-        LambdaQueryWrapper<AnnouncementEntity> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(AnnouncementEntity::getActive, true)
-                .lt(AnnouncementEntity::getPublishTime, now)
-                .gt(AnnouncementEntity::getExpireTime, now);
-        return announcementRepository.selectList(wrapper);
+
+    public Announcement createAnnouncement(Announcement announcement) {
+        announcement.setCreatedAt(LocalDateTime.now());
+        announcement.setUpdatedAt(LocalDateTime.now());
+        return announcementRepository.createAnnouncement(announcement);
     }
-    
-    /**
-     * 停用公告
-     */
-    @Transactional
-    public void deactivateAnnouncement(Long id) {
-        AnnouncementEntity announcement = announcementRepository.selectById(id);
-        if (announcement != null) {
-            announcement.setActive(false);
-            announcementRepository.updateById(announcement);
-        }
+
+    public Announcement updateAnnouncement(Announcement announcement) {
+        announcement.setUpdatedAt(LocalDateTime.now());
+        return announcementRepository.updateAnnouncement(announcement);
     }
-    
-    /**
-     * 获取最新公告
-     */
-    public List<AnnouncementEntity> getLatestAnnouncements() {
-        LambdaQueryWrapper<AnnouncementEntity> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(AnnouncementEntity::getActive, true)
-                .orderByDesc(AnnouncementEntity::getPublishTime)
-                .last("LIMIT 5");
-        return announcementRepository.selectList(wrapper);
+
+    public void deleteAnnouncement(Long id) {
+        announcementRepository.deleteAnnouncement(id);
+    }
+
+    public Announcement getAnnouncementDetail(Long id) {
+        return announcementRepository.getAnnouncementDetail(id);
     }
 }

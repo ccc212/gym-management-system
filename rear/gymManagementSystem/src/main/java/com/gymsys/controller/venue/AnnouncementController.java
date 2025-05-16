@@ -1,64 +1,60 @@
 package com.gymsys.controller.venue;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gymsys.entity.venue.AnnouncementEntity;
-import com.gymsys.repository.venue.AnnouncementRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import com.gymsys.common.Result;
+import com.gymsys.entity.Announcement;
+import com.gymsys.service.venue.AnnouncementService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import javax.annotation.Resource;
+import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/announcements")
+@RequestMapping({"/api/announcements", "/announcements"})
 public class AnnouncementController {
-    
-    @Autowired
-    private AnnouncementRepository announcementRepository;
-    
+
+    @Resource
+    private AnnouncementService announcementService;
+
     @GetMapping
-    public ResponseEntity<Page<AnnouncementEntity>> getAllAnnouncements(
+    public Result<Page<Announcement>> getAnnouncements(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
-        Page<AnnouncementEntity> announcementPage = announcementRepository.selectPage(
-                new Page<>(page, size),
-                new LambdaQueryWrapper<AnnouncementEntity>()
-        );
-        return ResponseEntity.ok(announcementPage);
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String keyword) {
+        Page<Announcement> announcements = announcementService.getAnnouncements(
+            page, size, type, status, startDate, endDate, keyword);
+        return Result.success(announcements);
     }
-    
-    @GetMapping("/active")
-    public ResponseEntity<List<AnnouncementEntity>> getActiveAnnouncements() {
-        List<AnnouncementEntity> announcements = announcementRepository.findByStatus("ACTIVE");
-        return ResponseEntity.ok(announcements);
-    }
-    
-    @GetMapping("/time-range")
-    public ResponseEntity<List<AnnouncementEntity>> getAnnouncementsByTimeRange(
-            @RequestParam LocalDateTime startTime,
-            @RequestParam LocalDateTime endTime) {
-        List<AnnouncementEntity> announcements = announcementRepository.findByPublishTimeBetween(startTime, endTime);
-        return ResponseEntity.ok(announcements);
-    }
-    
+
     @PostMapping
-    public ResponseEntity<AnnouncementEntity> createAnnouncement(@RequestBody AnnouncementEntity announcement) {
-        announcementRepository.insert(announcement);
-        return ResponseEntity.ok(announcement);
+    public Result<Announcement> createAnnouncement(@RequestBody Announcement announcement) {
+        Announcement created = announcementService.createAnnouncement(announcement);
+        return Result.success(created);
     }
-    
+
     @PutMapping("/{id}")
-    public ResponseEntity<AnnouncementEntity> updateAnnouncement(@PathVariable Long id, @RequestBody AnnouncementEntity announcement) {
+    public Result<Announcement> updateAnnouncement(
+            @PathVariable Long id,
+            @RequestBody Announcement announcement) {
         announcement.setId(id);
-        announcementRepository.updateById(announcement);
-        return ResponseEntity.ok(announcement);
+        Announcement updated = announcementService.updateAnnouncement(announcement);
+        return Result.success(updated);
     }
-    
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAnnouncement(@PathVariable Long id) {
-        announcementRepository.deleteById(id);
-        return ResponseEntity.ok().build();
+    public Result<Void> deleteAnnouncement(@PathVariable Long id) {
+        announcementService.deleteAnnouncement(id);
+        return Result.success(null);
+    }
+
+    @GetMapping("/{id}")
+    public Result<Announcement> getAnnouncementDetail(@PathVariable Long id) {
+        Announcement announcement = announcementService.getAnnouncementDetail(id);
+        return Result.success(announcement);
     }
 }

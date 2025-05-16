@@ -47,10 +47,10 @@
                 <el-table-column label="操作" width="320">
                     <template #default="scope">
                         <div class="action-btns">
-                            <el-button type="primary" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-                            <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
-                            <el-button v-if="scope.row.status === 'NORMAL'" type="warning" size="mini" @click="setVenueStatus(scope.row, 'MAINTENANCE')">维护</el-button>
-                            <el-button v-if="scope.row.status === 'MAINTENANCE'" type="success" size="mini" @click="setVenueStatus(scope.row, 'NORMAL')">恢复</el-button>
+                            <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
+                            <el-button type="danger" size="small" @click="handleDelete(scope.row)">删除</el-button>
+                            <el-button v-if="scope.row.status === 'NORMAL'" type="warning" size="small" @click="setVenueStatus(scope.row, 'MAINTENANCE')">维护</el-button>
+                            <el-button v-if="scope.row.status === 'MAINTENANCE'" type="success" size="small" @click="setVenueStatus(scope.row, 'NORMAL')">恢复</el-button>
                         </div>
                     </template>
                 </el-table-column>

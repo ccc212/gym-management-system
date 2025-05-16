@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/noshows")
+@RequestMapping({"/api/noshows", "/noshows"})
 public class NoshowController {
 
     @Resource

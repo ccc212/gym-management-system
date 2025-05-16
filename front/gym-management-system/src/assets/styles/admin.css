@@ -1,0 +1,135 @@
+/* 管理员页面通用样式 */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-form {
+    background-color: #f5f7fa;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.pagination-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+/* 场地管理页面样式 */
+.admin-venues-container {
+    padding: 20px;
+}
+
+.form-tip {
+    margin-left: 10px;
+    font-size: 12px;
+    color: #909399;
+}
+
+.no-edit .el-input.is-disabled .el-input__inner {
+    color: #606266;
+    background-color: #f5f7fa;
+}
+
+/* 预约管理页面样式 */
+.admin-reservations-container {
+    padding: 20px;
+}
+
+.reservation-detail {
+    padding: 10px;
+}
+
+.operation-history {
+    margin-top: 20px;
+    border-top: 1px solid #ebeef5;
+    padding-top: 20px;
+}
+
+.operation-history h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #303133;
+}
+
+.history-operator {
+    font-size: 12px;
+    color: #909399;
+    margin-top: 5px;
+}
+
+.approval-section {
+    margin-top: 20px;
+    border-top: 1px solid #ebeef5;
+    padding-top: 20px;
+}
+
+.approval-section h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #303133;
+}
+
+/* 特殊场地管理页面样式 */
+.admin-special-container {
+    padding: 20px;
+}
+
+/* 失约处理页面样式 */
+.admin-noshows-container {
+    padding: 20px;
+}
+
+.noshow-detail {
+    padding: 10px;
+}
+
+/* 公告管理页面样式 */
+.admin-announcements-container {
+    padding: 20px;
+}
+
+.announcement-title {
+    font-size: 20px;
+    color: #303133;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.announcement-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ebeef5;
+    color: #606266;
+    font-size: 14px;
+}
+
+.announcement-type {
+    font-weight: bold;
+    color: #409EFF;
+}
+
+.announcement-content {
+    line-height: 1.8;
+    padding: 15px 0;
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 768px) {
+    .search-form {
+        padding: 10px;
+    }
+
+    .admin-venues-container,
+    .admin-reservations-container,
+    .admin-special-container,
+    .admin-noshows-container,
+    .admin-announcements-container {
+        padding: 10px;
+    }
+}

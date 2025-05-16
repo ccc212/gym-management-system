@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/venues")
+@RequestMapping({"/api/venues", "/venues"})
 public class VenueController {
     
     @Autowired

@@ -22,6 +22,15 @@ export const constantRoutes:Array<RouteRecordRaw>=[
                  title: '首页',
                  icon: 'HomeFilled',
               }
+           },
+           {
+              path: '/venues',
+              component: () => import('../views/admin/Venues.vue'),
+              name: 'venues',
+              meta: {
+                 title: '场地管理',
+                 icon: 'Location',
+              }
            }
         ]
      },

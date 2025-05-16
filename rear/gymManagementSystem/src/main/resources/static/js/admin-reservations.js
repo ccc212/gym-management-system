@@ -189,7 +189,7 @@ const AdminReservationsComponent = {
         // 加载预约数据
         loadReservationData() {
             this.loading = true;
-            
+
             // 构建查询参数
             const params = new URLSearchParams({
                 page: this.pagination.currentPage,
@@ -245,7 +245,7 @@ const AdminReservationsComponent = {
                     this.$message.error('加载预约数据失败');
                 })
                 .finally(() => {
-                    this.loading = false;
+                this.loading = false;
                 });
         },
         // 搜索预约

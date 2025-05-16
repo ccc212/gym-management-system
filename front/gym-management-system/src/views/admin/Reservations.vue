@@ -333,15 +333,13 @@ const approveReservation = (reservation: any) => {
 // 执行批准
 const doApprove = async () => {
     if (!selectedReservation.value) return
-    
+
     try {
         const response = await axios.put(`/api/reservations/${selectedReservation.value.id}/approve`, {
             comment: approvalForm.comment
         })
-        
         if (response.data && response.data.code === 200) {
             ElMessage.success('预约已批准')
-            detailDialogVisible.value = false
             loadReservationData()
         } else {
             ElMessage.error(response.data.message || '批准失败')
@@ -349,6 +347,8 @@ const doApprove = async () => {
     } catch (error) {
         console.error('批准预约失败:', error)
         ElMessage.error('批准预约失败')
+    } finally {
+        detailDialogVisible.value = false
     }
 }
 
@@ -361,15 +361,13 @@ const rejectReservation = (reservation: any) => {
 // 执行拒绝
 const doReject = async () => {
     if (!selectedReservation.value) return
-    
+
     try {
         const response = await axios.put(`/api/reservations/${selectedReservation.value.id}/reject`, {
             comment: approvalForm.comment
         })
-        
         if (response.data && response.data.code === 200) {
             ElMessage.success('预约已拒绝')
-            detailDialogVisible.value = false
             loadReservationData()
         } else {
             ElMessage.error(response.data.message || '拒绝失败')
@@ -377,6 +375,8 @@ const doReject = async () => {
     } catch (error) {
         console.error('拒绝预约失败:', error)
         ElMessage.error('拒绝预约失败')
+    } finally {
+        detailDialogVisible.value = false
     }
 }
 

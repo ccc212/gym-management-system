@@ -118,7 +118,10 @@ export default {
       scheduleData: [],
       loading: false,
       selectedSchedule: null,
-      scheduleDetailVisible: false
+      scheduleDetailVisible: false,
+      scheduleCache: new Map(),
+      debounceTimer: null,
+      lastSearchParams: null
     }
   },
   computed: {
@@ -209,10 +212,19 @@ export default {
       };
       if (this.searchForm.venueType) params.venueType = this.searchForm.venueType;
       if (this.searchForm.venueId) params.venueId = this.searchForm.venueId;
+
+      const cacheKey = JSON.stringify(params);
+      if (this.scheduleCache.has(cacheKey)) {
+        this.scheduleData = this.scheduleCache.get(cacheKey);
+        this.loading = false;
+        return;
+      }
+
       axios.get('/api/venue-schedules/weekly', { params })
           .then(response => {
             if (response.data && response.data.code === 200) {
               this.scheduleData = response.data.data || [];
+              this.scheduleCache.set(cacheKey, this.scheduleData);
             } else {
               this.$message.error(response.data.msg || '获取场地安排失败');
             }
@@ -225,16 +237,23 @@ export default {
           });
     },
     searchSchedule() {
-      this.loadScheduleData();
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+      }
+      this.debounceTimer = setTimeout(() => {
+        this.loadScheduleData();
+      }, 300);
     },
     resetSearch() {
       this.searchForm = { venueType: '', venueId: '' };
+      this.scheduleCache.clear();
       this.searchSchedule();
     },
     changeWeek(offset) {
       const newDate = new Date(this.currentWeekStart);
       newDate.setDate(newDate.getDate() + (offset * 7));
       this.currentWeekStart = newDate;
+      this.scheduleCache.clear();
       this.loadScheduleData();
     },
     resetToCurrentWeek() {
@@ -317,3 +336,49 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.schedule-table th, .schedule-table td {
+  border: 1px solid #ebeef5;
+  text-align: center;
+  padding: 8px 0;
+}
+.time-column {
+  width: 90px;
+  background: #fafafa;
+  font-weight: bold;
+}
+.schedule-cell { text-align: center; min-width: 80px; min-height: 48px; padding: 4px 0; }
+.schedule-cell-content { cursor: pointer; border-radius: 4px; padding: 2px 0; }
+.schedule-cell-available { background: #e6f7e6; color: #389e0d; }
+.schedule-cell-booked { background: #fffbe6; color: #d48806; }
+.schedule-cell-in-use { background: #ffeaea; color: #cf1322; }
+.schedule-cell-special { background: #e6f4ff; color: #096dd9; }
+.schedule-cell-maintenance { background: #f5f5f5; color: #888; }
+.schedule-cell-empty { background: #fff; }
+.schedule-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  margin-right: 4px;
+}
+.legend-color.available { background: #e6f7e6; border: 1px solid #389e0d; }
+.legend-color.booked { background: #fffbe6; border: 1px solid #d48806; }
+.legend-color.in-use { background: #ffeaea; border: 1px solid #cf1322; }
+.legend-color.special { background: #e6f4ff; border: 1px solid #096dd9; }
+.legend-color.maintenance { background: #f5f5f5; border: 1px solid #888; }
+</style>

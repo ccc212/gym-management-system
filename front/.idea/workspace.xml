@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f0df868c-c4cb-422b-8814-9b89998c7c1b" name="更改" comment="11.2.3 修复了http://localhost:8080/user/venues数据无法显示的bug" />
+    <list default="true" id="f0df868c-c4cb-422b-8814-9b89998c7c1b" name="更改" comment="11.2.3 修复了http://localhost:8080/user/venues数据无法显示的bug">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/admin/AdminVenues.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/admin/AdminVenues.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/user/UserSchedule.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/user/UserSchedule.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/VenueScheduleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/VenueScheduleServiceImpl.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -101,7 +106,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1747408093505</updated>
-      <workItem from="1747408094763" duration="8269000" />
+      <workItem from="1747408094763" duration="11737000" />
     </task>
     <task id="LOCAL-00001" summary="11.2.3 修复了数据无法显示的bug">
       <option name="closed" value="true" />

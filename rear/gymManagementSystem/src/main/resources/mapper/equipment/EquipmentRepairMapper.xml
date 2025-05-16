@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gymsys.mapper.EquipmentRepairMapper">
+
+    <!-- 插入报修记录 -->
+    <insert id="insert" parameterType="com.gymsys.entity.equip.EquipmentRepair" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO equipment_repair (equipment_id, reason, apply_time)
+        VALUES (#{equipmentId}, #{reason}, #{applyTime})
+    </insert>
+
+    <!-- 根据ID删除 -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM equipment_repair WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ID更新 -->
+    <update id="updateById" parameterType="com.gymsys.entity.equip.EquipmentRepair">
+        UPDATE equipment_repair
+        SET
+            equipment_id = #{equipmentId},
+            reason = #{reason},
+            apply_time = #{applyTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" parameterType="int" resultType="com.gymsys.entity.equip.EquipmentRepair">
+        SELECT id, equipment_id, reason, apply_time
+        FROM equipment_repair
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据器材ID查询所有报修 -->
+    <select id="selectByEquipmentId" parameterType="int" resultType="com.gymsys.entity.equip.EquipmentRepair">
+        SELECT id, equipment_id, reason, apply_time
+        FROM equipment_repair
+        WHERE equipment_id = #{equipmentId}
+    </select>
+
+    <!-- 查询所有报修 -->
+    <select id="selectAll" resultType="com.gymsys.entity.equip.EquipmentRepair">
+        SELECT id, equipment_id, reason, apply_time
+        FROM equipment_repair
+    </select>
+
+</mapper>

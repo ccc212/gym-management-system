@@ -12,19 +12,29 @@
           <el-tag v-else type="info">正常</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="操作" width="120">
+        <template #default="scope">
+          <el-button size="small" type="danger" @click="openRepairDialog(scope.row.id)">报修</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
-    <el-form inline class="mt-4" :model="repairForm">
-      <el-form-item label="器材 ID">
-        <el-input-number v-model="repairForm.id" :min="1" />
-      </el-form-item>
-      <el-form-item label="报修原因">
-        <el-input v-model="repairForm.reason" placeholder="请输入报修原因" style="width: 300px" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="submitRepair">提交报修</el-button>
-      </el-form-item>
-    </el-form>
+    <el-dialog title="器材报修" v-model="dialogVisible" width="500px" append-to-body>
+      <el-form :model="repairForm" label-width="100px">
+        <el-form-item label="器材 ID">
+          <el-input-number v-model="repairForm.id" :min="1" disabled />
+        </el-form-item>
+        <el-form-item label="报修原因">
+          <el-input type="textarea" v-model="repairForm.reason" placeholder="请输入报修原因" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitRepair">提交</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </el-main>
 </template>
 
@@ -35,6 +45,7 @@ import { EquipmentRepairControllerService } from '../../../../generated/services
 import { EquipBasicsControllerService } from '../../../../generated/services/EquipBasicsControllerService';
 
 const repairRecords = ref<any[]>([]);
+const dialogVisible = ref(false);
 const repairForm = ref({ id: undefined as number | undefined, reason: '' });
 
 const loadRecords = async () => {
@@ -55,9 +66,15 @@ const loadRecords = async () => {
   }
 };
 
+const openRepairDialog = (id: number) => {
+  repairForm.value.id = id;
+  repairForm.value.reason = '';
+  dialogVisible.value = true;
+};
+
 const submitRepair = async () => {
   if (!repairForm.value.id || !repairForm.value.reason.trim()) {
-    ElMessage.warning('请填写器材 ID 和报修原因');
+    ElMessage.warning('请填写报修原因');
     return;
   }
   try {
@@ -67,8 +84,7 @@ const submitRepair = async () => {
     );
     if (res?.code === 0) {
       ElMessage.success('报修成功');
-      repairForm.value.id = undefined;
-      repairForm.value.reason = '';
+      dialogVisible.value = false;
       loadRecords();
     } else {
       ElMessage.error(res.msg || '报修失败');
@@ -84,5 +100,8 @@ onMounted(loadRecords);
 <style scoped>
 .mt-4 {
   margin-top: 20px;
+}
+.dialog-footer {
+  text-align: right;
 }
 </style>

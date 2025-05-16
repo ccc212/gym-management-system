@@ -6,10 +6,10 @@ export type CompetitionEquipmentRelationVO = {
     competitionId?: number;
     endTime?: string;
     equipmentId?: number;
+    equipmentName?: string;
     id?: number;
     num?: number;
     startTime?: string;
     status?: number;
-    venueName?: string;
 };
 

@@ -1,46 +1,54 @@
 package com.gymsys.service.equipment.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gymsys.entity.equip.EquipmentRepair;
 
-import com.gymsys.entity.equip.Equipment;
-import com.gymsys.service.equipment.EquipmentService;
-import com.gymsys.service.equipment.RepairService;
+import com.gymsys.mapper.equipment.EquipmentRepairMapper;
+import com.gymsys.service.equipment.EquipmentRepairService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.List;
 
+/**
+ * 报修记录服务实现类
+ */
 @Service
-public class RepairServiceImpl implements RepairService {
+public class RepairServiceImpl implements EquipmentRepairService {
 
     @Autowired
-    private EquipmentService equipmentService;
+    private EquipmentRepairMapper equipmentRepairMapper;
 
     @Override
-    public boolean reportRepair(Equipment equipment, String reason) {
-        try {
-            // 记录报修时间
-            Date repairTime = new Date();
-            // 调用EquipmentService更新器材状态为报修中
-            equipmentService.updateEquipmentStatus(equipment.getEquipmentId().longValue(), "报修中");
-            // 记录报修原因到数据库
-            equipmentService.logRepairReason(equipment.getEquipmentId().longValue(), reason, repairTime);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public boolean addRepairRecord(EquipmentRepair repair) {
+        return equipmentRepairMapper.insert(repair) > 0;
     }
 
     @Override
-    public boolean reportRepair(Integer equipmentId, String reason, Date repairTime) {
-        try {
-            // 调用EquipmentService更新器材状态为报修中
-            equipmentService.updateEquipmentStatus(equipmentId.longValue(), "报修中");
-            // 记录报修原因到数据库
-            equipmentService.logRepairReason(equipmentId.longValue(), reason, repairTime);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public boolean updateRepairRecord(EquipmentRepair repair) {
+        return equipmentRepairMapper.updateById(repair) > 0;
+    }
+
+    @Override
+    public boolean deleteRepairRecord(Integer id) {
+        return equipmentRepairMapper.deleteById(id) > 0;
+    }
+
+    @Override
+    public EquipmentRepair getById(Integer id) {
+        return equipmentRepairMapper.selectById(id);
+    }
+
+    @Override
+    public List<EquipmentRepair> listByEquipmentId(Integer equipmentId) {
+        QueryWrapper<EquipmentRepair> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(EquipmentRepair::getEquipmentId, equipmentId);
+        return equipmentRepairMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<EquipmentRepair> listAll() {
+        return equipmentRepairMapper.selectList(null);
     }
 }

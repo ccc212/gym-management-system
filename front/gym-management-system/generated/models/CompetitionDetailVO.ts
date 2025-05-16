@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { CompetitionEquipmentRelationVO } from './CompetitionEquipmentRelationVO';
 import type { CompetitionItem } from './CompetitionItem';
-import type { CompetitionVenueRelation } from './CompetitionVenueRelation';
+import type { CompetitionVenueRelationVO } from './CompetitionVenueRelationVO';
 export type CompetitionDetailVO = {
     category?: number;
     description?: string;
@@ -24,6 +24,6 @@ export type CompetitionDetailVO = {
     teamMaxNum?: number;
     teamMinNum?: number;
     type?: number;
-    venueRelations?: Array<CompetitionVenueRelation>;
+    venueRelations?: Array<CompetitionVenueRelationVO>;
 };
 

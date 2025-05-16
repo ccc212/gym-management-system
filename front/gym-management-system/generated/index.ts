@@ -30,6 +30,7 @@ export type { CompetitionVenueRelationVO } from './models/CompetitionVenueRelati
 export type { CompetitionVO } from './models/CompetitionVO';
 export type { Department } from './models/Department';
 export type { Equipment } from './models/Equipment';
+export type { EquipmentRepair } from './models/EquipmentRepair';
 export type { IPage_CompetitionEquipmentRelation_ } from './models/IPage_CompetitionEquipmentRelation_';
 export type { IPage_CompetitionItem_ } from './models/IPage_CompetitionItem_';
 export type { IPage_CompetitionSignUpTeam_ } from './models/IPage_CompetitionSignUpTeam_';

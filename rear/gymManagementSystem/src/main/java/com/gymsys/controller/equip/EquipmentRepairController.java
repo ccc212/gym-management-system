@@ -4,63 +4,129 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gymsys.entity.Result;
 import com.gymsys.entity.equip.Equipment;
 
+import com.gymsys.entity.equip.EquipmentRepair;
+import com.gymsys.service.equipment.EquipmentRepairService;
 import com.gymsys.service.equipment.EquipmentService;
-import com.gymsys.service.equipment.RepairService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
-/**
- * 器材报修管理控制器
- */
+import java.util.Date;
+import java.util.List;
 @RestController
-@RequestMapping("/equipment/repair") // 统一请求路径前缀
+@RequestMapping("/equipment/repair")
 public class EquipmentRepairController {
 
-    // 注入服务层对象（需确保 Service 已实现并被 Spring 管理）
     @Autowired
     private EquipmentService equipmentService;
     @Autowired
-    private RepairService repairService;
+    private EquipmentRepairService repairService;
 
-    /**
-     * 提交器材报修申请
-     * @param id 器材 ID
-     * @param reason 报修原因
-     * @return 操作结果
-     */
-    @PostMapping("/reportRepair/{id}") // POST 请求路径
-    public Result reportRepair(
-            @PathVariable("id") Integer id, // 路径参数
-            @RequestParam String reason // 请求参数（可改为 @RequestBody 接收对象）
-    ) {
-        // 校验器材是否存在
-        Equipment equipment = equipmentService.getById(id);
-        if (equipment == null) {
-            return Result.error("器材不存在");
-        }
-        // 调用报修服务处理报修逻辑
-        boolean reportResult = repairService.reportRepair(equipment, reason);
-        if (reportResult) {
-            return Result.success("报修成功");
-        } else {
-            return Result.error("报修失败，请联系管理员");
-        }
-    }
 
     /**
      * 管理员查看所有报修记录（仅显示报修中状态）
      * @return 报修记录列表
      */
-    @GetMapping("/admin/getRepairRecords") // GET 请求路径
+    @GetMapping("/admin/getRepairRecords")
     public Result getRepairRecords() {
-        // 构建查询条件：状态为报修中（2）
         QueryWrapper<Equipment> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Equipment::getStatus, 2);
 
-        // 查询报修记录
         List<Equipment> repairRecords = equipmentService.list(queryWrapper);
         return Result.success(repairRecords);
+    }
+
+    // 下面开始新增的 CRUD 接口实现
+
+    @Autowired
+    private EquipmentRepairService equipmentRepairService;
+
+    /**
+     * 新增报修记录
+     * @param repair 报修实体
+     * @return 操作结果
+     */
+    @PostMapping("/add")
+    public Result addRepair(@RequestBody EquipmentRepair repair) {
+        if (repair.getEquipmentId() == null) {
+            return Result.error("缺少器材ID");
+        }
+        repair.setApplyTime(new Date());
+        boolean saved = equipmentRepairService.addRepairRecord(repair);
+        if (saved) {
+            return Result.success("添加报修记录成功");
+        } else {
+            return Result.error("添加报修记录失败");
+        }
+    }
+
+    /**
+     * 修改报修记录
+     * @param repair 报修实体
+     * @return 操作结果
+     */
+    @PutMapping("/update")
+    public Result updateRepair(@RequestBody EquipmentRepair repair) {
+        if (repair.getId() == null) {
+            return Result.error("缺少报修记录ID");
+        }
+        boolean updated = equipmentRepairService.updateRepairRecord(repair);
+        if (updated) {
+            return Result.success("修改报修记录成功");
+        } else {
+            return Result.error("修改报修记录失败");
+        }
+    }
+
+    /**
+     * 删除报修记录
+     * @param id 报修记录ID
+     * @return 操作结果
+     */
+    @DeleteMapping("/delete/{id}")
+    public Result deleteRepair(@PathVariable Integer id) {
+        boolean deleted = equipmentRepairService.deleteRepairRecord(id);
+        if (deleted) {
+            return Result.success("删除报修记录成功");
+        } else {
+            return Result.error("删除报修记录失败");
+        }
+    }
+
+    /**
+     * 根据ID查询报修记录
+     * @param id 报修记录ID
+     * @return 报修记录详情
+     */
+    @GetMapping("/get/{id}")
+    public Result getRepairById(@PathVariable Integer id) {
+        EquipmentRepair repair = equipmentRepairService.getById(id);
+        if (repair != null) {
+            return Result.success(repair);
+        } else {
+            return Result.error("报修记录不存在");
+        }
+    }
+
+    /**
+     * 根据器材ID查询该器材所有报修记录
+     * @param equipmentId 器材ID
+     * @return 报修记录列表
+     */
+    @GetMapping("/listByEquipment/{equipmentId}")
+    public Result listRepairsByEquipment(@PathVariable Integer equipmentId) {
+        List<EquipmentRepair> repairs = equipmentRepairService.listByEquipmentId(equipmentId);
+        return Result.success(repairs);
+    }
+
+    /**
+     * 查询所有报修记录
+     * @return 报修记录列表
+     */
+    @GetMapping("/listAll")
+    public Result listAllRepairs() {
+        List<EquipmentRepair> repairs = equipmentRepairService.listAll();
+        return Result.success(repairs);
     }
 }

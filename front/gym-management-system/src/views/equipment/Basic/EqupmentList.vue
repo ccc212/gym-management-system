@@ -16,7 +16,6 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button icon="Search" @click="searchBtn">搜索</el-button>
         <el-button icon="Refresh" type="danger" @click="resetBtn">重置</el-button>
         <el-button icon="Plus" type="primary" @click="addBtn">新增</el-button>
       </el-form-item>
@@ -37,11 +36,12 @@
           <el-tag v-else-if="scope.row.status === 2" type="danger">待维修</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="280px">
+      <el-table-column label="操作" width="350px">
         <template #default="scope">
           <el-button type="primary" icon="View" size="small" @click="viewBtn(scope.row)">查看详情</el-button>
           <el-button type="warning" icon="Edit" size="small" @click="editBtn(scope.row)">编辑</el-button>
           <el-button type="danger" icon="Delete" size="small" @click="deleteBtn(scope.row.id)">删除</el-button>
+          <el-button type="info" icon="Warning" size="small" @click="repairBtn(scope.row)">报修</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -60,11 +60,8 @@
     <!-- 新增/编辑对话框 -->
     <el-dialog :title="dialogTitle" v-model="dialogVisible" width="700px" append-to-body>
       <el-form ref="formRef" :model="formData" :rules="rules" label-width="120px">
-        <el-form-item label="器材编号" prop="number">
-          <el-input v-model="formData.id" placeholder="请输入器材编号" />
-        </el-form-item>
         <el-form-item label="器材名称" prop="name">
-          <el-input v-model="formData.equipmentName" placeholder="请输入器材名称" />
+          <el-input v-model="formData.equipmentName" placeholder="请输入器材名称"/>
         </el-form-item>
         <el-form-item label="器材类型" prop="type">
           <el-select v-model="formData.type" placeholder="请选择器材类型">
@@ -77,10 +74,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="仓库剩余数量" prop="quantity">
-          <el-input-number v-model="formData.remainingQuantity" :min="0" :max="10000" placeholder="请输入仓库剩余数量" />
+          <el-input-number v-model="formData.remainingQuantity" :min="0" :max="10000" placeholder="请输入仓库剩余数量"/>
         </el-form-item>
         <el-form-item label="器材管理员" prop="admin">
-          <el-input v-model="formData.administrator" placeholder="请输入器材管理员名称" />
+          <el-input v-model="formData.administrator" placeholder="请输入器材管理员名称"/>
         </el-form-item>
         <el-form-item label="创建时间" prop="createTime">
           <el-date-picker
@@ -97,6 +94,14 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 报修-->
+    <repair
+        v-model="openRepair"
+        :id="currentRepair?.id"
+        :equipmentName="currentRepair?.equipmentName"
+        :administrator="currentRepair?.administrator"
+    />
 
     <!-- 详情对话框 -->
     <el-dialog title="器材详情" v-model="detailDialogVisible" width="800px" append-to-body>
@@ -118,19 +123,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import {nextTick, onMounted, ref, watch} from 'vue';
+import {ElMessage, ElMessageBox} from 'element-plus';
 import {EquipBasicsControllerService} from '../../../../generated/services/EquipBasicsControllerService';
-import type { Equipment } from '../../../../generated/models/Equipment';
+import type {Equipment} from '../../../../generated/models/Equipment';
+import Repair from '../../../components/equipment/Repair.vue';
 
 const statusOptions = [
-  { value: 0, label: '在库中' },
-  { value: 1, label: '已借出' },
-  { value: 2, label: '报修中' }
+  {value: 0, label: '在库中'},
+  {value: 1, label: '已借出'},
+  {value: 2, label: '报修中'}
 ];
 const typeOptions = [
-  { value: 'BALL', label: '球类器材' },
-  { value: 'FIELD', label: '场地所需器材' }
+  {value: 'BALL', label: '球类器材'},
+  {value: 'FIELD', label: '场地所需器材'}
 ];
 
 const tableList = ref<Equipment[]>([]);
@@ -146,6 +152,17 @@ const searchParams = ref({
 const dialogTitle = ref('');
 const formRef = ref();
 
+// 报修对话框相关
+const openRepair = ref(false);
+
+const repairBtn = (row: any) => {
+  currentRepair.value = row;
+  openRepair.value = true;
+}
+
+const currentRepair = ref(null);
+
+
 const defaultFormData = (): Equipment => ({
   id: undefined,
   equipmentName: '',
@@ -159,11 +176,11 @@ const defaultFormData = (): Equipment => ({
 const formData = ref<Equipment>(defaultFormData());
 
 const rules = {
-  equipmentName: [{ required: true, message: '请输入器材名称', trigger: 'blur' }],
-  status: [{ required: true, message: '请选择状态', trigger: 'change' }],
-  type: [{ required: true, message: '请选择器材类型', trigger: 'change' }],
-  administrator: [{ required: true, message: '请输入管理员', trigger: 'blur' }],
-  remainingQuantity: [{ required: true, message: '请输入数量', trigger: 'change' }]
+  equipmentName: [{required: true, message: '请输入器材名称', trigger: 'blur'}],
+  status: [{required: true, message: '请选择状态', trigger: 'change'}],
+  type: [{required: true, message: '请选择器材类型', trigger: 'change'}],
+  administrator: [{required: true, message: '请输入管理员', trigger: 'blur'}],
+  remainingQuantity: [{required: true, message: '请输入数量', trigger: 'change'}]
 };
 
 const statusLabel = (val: number) => statusOptions.find(s => s.value === val)?.label || '';
@@ -182,15 +199,15 @@ const loadData = async () => {
   }
 };
 
+// 监听 searchParams 变量，改变时触发页面的重新加载
+watch(() => searchParams, () => {
+  loadData();
+}, {deep: true});
+
 onMounted(loadData);
 
-const searchBtn = () => {
-  searchParams.value.currentPage = 1;
-  loadData();
-};
-
 const resetBtn = () => {
-  Object.assign(searchParams.value, { equipmentName: '', status: null, type: '', currentPage: 1 });
+  Object.assign(searchParams.value, {equipmentName: '', status: null, type: '', currentPage: 1});
   loadData();
 };
 
@@ -208,7 +225,7 @@ const addBtn = async () => {
 
 const editBtn = (row: Equipment) => {
   dialogTitle.value = '编辑器材';
-  formData.value = { ...row };
+  formData.value = {...row};
   dialogVisible.value = true;
 };
 

@@ -1,13 +1,7 @@
 <template>
-  <el-dialog
-      title="器材预约审核"
-      v-model="dialogVisible"
-      width="900px"
-      append-to-body
-      :before-close="handleClose"
-      v-loading="loading"
-      :destroy-on-close="false"
-  >
+  <el-main>
+    <h2 style="margin-bottom: 16px">器材预约审核</h2>
+
     <!-- 搜索区域 -->
     <el-form :inline="true" :model="searchParams" class="mb-4">
       <el-form-item label="器材名称">
@@ -68,13 +62,7 @@
         @current-change="handleCurrentChange"
         class="mt-4"
     />
-
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="handleClose">关闭</el-button>
-      </span>
-    </template>
-  </el-dialog>
+  </el-main>
 </template>
 
 <script setup lang="ts">
@@ -83,10 +71,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { CompetitionEquipmentRelationControllerService } from '../../../../generated/services/CompetitionEquipmentRelationControllerService';
 import { EquipBasicsControllerService } from '../../../../generated/services/EquipBasicsControllerService';
 
-// 直接写死一个竞赛ID，实际可以从路由或者其他来源获取
 const competitionId = 1;
-
-const dialogVisible = ref(true);
 const loading = ref(false);
 const reservedEquipments = ref<any[]>([]);
 
@@ -100,10 +85,6 @@ const pagination = reactive({
   pageSize: 10,
   total: 0
 });
-
-const handleClose = () => {
-  dialogVisible.value = false;
-};
 
 const resetSearch = () => {
   searchParams.equipmentName = '';
@@ -132,8 +113,18 @@ const loadReservedEquipments = async () => {
           pagination.pageSize
       );
     }
+
     if (res?.data?.records) {
-      reservedEquipments.value = res.data.records;
+      const list = res.data.records;
+      const equipRes = await EquipBasicsControllerService.getListUsingGet1(1, '', 999);
+      const equipmentMap: Record<number, string> = {};
+      equipRes?.data?.records?.forEach((item: any) => {
+        equipmentMap[item.id] = item.equipmentName;
+      });
+      reservedEquipments.value = list.map((item: any) => ({
+        ...item,
+        equipmentName: equipmentMap[item.equipmentId] || '未知器材'
+      }));
       pagination.total = res.data.total;
     }
   } catch (error) {
@@ -187,10 +178,6 @@ const approveReservation = async (row: any) => {
   });
 };
 
-onMounted(() => {
-  if (dialogVisible.value) loadReservedEquipments();
-});
-
 const handleSizeChange = (val: number) => {
   pagination.pageSize = val;
   pagination.currentPage = 1;
@@ -201,10 +188,14 @@ const handleCurrentChange = (val: number) => {
   pagination.currentPage = val;
   loadReservedEquipments();
 };
+
+onMounted(() => {
+  loadReservedEquipments();
+});
 </script>
 
 <style scoped>
-.dialog-footer {
-  text-align: right;
+.mt-4 {
+  margin-top: 16px;
 }
 </style>

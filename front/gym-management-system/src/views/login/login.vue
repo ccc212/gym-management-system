@@ -71,6 +71,8 @@ function submitForm() {
                 store.setToken(res.data.token)
                 store.getInfo()
                 mstore.getMenuList(router, store.getId)
+                // 自动写入 userId
+                localStorage.setItem('userId', res.data.id)
                 //跳转
                 router.push({path:'/'})
             }

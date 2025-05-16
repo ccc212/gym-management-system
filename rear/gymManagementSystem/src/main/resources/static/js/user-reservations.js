@@ -167,90 +167,70 @@ const UserReservationsComponent = {
             // 取消表单
             cancelForm: {
                 reason: ''
-            }
+            },
+            pollingTimer: null, // 添加轮询定时器
+            pollingInterval: 5000, // 轮询间隔，5秒
         };
     },
     created() {
-        // 初始加载预约数据
-        this.loadReservationData();
+        this.loadReservations();
+        // 启动轮询
+        this.startPolling();
+    },
+    beforeDestroy() {
+        // 组件销毁前清除定时器
+        this.stopPolling();
     },
     methods: {
+        // 启动轮询
+        startPolling() {
+            this.pollingTimer = setInterval(() => {
+                this.loadReservations();
+            }, this.pollingInterval);
+        },
+        // 停止轮询
+        stopPolling() {
+            if (this.pollingTimer) {
+                clearInterval(this.pollingTimer);
+                this.pollingTimer = null;
+            }
+        },
         // 加载预约数据
-        loadReservationData() {
+        async loadReservations() {
             this.loading = true;
-            
-            // 获取当前用户ID（从localStorage或其他地方）
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const userId = currentUser && currentUser.id ? currentUser.id : null;
-            if (!userId) {
-                this.$message.error('请先登录');
+            try {
+                const params = {
+                    page: this.pagination.currentPage,
+                    size: this.pagination.pageSize
+                };
+                
+                if (this.searchForm.status) {
+                    params.status = this.searchForm.status;
+                }
+                if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
+                    params.startDate = this.searchForm.dateRange[0];
+                    params.endDate = this.searchForm.dateRange[1];
+                }
+                
+                const response = await axios.get('/api/reservations', { params });
+                if (response.data.code === 200) {
+                    const pageData = response.data.data;
+                    this.reservationList = pageData.records || [];
+                    this.pagination.total = pageData.total || 0;
+                } else {
+                    this.$message.error(response.data.message || '加载预约数据失败');
+                }
+            } catch (error) {
+                console.error('加载预约数据失败:', error);
+                this.$message.error('加载预约数据失败');
+            } finally {
                 this.loading = false;
-                return;
             }
-
-            console.log('当前用户ID:', userId);
-
-            // 构建查询参数
-            const params = new URLSearchParams({
-                page: this.pagination.currentPage,
-                size: this.pagination.pageSize
-            });
-            
-            // 添加状态过滤
-            if (this.searchForm.status) {
-                params.append('status', this.searchForm.status);
-            }
-            
-            // 添加日期范围过滤
-            if (this.searchForm.dateRange && this.searchForm.dateRange.length === 2) {
-                params.append('startDate', this.searchForm.dateRange[0]);
-                params.append('endDate', this.searchForm.dateRange[1]);
-            }
-            
-            console.log('查询参数:', params.toString());
-            
-            // 发送请求到后端
-            axios.get(`/api/reservations/user/${userId}?${params.toString()}`)
-                .then(response => {
-                    console.log('获取预约列表响应:', response.data);
-                    if (response.data && response.data.records) {
-                        const { records, total, current, size } = response.data;
-                        console.log('预约记录数:', records.length);
-                        this.reservationList = records.map(reservation => {
-                            // 处理日期
-                            if (typeof reservation.date === 'string') {
-                                // 如果是字符串，直接使用
-                                reservation.date = reservation.date;
-                            } else if (reservation.date instanceof Date) {
-                                // 如果是Date对象，转换为字符串
-                                reservation.date = reservation.date.toISOString().split('T')[0];
-                            }
-                            console.log('处理预约记录:', reservation);
-                            return reservation;
-                        });
-                        this.pagination.total = total;
-                        this.pagination.currentPage = current;
-                        this.pagination.pageSize = size;
-                    } else {
-                        console.error('预约数据格式不正确:', response.data);
-                        this.$message.error('获取预约列表失败：数据格式不正确');
-                    }
-                })
-                .catch(error => {
-                    console.error('获取预约列表失败:', error);
-                    if (error.response) {
-                        console.error('错误响应:', error.response.data);
-                    }
-                    this.$message.error('获取预约列表失败：' + (error.response?.data?.message || error.message));
-                })
-                .finally(() => {
-                    this.loading = false;
-                });
         },
         // 搜索预约
         searchReservations() {
             this.pagination.currentPage = 1;
-            this.loadReservationData();
+            this.loadReservations();
         },
         // 重置搜索条件
         resetSearch() {
@@ -286,12 +266,12 @@ const UserReservationsComponent = {
         // 分页大小变化处理
         handleSizeChange(val) {
             this.pagination.pageSize = val;
-            this.loadReservationData();
+            this.loadReservations();
         },
         // 页码变化处理
         handleCurrentChange(val) {
             this.pagination.currentPage = val;
-            this.loadReservationData();
+            this.loadReservations();
         },
         // 显示预约详情
         showReservationDetail(reservation) {
@@ -324,7 +304,7 @@ const UserReservationsComponent = {
             .then(response => {
                 this.$message.success('预约已成功取消');
                 this.cancelDialogVisible = false;
-                this.loadReservationData(); // 重新加载数据
+                this.loadReservations(); // 重新加载数据
             })
             .catch(error => {
                 console.error('取消预约失败:', error);

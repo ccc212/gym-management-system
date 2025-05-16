@@ -14,7 +14,7 @@
       </el-table-column>
       <el-table-column label="操作" width="120">
         <template #default="scope">
-          <el-button size="small" type="danger" @click="openRepairDialog(scope.row.id)">报修</el-button>
+          <el-button size="small" type="danger" @click="openRepairDialog(scope.row.id)">审核</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -24,8 +24,8 @@
         <el-form-item label="器材 ID">
           <el-input-number v-model="repairForm.id" :min="1" disabled />
         </el-form-item>
-        <el-form-item label="报修原因">
-          <el-input type="textarea" v-model="repairForm.reason" placeholder="请输入报修原因" />
+        <el-form-item label="原因">
+          <el-input type="textarea" v-model="repairForm.reason" placeholder="请输入审核原因" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -52,6 +52,7 @@ const loadRecords = async () => {
   try {
     const equipRes = await EquipBasicsControllerService.getListUsingGet1(1, '', 999);
     if (!equipRes?.data?.records) return;
+    // 只筛选状态为“报修中”的器材
     const list = equipRes.data.records.filter((item: any) => item.status === 2);
 
     repairRecords.value = list.map((item: any) => ({
@@ -74,28 +75,41 @@ const openRepairDialog = (id: number) => {
 
 const submitRepair = async () => {
   if (!repairForm.value.id || !repairForm.value.reason.trim()) {
-    ElMessage.warning('请填写报修原因');
+    ElMessage.warning('请填写审核原因');
     return;
   }
   try {
-    const res = await EquipmentRepairControllerService.reportRepairUsingPost(
-        repairForm.value.id,
-        repairForm.value.reason
-    );
+    const repairPayload = {
+      equipmentId: repairForm.value.id,
+      reason: repairForm.value.reason.trim(),
+      applyTime: new Date().toISOString(),
+    };
+
+    // 调用接口新增报修记录
+    const res = await EquipmentRepairControllerService.addRepairUsingPost(repairPayload);
+
     if (res?.code === 0) {
-      ElMessage.success('报修成功');
+      // 报修添加成功后，更新器材状态为报修中（2）
+      await EquipBasicsControllerService.updateUsingPut1({
+        id: repairForm.value.id,
+        status: 2
+      });
+
+      ElMessage.success('审核成功，报修记录已添加');
       dialogVisible.value = false;
       loadRecords();
     } else {
-      ElMessage.error(res.msg || '报修失败');
+      ElMessage.error(res.msg || '审核失败');
     }
   } catch (error) {
-    ElMessage.error('报修提交失败');
+    ElMessage.error('审核提交失败');
   }
 };
 
 onMounted(loadRecords);
 </script>
+
+
 
 <style scoped>
 .mt-4 {
@@ -105,3 +119,4 @@ onMounted(loadRecords);
   text-align: right;
 }
 </style>
+

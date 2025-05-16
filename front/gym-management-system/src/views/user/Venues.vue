@@ -73,7 +73,7 @@
     </el-card>
     
     <!-- 时间段选择弹窗 -->
-    <el-dialog title="选择预约时间段" :visible.sync="timeSlotDialogVisible" width="650px">
+    <el-dialog title="选择预约时间段" v-model:visible="timeSlotDialogVisible" width="650px">
       <div v-if="selectedVenue">
         <h4>场地: {{ selectedVenue.name }}</h4>
         <p>日期: {{ formatDate(searchForm.date) }}</p>
@@ -120,7 +120,7 @@
     </el-dialog>
     
     <!-- 场地详情弹窗 -->
-    <el-dialog title="场地详情" :visible.sync="venueDetailDialogVisible" width="500px">
+    <el-dialog title="场地详情" v-model:visible="venueDetailDialogVisible" width="500px">
       <div v-if="selectedVenue" class="venue-detail">
         <div class="venue-image">
           <img :src="selectedVenue.imageUrl || '/img/default-venue.jpg'" alt="场地图片">
@@ -287,7 +287,15 @@ export default {
             'Content-Type': 'application/json'
           }
         })
-        this.timeSlots = response.data
+        // 适配不同返回格式
+        if (Array.isArray(response.data)) {
+          this.timeSlots = response.data
+        } else if (response.data && Array.isArray(response.data.data)) {
+          this.timeSlots = response.data.data
+        } else {
+          this.timeSlots = []
+        }
+        console.log('timeSlots:', this.timeSlots)
       } catch (error) {
         this.$message.error('加载时间段信息失败')
         console.error('加载时间段信息失败:', error)

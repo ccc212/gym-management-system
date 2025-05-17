@@ -102,17 +102,13 @@ public class CompetitionSignUpTeamServiceImpl extends ServiceImpl<CompetitionSig
 
     @Override
     public void updateCompetitionSignUpTeam(UpdateCompetitionSignUpTeamDTO updateCompetitionSignUpTeamDTO) {
-        lambdaUpdate().eq(CompetitionSignUpTeam::getId, updateCompetitionSignUpTeamDTO.getId())
-                .set(updateCompetitionSignUpTeamDTO.getTeamId() != null, CompetitionSignUpTeam::getTeamId, updateCompetitionSignUpTeamDTO.getTeamId())
-                .set(updateCompetitionSignUpTeamDTO.getCompetitionId() != null, CompetitionSignUpTeam::getCompetitionId, updateCompetitionSignUpTeamDTO.getCompetitionId())
-                .set(updateCompetitionSignUpTeamDTO.getTeamName() != null, CompetitionSignUpTeam::getTeamName, updateCompetitionSignUpTeamDTO.getTeamName())
-                .set(updateCompetitionSignUpTeamDTO.getLeaderName() != null, CompetitionSignUpTeam::getLeaderName, updateCompetitionSignUpTeamDTO.getLeaderName())
-                .set(updateCompetitionSignUpTeamDTO.getLeaderPhone() != null, CompetitionSignUpTeam::getLeaderPhone, updateCompetitionSignUpTeamDTO.getLeaderPhone())
-                .set(updateCompetitionSignUpTeamDTO.getDepartId() != null, CompetitionSignUpTeam::getDepartId, updateCompetitionSignUpTeamDTO.getDepartId())
-                .set(updateCompetitionSignUpTeamDTO.getCompetitionItemId() != null, CompetitionSignUpTeam::getCompetitionItemId, updateCompetitionSignUpTeamDTO.getCompetitionItemId())
-                .set(updateCompetitionSignUpTeamDTO.getRemark() != null, CompetitionSignUpTeam::getRemark, updateCompetitionSignUpTeamDTO.getRemark())
-                .set(updateCompetitionSignUpTeamDTO.getStatus() != null, CompetitionSignUpTeam::getStatus, updateCompetitionSignUpTeamDTO.getStatus())
-                .set(updateCompetitionSignUpTeamDTO.getRejectReason() != null, CompetitionSignUpTeam::getRejectReason, updateCompetitionSignUpTeamDTO.getRejectReason());
+        CompetitionSignUpTeam competitionSignUpTeam = getById(updateCompetitionSignUpTeamDTO.getId());
+        if (competitionSignUpTeam == null) {
+            throw new BizException(StatusCodeEnum.COMPETITION_SIGN_UP_TEAM_NOT_EXIST);
+        }
+
+        CompetitionSignUpTeam updateEntity = BeanUtil.copyProperties(updateCompetitionSignUpTeamDTO, CompetitionSignUpTeam.class);
+        updateById(updateEntity);
     }
 
     @Override

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f0df868c-c4cb-422b-8814-9b89998c7c1b" name="更改" comment="11.2.8 写了http://localhost:8080/user/schedule的前端优化，去掉了特殊表的查询，提高了查询速度">
+    <list default="true" id="f0df868c-c4cb-422b-8814-9b89998c7c1b" name="更改" comment="11.2.3 修复了http://localhost:8080/user/venues数据无法显示的bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/admin/NoShows.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/admin/NoShows.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/user/UserVenues.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/user/UserVenues.vue" afterDir="false" />

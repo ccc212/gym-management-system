@@ -343,8 +343,8 @@ async function deleteVenue(venue) {
 async function setVenueStatus(venue, status) {
   loading.value = true
   try {
-    // 兼容后端接口，传递 status 字段
-    const response = await axios.put(`/api/venues/${venue.id}/status`, { status })
+    // 通过URL参数传递status，兼容后端接口
+    const response = await axios.put(`/api/venues/${venue.id}/status`, null, { params: { status } })
     if (response.data && response.data.code === 200) {
       ElMessage.success(`更新场地状态为${getStatusText(status)}成功`)
       loadVenueData()

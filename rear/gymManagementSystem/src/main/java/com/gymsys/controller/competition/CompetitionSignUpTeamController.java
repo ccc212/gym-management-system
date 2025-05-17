@@ -12,6 +12,7 @@ import com.gymsys.entity.competition.vo.CompetitionSignUpTeamVO;
 import com.gymsys.entity.competition.vo.CompetitionSignUpUserVO;
 import com.gymsys.service.competition.ICompetitionSignUpTeamService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,7 +30,7 @@ import java.util.List;
 @RequestMapping("/competition-sign-up-team")
 @RequiredArgsConstructor
 public class CompetitionSignUpTeamController {
-
+    @Autowired
     private final ICompetitionSignUpTeamService competitionSignUpTeamService;
 
     @PostMapping("/add")

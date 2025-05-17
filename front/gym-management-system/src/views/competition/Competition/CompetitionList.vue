@@ -580,4 +580,4 @@ const handleVenueReservationSuccess = () => {
 </script>
 
 <style scoped>
-</style> 
+</style>

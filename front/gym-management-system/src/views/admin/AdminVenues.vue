@@ -121,12 +121,12 @@ const searchForm = reactive({
   status: ''
 })
 const venueTypes = [
-  { value: '篮球场', label: '篮球场' },
-  { value: '足球场', label: '足球场' },
-  { value: '羽毛球场', label: '羽毛球场' },
-  { value: '网球场', label: '网球场' },
-  { value: '游泳池', label: '游泳池' },
-  { value: '乒乓球室', label: '乒乓球室' }
+  { value: 'basketball', label: '篮球场' },
+  { value: 'football', label: '足球场' },
+  { value: 'badminton', label: '羽毛球场' },
+  { value: 'tennis', label: '网球场' },
+  { value: 'swimming', label: '游泳池' },
+  { value: 'table_tennis', label: '乒乓球室' }
 ]
 const statusOptions = [
   { value: 'NORMAL', label: '正常' },

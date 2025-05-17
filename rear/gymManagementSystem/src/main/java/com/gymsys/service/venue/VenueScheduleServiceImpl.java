@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.gymsys.dto.VenueScheduleDTO;
 import com.gymsys.entity.reservation.ReservationEntity;
 import com.gymsys.entity.venue.VenueEntity;
-import com.gymsys.entity.specialarrangement.SpecialArrangement;
-import com.gymsys.mapper.specialarrangement.SpecialArrangementMapper;
 import com.gymsys.repository.reservation.ReservationRepository;
 import com.gymsys.repository.venue.VenueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +25,6 @@ public class VenueScheduleServiceImpl implements VenueScheduleService {
     private VenueRepository venueRepository;
     @Autowired
     private ReservationRepository reservationRepository;
-    @Autowired
-    private SpecialArrangementMapper specialArrangementMapper;
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Override
@@ -80,14 +76,6 @@ public class VenueScheduleServiceImpl implements VenueScheduleService {
         if (date.getDayOfWeek().getValue() == 1 && 
             time.getHour() >= 8 && time.getHour() < 10) {
             return "MAINTENANCE";
-        }
-        LambdaQueryWrapper<SpecialArrangement> specialWrapper = new LambdaQueryWrapper<>();
-        specialWrapper.eq(SpecialArrangement::getVenueId, venue.getId())
-                     .eq(SpecialArrangement::getDate, date)
-                     .le(SpecialArrangement::getStartTime, time.format(TIME_FORMATTER))
-                     .ge(SpecialArrangement::getEndTime, time.plusHours(1).format(TIME_FORMATTER));
-        if (specialArrangementMapper.selectCount(specialWrapper) > 0) {
-            return "SPECIAL";
         }
         LocalDateTime slotDateTime = date.atTime(time);
         if (slotDateTime.isBefore(LocalDateTime.now())) {

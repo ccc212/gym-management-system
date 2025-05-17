@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f0df868c-c4cb-422b-8814-9b89998c7c1b" name="更改" comment="11.2.3 修复了http://localhost:8080/user/venues数据无法显示的bug">
+    <list default="true" id="f0df868c-c4cb-422b-8814-9b89998c7c1b" name="更改" comment="11.2.8 写了http://localhost:8080/user/schedule的前端优化，去掉了特殊表的查询，提高了查询速度">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/admin/AdminVenues.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/admin/AdminVenues.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/user/UserSchedule.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/user/UserSchedule.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/VenueScheduleServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../rear/gymManagementSystem/src/main/java/com/gymsys/service/venue/VenueScheduleServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/admin/NoShows.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/admin/NoShows.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym-management-system/src/views/user/UserVenues.vue" beforeDir="false" afterPath="$PROJECT_DIR$/gym-management-system/src/views/user/UserVenues.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,49 +24,49 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "TomOVOTom"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;TomOVOTom&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ccc212/gym-management-system.git",
-    "accountId": "9c75f68b-e6d6-4e51-9ad8-343594b616be"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ccc212/gym-management-system.git&quot;,
+    &quot;accountId&quot;: &quot;9c75f68b-e6d6-4e51-9ad8-343594b616be&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 7
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2xBOeIgcxb8F9dQsYwg8LPwhJ6R" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Code/作业/软综作业/gym-management-system/front/gym-management-system",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev (1).executor": "Run",
-    "npm.dev.executor": "Run",
-    "ts.external.directory.path": "D:\\Code\\作业\\软综作业\\gym-management-system\\front\\gym-management-system\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Code/作业/软综作业/gym-management-system/front/gym-management-system&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev (1).executor&quot;: &quot;Run&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\Code\\作业\\软综作业\\gym-management-system\\front\\gym-management-system\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+  &quot;keyToStringList&quot;: {
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Code\作业\软综作业\gym-management-system\front\gym-management-system" />
@@ -139,6 +138,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="11.2.3 修复了数据无法显示的bug" />
     <MESSAGE value="11.2.3 修复了http://localhost:8080/user/venues数据无法显示的bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="11.2.3 修复了http://localhost:8080/user/venues数据无法显示的bug" />
+    <MESSAGE value="11.2.8 写了http://localhost:8080/user/schedule的前端优化，去掉了特殊表的查询，提高了查询速度" />
+    <option name="LAST_COMMIT_MESSAGE" value="11.2.8 写了http://localhost:8080/user/schedule的前端优化，去掉了特殊表的查询，提高了查询速度" />
   </component>
 </project>

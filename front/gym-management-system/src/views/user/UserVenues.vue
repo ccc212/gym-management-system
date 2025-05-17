@@ -115,7 +115,7 @@
     </el-dialog>
     <!-- 场地详情弹窗 -->
     <el-dialog
-      :visible.sync="venueDetailDialogVisible"
+      v-model="venueDetailDialogVisible"
       title="场地详情"
       width="500px">
       <div v-if="selectedVenue" class="venue-detail">

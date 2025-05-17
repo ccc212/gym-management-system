@@ -217,30 +217,28 @@ const noshowInfo = computed(() => {
 // 加载失约数据
 const loadNoshowsData = async () => {
     loading.value = true
-    
     try {
-        // 构建查询参数
-        const params = new URLSearchParams({
-            page: pagination.currentPage.toString(),
-            size: pagination.pageSize.toString()
-        })
-        
+        // 构建查询参数（用对象，日期格式为'yyyy-MM-dd'）
+        const params = {
+            page: pagination.currentPage,
+            size: pagination.pageSize
+        }
         if (searchForm.venueType) {
-            params.append('venueType', searchForm.venueType)
+            params.venueType = searchForm.venueType
         }
         if (searchForm.status) {
-            params.append('status', searchForm.status)
+            params.status = searchForm.status
         }
         if (searchForm.dateRange && searchForm.dateRange.length === 2) {
-            params.append('startDate', searchForm.dateRange[0])
-            params.append('endDate', searchForm.dateRange[1])
+            params.startDate = searchForm.dateRange[0]
+            params.endDate = searchForm.dateRange[1]
         }
-        
-        const response = await axios.get(`/api/noshows?${params.toString()}`)
-        
-        if (response.data && response.data.records) {
-            noshowsList.value = response.data.records
-            pagination.total = response.data.total
+        // 直接用对象传参
+        const response = await axios.get('/api/noshows', { params })
+        // 兼容后端返回结构
+        if (response.data && (response.data.records || Array.isArray(response.data))) {
+            noshowsList.value = response.data.records || response.data
+            pagination.total = response.data.total || response.data.length || 0
         }
     } catch (error) {
         console.error('加载失约数据失败:', error)
@@ -310,23 +308,26 @@ const handleNoshow = (noshow: any, action: string) => {
 // 提交处理
 const submitHandle = async () => {
     if (!currentNoshow.value || !handleFormRef.value) return
-    
     try {
-        const response = await axios.put(`/api/noshows/${currentNoshow.value.id}/handle`, {
-            action: currentAction.value,
-            ...handleForm
-        })
-        
-        if (response.data && response.data.code === 200) {
+        const handleData = {
+            status: currentAction.value,
+            penalty: handleForm.penalty,
+            restrictDays: handleForm.restrictDays,
+            reason: handleForm.reason,
+            notifyUser: handleForm.notifyUser
+        }
+        const response = await axios.post(`/api/noshows/${currentNoshow.value.id}/handle`, handleData)
+        // 只要返回对象就认为成功
+        if (response.data && typeof response.data === 'object') {
             ElMessage.success('处理成功')
             handleDialogVisible.value = false
-            loadNoshowsData()
+            await loadNoshowsData()
         } else {
-            ElMessage.error(response.data.message || '处理失败')
+            ElMessage.error(response.data.message || response.data.msg || '处理失败')
         }
     } catch (error) {
-        console.error('处理失约失败:', error)
-        ElMessage.error('处理失约失败')
+        console.error('处理失约失败:', error, error.response?.data)
+        ElMessage.error('处理失约失败: ' + (error.response?.data?.message || error.message))
     }
 }
 
@@ -339,9 +340,9 @@ const viewNoshowDetail = (noshow: any) => {
 // 创建测试数据
 const createTestData = async () => {
     try {
-        const response = await axios.post('/api/noshows/test-data')
-        
-        if (response.data && response.data.code === 200) {
+        // 兼容JS组件的POST方式
+        const response = await axios.post('/api/noshows/test/create')
+        if (response.data && (response.data.code === 200 || response.data.success)) {
             ElMessage.success('创建测试数据成功')
             loadNoshowsData()
         } else {

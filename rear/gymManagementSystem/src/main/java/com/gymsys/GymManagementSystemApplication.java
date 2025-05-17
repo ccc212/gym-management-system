@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = {"com.gymsys.repository.venue", "com.gymsys.repository.competition"})
+@EnableJpaRepositories(basePackages = {"com.gymsys.repository.venue"})
 @EntityScan(basePackages = {"com.gymsys.entity.venue", "com.gymsys.entity.competition"})
 @MapperScan({"com.gymsys.mapper", "com.gymsys.repository"})
 public class GymManagementSystemApplication {
